@@ -462,11 +462,8 @@ void PCU_run_interactive(PCU_TestCase *suite)
 	}
 	while (1) {
 		PCU_PRINTF0("************** PCUnit: Interactive Mode **************\n");
-		if (enable_color) {
-			PCU_PRINTF0("(R)un all, (S)elect TestCase, (L)ist of TestCases, (D)isable color, (Q)uit\n");
-		} else {
-			PCU_PRINTF0("(R)un all, (S)elect TestCase, (L)ist of TestCases, (E)nable color, (Q)uit\n");
-		}
+		PCU_PRINTF1("(R)un all, (S)elect TestCase, (L)ist of TestCases, %sable color, (Q)uit\n", 
+				enable_color ? "(D)is" : "(E)n");
 		PCU_PRINTF0("Enter Command: ");
 		getline(input_buf, sizeof input_buf);
 		PCU_PRINTF0("\n");
