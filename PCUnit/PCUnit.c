@@ -195,7 +195,7 @@ static void print_result_selected(PCU_TestCase *testcase, int idx)
 
 static void print_result(PCU_TestCase *testcase)
 {
-	int i;
+	PCU_Test *p;
 	PCU_PRINTF1("TestCase: %s\n", testcase->name);
 	if (testcase->initialize_error) {
 		set_color(COLOR_RED);
@@ -205,9 +205,8 @@ static void print_result(PCU_TestCase *testcase)
 		return;
 	}
 	PCU_PRINTF0("\n");
-	for (i = 0; testcase->tests[i].name != 0; i++) {
-		PCU_Test *test = &testcase->tests[i];
-		print_failure(test);
+	for (p = testcase->tests; p->name != 0; p++) {
+		print_failure(p);
 	}
 	if (testcase->result.num_tests_failed == 0) {
 		set_color(COLOR_GREEN);
