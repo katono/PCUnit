@@ -190,7 +190,6 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat)
 {
-	unsigned long t;
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
 	if (!self) {
 		PCU_PRINTF3("malloc failed: %s(%d): %s\n", file, line, expr);
@@ -198,8 +197,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	}
 
 	self->type = type;
-	t = PCU_GET_ASSERT_TYPE(type);
-	switch (t) {
+	switch (PCU_GET_ASSERT_TYPE(type)) {
 	case PCU_TYPE_NONE:
 		break;
 	case PCU_TYPE_BOOL:
@@ -238,13 +236,19 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 static void PCU_TestFailure_delete(PCU_TestFailure *self)
 {
 	if (!self) return;
-	if (PCU_GET_ASSERT_TYPE(self->type) == PCU_TYPE_NSTR || PCU_GET_ASSERT_TYPE(self->type) == PCU_TYPE_STR || 
-			PCU_GET_ASSERT_TYPE(self->type) == PCU_TYPE_MSG || PCU_GET_ASSERT_TYPE(self->type) == PCU_TYPE_FAIL) {
+	switch (PCU_GET_ASSERT_TYPE(self->type)) {
+	case PCU_TYPE_STR:
+	case PCU_TYPE_NSTR:
+	case PCU_TYPE_MSG:
+	case PCU_TYPE_FAIL:
 		if (self->expected.str) {
 			PCU_STR_FREE(self->expected.str);
 		} else {
 			PCU_STR_FREE(self->actual.str);
 		}
+		break;
+	default:
+		break;
 	}
 	PCU_FREE(self);
 }

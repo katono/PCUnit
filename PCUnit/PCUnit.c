@@ -119,9 +119,7 @@ static void print_failure(PCU_Test *test)
 		} else {
 			PCU_PRINTF3("  %d) %s(%d)\n", n++, pos->file, pos->line);
 		}
-		if (type != PCU_TYPE_MSG) {
-			PCU_PRINTF1("   %s\n", pos->expr);
-		}
+		PCU_PRINTF1("   %s\n", pos->expr);
 		switch (type) {
 		case PCU_TYPE_BOOL:
 			PCU_PRINTF1("    expected <%s>\n", pos->expected.num ? true_str : false_str);
