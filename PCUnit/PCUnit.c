@@ -49,6 +49,7 @@ enum {
 #ifdef _WIN32
 #include <windows.h>
 static CONSOLE_SCREEN_BUFFER_INFO csbi;
+static int csbi_init_flag = 0;
 #endif
 static void set_color(int color)
 {
@@ -57,7 +58,10 @@ static void set_color(int color)
 	WORD attr;
 	if (!enable_color) return;
 	h = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(h, &csbi);
+	if (!csbi_init_flag) {
+		GetConsoleScreenBufferInfo(h, &csbi);
+		csbi_init_flag = 1;
+	}
 	switch (color) {
 	case COLOR_GREEN:
 		attr = FOREGROUND_GREEN;
@@ -89,6 +93,7 @@ static void reset_color(void)
 #ifdef _WIN32
 	HANDLE h;
 	if (!enable_color) return;
+	if (!csbi_init_flag) return;
 	h = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(h, csbi.wAttributes);
 #else
