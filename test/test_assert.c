@@ -165,6 +165,59 @@ static void test_assert_nstr_not_equal(void)
 	PCU_ASSERT_NSTRING_NOT_EQUAL(a, b, 4);
 }
 
+static void test_assert_dbl_equal(void)
+{
+	double a, b, delta;
+	a = 100.0;
+	b = 100.0;
+	delta = 0.0;
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL_FATAL(a, b, delta);
+
+	a = 100.0;
+	b = 100.1;
+	delta = 0.1;
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL_FATAL(a, b, delta);
+
+	a = 100.1;
+	b = 100.0;
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL_FATAL(a, b, delta);
+
+	delta = -0.1;
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL_FATAL(a, b, delta);
+
+	delta = 0.0999;
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL_FATAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+}
+static void test_assert_dbl_not_equal(void)
+{
+	double a, b, delta;
+	a = 100.0;
+	b = 100.1;
+	delta = 0.0999;
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(a, b, delta);
+
+	delta = -0.0999;
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(a, b, delta);
+
+	delta = 0.1;
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+
+	a = 100.0;
+	b = 100.0;
+	delta = 0.0;
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(a, b, delta);
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+}
+
 static void test_msg0(void)
 {
 	PCU_MSG0("test_msg0: 1");
@@ -294,6 +347,8 @@ PCU_Test assert_tests[] = {
 	{ "test_assert_str_not_equal"  , test_assert_str_not_equal  } ,
 	{ "test_assert_nstr_equal"     , test_assert_nstr_equal     } ,
 	{ "test_assert_nstr_not_equal" , test_assert_nstr_not_equal } ,
+	{ "test_assert_dbl_equal"      , test_assert_dbl_equal      } ,
+	{ "test_assert_dbl_not_equal"  , test_assert_dbl_not_equal  } ,
 	{ "test_msg0"                  , test_msg0                  } ,
 	{ "test_msg1"                  , test_msg1                  } ,
 	{ "test_msg2"                  , test_msg2                  } ,

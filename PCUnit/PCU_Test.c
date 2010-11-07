@@ -5,6 +5,7 @@ static PCU_Test *current_test;
 static int repeat_counter;
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat);
+static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat);
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node);
 static PCU_TestFailure *list_pop(PCU_TestFailure *list);
@@ -120,6 +121,41 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 	return 0;
 }
 
+int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line)
+{
+	double dlt = delta;
+	int not_flag;
+	PCU_TestFailure *node;
+	current_test->result.num_asserts++;
+	current_test->result.num_asserts_ran++;
+
+	not_flag = PCU_GET_NOT_FLAG(type);
+	if (dlt < 0) {
+		dlt = -dlt;
+	}
+
+	if (expected == actual) {
+		if (!not_flag) {
+			return 1;
+		}
+	} else {
+		double d = (expected < actual) ? actual - expected : expected - actual;
+		if (!not_flag && d <= dlt) {
+			return 1;
+		} else if (not_flag && d > dlt) {
+			return 1;
+		}
+	}
+
+	current_test->result.num_asserts_failed++;
+
+	node = PCU_TestFailure_new_double(expected, actual, delta, type, expr, file, line, repeat_counter);
+	if (node) {
+		list_push(&current_test->assertion_list, node);
+	}
+	return 0;
+}
+
 void PCU_msg_impl(const char *msg, const char *file, int line)
 {
 	PCU_TestFailure *node;
@@ -219,6 +255,40 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 			PCU_FREE(self);
 			return 0;
 		}
+		break;
+	default:
+		self->type = PCU_TYPE_NONE;
+		break;
+	}
+
+	self->expr = expr;
+	self->file = file;
+	self->line = line;
+	self->repeat = repeat;
+	self->next = self->prev = 0;
+	return self;
+}
+
+static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat)
+{
+	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
+	if (!self) {
+		PCU_PRINTF3("malloc failed: %s(%d): %s\n", file, line, expr);
+		return 0;
+	}
+
+	self->type = type;
+	switch (PCU_GET_ASSERT_TYPE(type)) {
+	case PCU_TYPE_DBL:
+#ifndef PCU_NO_STDLIB
+		self->expected.dbl = expected;
+		self->actual.dbl = actual;
+		self->delta = delta;
+#else
+		(void) expected;
+		(void) actual;
+		(void) delta;
+#endif
 		break;
 	default:
 		self->type = PCU_TYPE_NONE;

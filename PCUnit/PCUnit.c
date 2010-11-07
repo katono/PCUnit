@@ -157,6 +157,13 @@ static void print_failure(PCU_Test *test)
 				PCU_PRINTF1("    length   <%d>\n", PCU_GET_NSTR_LEN(pos->type));
 			}
 			break;
+#ifndef PCU_NO_STDLIB
+		case PCU_TYPE_DBL:
+			PCU_PRINTF1("    expected <%f>\n", pos->expected.dbl);
+			PCU_PRINTF1("    actual   <%f>\n", pos->actual.dbl);
+			PCU_PRINTF1("    delta    <%f>\n", pos->delta);
+			break;
+#endif
 		case PCU_TYPE_MSG:
 		case PCU_TYPE_FAIL:
 			PCU_PRINTF1("    %s\n", pos->expected.str);
