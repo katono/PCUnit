@@ -16,10 +16,13 @@ void PCU_set_getchar(PCU_Getchar func)
 
 #ifdef PCU_NO_STDLIB
 
-#define PRINTF_BUF_SIZE		256
-#define MAX_NUM_FAILURES	64
-#define STR_POOL_SIZE		4096
+#ifndef PCU_MAX_FAILURE_NUM
+#define PCU_MAX_FAILURE_NUM	64
+#endif
 
+#ifndef PCU_STRING_POOL_SIZE
+#define PCU_STRING_POOL_SIZE	4096
+#endif
 
 int PCU_getchar(void)
 {
@@ -391,14 +394,13 @@ int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 
 static int PCU_printf_aux(const char *format, size_t *arg_list)
 {
-	/* NOTE: attention to buffer overflow */
-	static char buf[PRINTF_BUF_SIZE];
-	char *p = buf;
+	extern char PCU_msg_buf[];
+	char *p = PCU_msg_buf;
 
 	if (!putchar_func) {
 		return 0;
 	}
-	PCU_sprintf_aux(buf, format, arg_list);
+	PCU_sprintf_aux(PCU_msg_buf, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
@@ -517,21 +519,16 @@ int PCU_printf9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_
 /* 
  * malloc for PCU_TestFailure
  */
-typedef struct {
-	PCU_TestFailure obj;
-	int used_flag;
-} TestFailureBlock;
-
-static TestFailureBlock block_pool[MAX_NUM_FAILURES];
+static PCU_TestFailure failure_pool[PCU_MAX_FAILURE_NUM];
 
 void *PCU_malloc(size_t size)
 {
-	TestFailureBlock *p = block_pool;
-	const TestFailureBlock *end = &block_pool[MAX_NUM_FAILURES];
+	PCU_TestFailure *p = failure_pool;
+	const PCU_TestFailure *end = &failure_pool[PCU_MAX_FAILURE_NUM];
 	(void) size;
 	for (; p != end; p++) {
-		if (p->used_flag == 0) {
-			p->used_flag = 1;
+		/* exprを使用フラグとして使う */
+		if (p->expr == 0) {
 			return p;
 		}
 	}
@@ -541,19 +538,19 @@ void *PCU_malloc(size_t size)
 void PCU_free(void *ptr)
 {
 	if (!ptr) return;
-	((TestFailureBlock *) ptr)->used_flag = 0;
+	((PCU_TestFailure *) ptr)->expr = 0;
 }
 
 /* 
  * malloc for string
  */
-static char str_pool[STR_POOL_SIZE];
+static char str_pool[PCU_STRING_POOL_SIZE];
 static char *str_pool_next_ptr = str_pool;
 
 char *PCU_str_malloc(size_t size)
 {
 	char *p = str_pool_next_ptr;
-	const char *end = &str_pool[STR_POOL_SIZE];
+	const char *end = &str_pool[PCU_STRING_POOL_SIZE];
 	if (str_pool_next_ptr + size > end) {
 		return 0;
 	}
