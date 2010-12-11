@@ -122,7 +122,7 @@ static void print_failure(PCU_Test *test)
 		if (type == PCU_TYPE_SETUP) {
 			PCU_PRINTF2("  %d) %s\n", n++, test->name);
 		} else {
-			PCU_PRINTF3("  %d) %s(%d)\n", n++, pos->file, pos->line);
+			PCU_PRINTF3("  %d) %s:%d\n", n++, pos->file, pos->line);
 		}
 		PCU_PRINTF1("   %s\n", pos->expr);
 		switch (type) {
@@ -263,7 +263,7 @@ static void run_all(PCU_TestCase *cases)
 		PCU_TestCase_run(p);
 		PCU_TestCase_get_result(p, &case_result);
 		add_result(&case_result);
-		PCU_PRINTF0("--------------------------------\n");
+		PCU_PRINTF0("----\n");
 		print_result(p);
 	}
 	reset(cases);
