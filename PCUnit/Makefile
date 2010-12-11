@@ -1,4 +1,6 @@
-CFLAGS = -Wall -ansi -pedantic-errors -g
+CC = gcc
+AR = ar
+CFLAGS = -Wall -ansi -pedantic-errors -Os
 # CFLAGS += -DPCU_NO_STDLIB
 TARGET = libpcunit.a
 OBJS = PCUnit.o
