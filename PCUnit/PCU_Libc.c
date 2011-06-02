@@ -27,6 +27,30 @@ int PCU_getchar(void)
 	return getchar_func();
 }
 
+#ifndef PCU_NO_STDLIB
+#include <stdarg.h>
+int PCU_printf(const char *format, ...)
+{
+	extern char PCU_msg_buf[];
+	char *p = PCU_msg_buf;
+	int ret;
+	va_list ap;
+
+	if (!putchar_func) {
+		return -1;
+	}
+
+	va_start(ap, format);
+	ret = vsprintf(PCU_msg_buf, format, ap);
+	va_end(ap);
+
+	while (*p) {
+		putchar_func((int) *(p++));
+	}
+	return ret;
+}
+#endif
+
 #ifdef PCU_NO_STDLIB
 
 #ifndef PCU_MAX_FAILURE_NUM

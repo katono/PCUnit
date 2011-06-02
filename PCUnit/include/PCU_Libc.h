@@ -23,16 +23,17 @@ int PCU_getchar(void);
 # define PCU_SPRINTF7	sprintf
 # define PCU_SPRINTF8	sprintf
 # define PCU_SPRINTF9	sprintf
-# define PCU_PRINTF0	printf
-# define PCU_PRINTF1	printf
-# define PCU_PRINTF2	printf
-# define PCU_PRINTF3	printf
-# define PCU_PRINTF4	printf
-# define PCU_PRINTF5	printf
-# define PCU_PRINTF6	printf
-# define PCU_PRINTF7	printf
-# define PCU_PRINTF8	printf
-# define PCU_PRINTF9	printf
+# define PCU_PRINTF0	PCU_printf
+# define PCU_PRINTF1	PCU_printf
+# define PCU_PRINTF2	PCU_printf
+# define PCU_PRINTF3	PCU_printf
+# define PCU_PRINTF4	PCU_printf
+# define PCU_PRINTF5	PCU_printf
+# define PCU_PRINTF6	PCU_printf
+# define PCU_PRINTF7	PCU_printf
+# define PCU_PRINTF8	PCU_printf
+# define PCU_PRINTF9	PCU_printf
+int PCU_printf(const char *format, ...);
 
 # define PCU_MALLOC		malloc
 # define PCU_FREE		free
