@@ -343,7 +343,7 @@ static int find_test_number(const PCU_Test *tests, const char *input_str)
 	return n - 1;
 }
 
-static void getline(char *buf, int size)
+static void get_line(char *buf, int size)
 {
 	int c;
 	int i = 0;
@@ -359,7 +359,7 @@ static void select_test(PCU_TestCase *cases, int case_idx)
 	int idx;
 	PCU_TestCase *testcase = &cases[case_idx];
 	PCU_PRINTF0("Enter Test's Number or Name: ");
-	getline(input_buf, sizeof input_buf);
+	get_line(input_buf, sizeof input_buf);
 
 	idx = find_test_number(testcase->tests, input_buf);
 	if (idx == -1) {
@@ -409,7 +409,7 @@ static void select_case(PCU_TestCase *cases)
 	int idx;
 	PCU_TestCase *selected_case;
 	PCU_PRINTF0("Enter TestCase's Number or Name: ");
-	getline(input_buf, sizeof input_buf);
+	get_line(input_buf, sizeof input_buf);
 
 	idx = find_case_number(cases, input_buf);
 	if (idx == -1) {
@@ -432,7 +432,7 @@ static void select_case(PCU_TestCase *cases)
 		PCU_PRINTF0(", (Q)uit\n");
 #endif
 		PCU_PRINTF0("Enter Command: ");
-		getline(input_buf, sizeof input_buf);
+		get_line(input_buf, sizeof input_buf);
 		PCU_PRINTF0("\n");
 		switch (input_buf[0]) {
 		case 'r':
@@ -474,7 +474,7 @@ void PCU_run_interactive(PCU_TestCase *suite)
 		PCU_PRINTF1("(R)un all, (S)elect TestCase, (L)ist of TestCases, %sable color, (Q)uit\n", 
 				enable_color ? "(D)is" : "(E)n");
 		PCU_PRINTF0("Enter Command: ");
-		getline(input_buf, sizeof input_buf);
+		get_line(input_buf, sizeof input_buf);
 		PCU_PRINTF0("\n");
 		switch (input_buf[0]) {
 		case 'r':
