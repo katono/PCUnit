@@ -1,13 +1,18 @@
 #ifndef PCU_LIBC_H_INCLUDED
 #define PCU_LIBC_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int PCU_getchar(void);
+
 #ifndef PCU_NO_STDLIB
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <setjmp.h>
 
-# define PCU_GETCHAR	getchar
 # define PCU_SPRINTF0	sprintf
 # define PCU_SPRINTF1	sprintf
 # define PCU_SPRINTF2	sprintf
@@ -48,11 +53,6 @@
 #else
 # include <stddef.h> /* size_t */
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-# define PCU_GETCHAR	PCU_getchar
 # define PCU_SPRINTF0(s, f)                                     PCU_sprintf0(s, f)
 # define PCU_SPRINTF1(s, f, a1)                                 PCU_sprintf1(s, f, (size_t)(a1))
 # define PCU_SPRINTF2(s, f, a1, a2)                             PCU_sprintf2(s, f, (size_t)(a1), (size_t)(a2))
@@ -73,7 +73,6 @@ extern "C" {
 # define PCU_PRINTF7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_printf7(f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
 # define PCU_PRINTF8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_printf8(f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
 # define PCU_PRINTF9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_printf9(f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
-int PCU_getchar(void);
 int PCU_printf0(const char *format);
 int PCU_printf1(const char *format, size_t arg1);
 int PCU_printf2(const char *format, size_t arg1, size_t arg2);
@@ -125,10 +124,11 @@ int PCU_atoi(const char *s);
 # define PCU_SETJMP(j)	((void)(j), 0)
 # define PCU_LONGJMP(j, v)
 
-# ifdef __cplusplus
-}
-# endif
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* PCU_LIBC_H_INCLUDED */

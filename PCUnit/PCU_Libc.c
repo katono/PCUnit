@@ -1,8 +1,13 @@
 #include "include/PCU_Libc.h"
 #include "include/PCUnit.h"
 
+#ifdef PCU_NO_STDLIB
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
+#else
+static PCU_Putchar putchar_func = putchar;
+static PCU_Getchar getchar_func = getchar;
+#endif
 
 void PCU_set_putchar(PCU_Putchar func)
 {
@@ -14,6 +19,14 @@ void PCU_set_getchar(PCU_Getchar func)
 	getchar_func = func;
 }
 
+int PCU_getchar(void)
+{
+	if (!getchar_func) {
+		return -1;
+	}
+	return getchar_func();
+}
+
 #ifdef PCU_NO_STDLIB
 
 #ifndef PCU_MAX_FAILURE_NUM
@@ -23,14 +36,6 @@ void PCU_set_getchar(PCU_Getchar func)
 #ifndef PCU_STRING_POOL_SIZE
 #define PCU_STRING_POOL_SIZE	4096
 #endif
-
-int PCU_getchar(void)
-{
-	if (!getchar_func) {
-		return -1;
-	}
-	return getchar_func();
-}
 
 
 /* 
