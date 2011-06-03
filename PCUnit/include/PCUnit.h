@@ -10,6 +10,8 @@ extern "C" {
 /* 
  * private
  */
+extern char PCU_msg_buf[];
+
 #define PCU_TYPE_NONE	0x00000000
 #define PCU_TYPE_BOOL	0x00000001
 #define PCU_TYPE_NUM	0x00000002
@@ -161,7 +163,7 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)		if (!PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__)) return
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)	if (!PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__)) return
 
-#define PCU_FAIL_BEGIN()		do { extern char PCU_msg_buf[]
+#define PCU_FAIL_BEGIN()		do {
 #define PCU_FAIL_END()			PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__); } while (0)
 #define PCU_FAIL_END_FATAL()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__); return; } while (0)
 
@@ -196,7 +198,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line);
 
 
-#define PCU_MSG_BEGIN()	do { extern char PCU_msg_buf[]
+#define PCU_MSG_BEGIN()	do {
 #define PCU_MSG_END()	PCU_msg_impl(PCU_msg_buf, __FILE__, __LINE__); } while (0)
 
 #define PCU_MSG0(format)                                     PCU_MSG_BEGIN(); PCU_SPRINTF0(PCU_msg_buf, format)                                    ; PCU_MSG_END()
