@@ -9,12 +9,7 @@
 
 char PCU_msg_buf[256];
 static char input_buf[64];
-static int enable_color = 
-#ifdef PCU_NO_STDLIB
-	0;
-#else
-	1;
-#endif
+static int enable_color;
 
 static PCU_Result result;
 
@@ -161,7 +156,7 @@ static void print_failure(PCU_Test *test)
 				PCU_PRINTF1("    length   <%d>\n", PCU_GET_NSTR_LEN(pos->type));
 			}
 			break;
-#ifndef PCU_NO_STDLIB
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 		case PCU_TYPE_DBL:
 			PCU_PRINTF1("    expected <%f>\n", pos->expected.dbl);
 			PCU_PRINTF1("    actual   <%f>\n", pos->actual.dbl);

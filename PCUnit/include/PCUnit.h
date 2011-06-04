@@ -57,7 +57,7 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#ifndef PCU_NO_STDLIB
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 		double dbl;
 #endif
 	} expected;
@@ -65,11 +65,11 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#ifndef PCU_NO_STDLIB
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 		double dbl;
 #endif
 	} actual;
-#ifndef PCU_NO_STDLIB
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 	double delta;
 #endif
 	unsigned long type;
@@ -189,9 +189,9 @@ void PCU_disable_color(void);
 #define PCU_FAIL8_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_FAIL_BEGIN(); PCU_SPRINTF8(PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_END_FATAL()
 #define PCU_FAIL9_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_FAIL_BEGIN(); PCU_SPRINTF9(PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_END_FATAL()
 
-#if !defined(PCU_NO_STDLIB) && __STDC_VERSION__ >= 199901L
-#define PCU_FAIL(format, ...)		PCU_FAIL_BEGIN(); snprintf(PCU_msg_buf, 256, format, __VA_ARGS__); PCU_FAIL_END()
-#define PCU_FAIL_FATAL(format, ...)	PCU_FAIL_BEGIN(); snprintf(PCU_msg_buf, 256, format, __VA_ARGS__); PCU_FAIL_END_FATAL()
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB) && __STDC_VERSION__ >= 199901L
+#define PCU_FAIL(format, ...)		PCU_FAIL_BEGIN(); PCU_sprintf(PCU_msg_buf, format, __VA_ARGS__); PCU_FAIL_END()
+#define PCU_FAIL_FATAL(format, ...)	PCU_FAIL_BEGIN(); PCU_sprintf(PCU_msg_buf, format, __VA_ARGS__); PCU_FAIL_END_FATAL()
 #endif
 
 int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line);
@@ -212,8 +212,8 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 #define PCU_MSG8(format, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_MSG_BEGIN(); PCU_SPRINTF8(PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_END()
 #define PCU_MSG9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_MSG_BEGIN(); PCU_SPRINTF9(PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_END()
 
-#if !defined(PCU_NO_STDLIB) && __STDC_VERSION__ >= 199901L
-#define PCU_MSG(format, ...)		PCU_MSG_BEGIN(); snprintf(PCU_msg_buf, 256, format, __VA_ARGS__); PCU_MSG_END()
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB) && __STDC_VERSION__ >= 199901L
+#define PCU_MSG(format, ...)		PCU_MSG_BEGIN(); PCU_sprintf(PCU_msg_buf, format, __VA_ARGS__); PCU_MSG_END()
 #endif
 
 void PCU_msg_impl(const char *msg, const char *file, int line);
