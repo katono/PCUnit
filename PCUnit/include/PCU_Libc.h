@@ -7,49 +7,28 @@ extern "C" {
 
 int PCU_getchar(void);
 
-#ifndef PCU_NO_STDLIB
-# include <stdio.h>
+
+#if defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+# include <stddef.h> /* size_t */
+# define PCU_MALLOC		PCU_malloc
+# define PCU_FREE		PCU_free
+# define PCU_STR_MALLOC	PCU_str_malloc
+# define PCU_STR_FREE	PCU_str_free
+void *PCU_malloc(size_t size);
+void PCU_free(void *ptr);
+char *PCU_str_malloc(size_t size);
+void PCU_str_free(char *ptr);
+#else
 # include <stdlib.h>
-# include <string.h>
-
-# define PCU_SPRINTF0	sprintf
-# define PCU_SPRINTF1	sprintf
-# define PCU_SPRINTF2	sprintf
-# define PCU_SPRINTF3	sprintf
-# define PCU_SPRINTF4	sprintf
-# define PCU_SPRINTF5	sprintf
-# define PCU_SPRINTF6	sprintf
-# define PCU_SPRINTF7	sprintf
-# define PCU_SPRINTF8	sprintf
-# define PCU_SPRINTF9	sprintf
-# define PCU_PRINTF0	PCU_printf
-# define PCU_PRINTF1	PCU_printf
-# define PCU_PRINTF2	PCU_printf
-# define PCU_PRINTF3	PCU_printf
-# define PCU_PRINTF4	PCU_printf
-# define PCU_PRINTF5	PCU_printf
-# define PCU_PRINTF6	PCU_printf
-# define PCU_PRINTF7	PCU_printf
-# define PCU_PRINTF8	PCU_printf
-# define PCU_PRINTF9	PCU_printf
-int PCU_printf(const char *format, ...);
-
 # define PCU_MALLOC		malloc
 # define PCU_FREE		free
 # define PCU_STR_MALLOC	malloc
 # define PCU_STR_FREE	free
+#endif
 
-# define PCU_STRLEN		strlen
-# define PCU_STRCMP		strcmp
-# define PCU_STRNCMP	strncmp
-# define PCU_STRCPY		strcpy
-# define PCU_STRNCPY	strncpy
-# define PCU_MEMSET		memset
-# define PCU_ATOI		atoi
 
-#else
+#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
 # include <stddef.h> /* size_t */
-
 # define PCU_SPRINTF0(s, f)                                     PCU_sprintf0(s, f)
 # define PCU_SPRINTF1(s, f, a1)                                 PCU_sprintf1(s, f, (size_t)(a1))
 # define PCU_SPRINTF2(s, f, a1, a2)                             PCU_sprintf2(s, f, (size_t)(a1), (size_t)(a2))
@@ -90,16 +69,34 @@ int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
 int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
 int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
+#else /* PCU_NO_VSPRINTF */
+# define PCU_SPRINTF0	PCU_sprintf
+# define PCU_SPRINTF1	PCU_sprintf
+# define PCU_SPRINTF2	PCU_sprintf
+# define PCU_SPRINTF3	PCU_sprintf
+# define PCU_SPRINTF4	PCU_sprintf
+# define PCU_SPRINTF5	PCU_sprintf
+# define PCU_SPRINTF6	PCU_sprintf
+# define PCU_SPRINTF7	PCU_sprintf
+# define PCU_SPRINTF8	PCU_sprintf
+# define PCU_SPRINTF9	PCU_sprintf
+# define PCU_PRINTF0	PCU_printf
+# define PCU_PRINTF1	PCU_printf
+# define PCU_PRINTF2	PCU_printf
+# define PCU_PRINTF3	PCU_printf
+# define PCU_PRINTF4	PCU_printf
+# define PCU_PRINTF5	PCU_printf
+# define PCU_PRINTF6	PCU_printf
+# define PCU_PRINTF7	PCU_printf
+# define PCU_PRINTF8	PCU_printf
+# define PCU_PRINTF9	PCU_printf
+int PCU_sprintf(char *buf, const char *format, ...);
+int PCU_printf(const char *format, ...);
+#endif /* PCU_NO_VSPRINTF */
 
-# define PCU_MALLOC	PCU_malloc
-# define PCU_FREE	PCU_free
-# define PCU_STR_MALLOC	PCU_str_malloc
-# define PCU_STR_FREE	PCU_str_free
-void *PCU_malloc(size_t size);
-void PCU_free(void *ptr);
-char *PCU_str_malloc(size_t size);
-void PCU_str_free(char *ptr);
 
+#ifdef PCU_NO_STDLIB
+# include <stddef.h> /* size_t */
 # define PCU_STRLEN		PCU_strlen
 # define PCU_STRCMP		PCU_strcmp
 # define PCU_STRNCMP	PCU_strncmp
@@ -116,9 +113,18 @@ void *PCU_memset(void *b, int c, size_t len);
 long PCU_strtol(const char *s, char **endptr, int base);
 unsigned long PCU_strtoul(const char *s, char **endptr, int base);
 int PCU_atoi(const char *s);
-
-
+#else
+# include <string.h>
+# include <stdlib.h>
+# define PCU_STRLEN		strlen
+# define PCU_STRCMP		strcmp
+# define PCU_STRNCMP	strncmp
+# define PCU_STRCPY		strcpy
+# define PCU_STRNCPY	strncpy
+# define PCU_MEMSET		memset
+# define PCU_ATOI		atoi
 #endif
+
 
 #ifdef __cplusplus
 }

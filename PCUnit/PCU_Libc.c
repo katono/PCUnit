@@ -1,10 +1,11 @@
 #include "include/PCU_Libc.h"
 #include "include/PCUnit.h"
 
-#ifdef PCU_NO_STDLIB
+#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
 #else
+#include <stdio.h>
 static PCU_Putchar putchar_func = putchar;
 static PCU_Getchar getchar_func = getchar;
 #endif
@@ -27,40 +28,7 @@ int PCU_getchar(void)
 	return getchar_func();
 }
 
-#ifndef PCU_NO_STDLIB
-#include <stdarg.h>
-int PCU_printf(const char *format, ...)
-{
-	extern char PCU_msg_buf[];
-	char *p = PCU_msg_buf;
-	int ret;
-	va_list ap;
-
-	if (!putchar_func) {
-		return -1;
-	}
-
-	va_start(ap, format);
-	ret = vsprintf(PCU_msg_buf, format, ap);
-	va_end(ap);
-
-	while (*p) {
-		putchar_func((int) *(p++));
-	}
-	return ret;
-}
-#endif
-
-#ifdef PCU_NO_STDLIB
-
-#ifndef PCU_MAX_FAILURE_NUM
-#define PCU_MAX_FAILURE_NUM	64
-#endif
-
-#ifndef PCU_STRING_POOL_SIZE
-#define PCU_STRING_POOL_SIZE	4096
-#endif
-
+#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
 
 /* 
  * flags:
@@ -425,15 +393,16 @@ static int PCU_printf_aux(const char *format, size_t *arg_list)
 {
 	extern char PCU_msg_buf[];
 	char *p = PCU_msg_buf;
+	int ret;
 
 	if (!putchar_func) {
-		return 0;
+		return -1;
 	}
-	PCU_sprintf_aux(PCU_msg_buf, format, arg_list);
+	ret = PCU_sprintf_aux(p, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
-	return 0;
+	return ret;
 }
 
 int PCU_printf0(const char *format)
@@ -544,6 +513,50 @@ int PCU_printf9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_
 }
 #endif
 
+#else
+
+#include <stdarg.h>
+#include <stdio.h>
+int PCU_sprintf(char *buf, const char *format, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, format);
+	ret = vsprintf(buf, format, ap);
+	va_end(ap);
+	return ret;
+}
+
+int PCU_printf(const char *format, ...)
+{
+	extern char PCU_msg_buf[];
+	char *p = PCU_msg_buf;
+	int ret;
+	va_list ap;
+
+	if (!putchar_func) {
+		return -1;
+	}
+	va_start(ap, format);
+	ret = vsprintf(p, format, ap);
+	va_end(ap);
+	while (*p) {
+		putchar_func((int) *(p++));
+	}
+	return ret;
+}
+
+#endif
+
+#if defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+
+#ifndef PCU_MAX_FAILURE_NUM
+#define PCU_MAX_FAILURE_NUM	64
+#endif
+
+#ifndef PCU_STRING_POOL_SIZE
+#define PCU_STRING_POOL_SIZE	4096
+#endif
 
 /* 
  * malloc for PCU_TestFailure
@@ -592,6 +605,10 @@ void PCU_str_free(char *ptr)
 	(void) ptr;
 	str_pool_next_ptr = str_pool;
 }
+
+#endif
+
+#ifdef PCU_NO_STDLIB
 
 size_t PCU_strlen(const char *s)
 {
@@ -773,6 +790,5 @@ int PCU_atoi(const char *s)
 {
 	return (int) PCU_strtol(s, 0, 10);
 }
-
 
 #endif
