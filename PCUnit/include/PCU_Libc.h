@@ -11,7 +11,6 @@ int PCU_getchar(void);
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <setjmp.h>
 
 # define PCU_SPRINTF0	sprintf
 # define PCU_SPRINTF1	sprintf
@@ -47,9 +46,6 @@ int PCU_printf(const char *format, ...);
 # define PCU_STRNCPY	strncpy
 # define PCU_MEMSET		memset
 # define PCU_ATOI		atoi
-
-# define PCU_SETJMP		setjmp
-# define PCU_LONGJMP	longjmp
 
 #else
 # include <stddef.h> /* size_t */
@@ -120,10 +116,6 @@ void *PCU_memset(void *b, int c, size_t len);
 long PCU_strtol(const char *s, char **endptr, int base);
 unsigned long PCU_strtoul(const char *s, char **endptr, int base);
 int PCU_atoi(const char *s);
-
-# define jmp_buf	int
-# define PCU_SETJMP(j)	((void)(j), 0)
-# define PCU_LONGJMP(j, v)
 
 
 #endif

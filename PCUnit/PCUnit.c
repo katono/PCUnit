@@ -9,7 +9,6 @@
 
 char PCU_msg_buf[256];
 static char input_buf[64];
-static jmp_buf quit_jmp;
 static int enable_color = 
 #ifdef PCU_NO_STDLIB
 	0;
@@ -404,7 +403,7 @@ static int find_case_number(const PCU_TestCase *cases, const char *input_str)
 	return n - 1;
 }
 
-static void select_case(PCU_TestCase *cases)
+static int select_case(PCU_TestCase *cases)
 {
 	int idx;
 	PCU_TestCase *selected_case;
@@ -416,7 +415,7 @@ static void select_case(PCU_TestCase *cases)
 		idx = find_case_name(cases, input_buf);
 		if (idx == -1) {
 			PCU_PRINTF0("\nTestCase not found.\n");
-			return;
+			return 0;
 		}
 	}
 
@@ -425,12 +424,7 @@ static void select_case(PCU_TestCase *cases)
 	PCU_PRINTF0("\n");
 	while (1) {
 		PCU_PRINTF1("============== TestCase: %s ==============\n", selected_case->name);
-		PCU_PRINTF0("(R)un TestCase, (S)elect Test, (L)ist of Tests, (M)ove up");
-#ifdef PCU_NO_STDLIB
-		PCU_PRINTF0("\n");
-#else
-		PCU_PRINTF0(", (Q)uit\n");
-#endif
+		PCU_PRINTF0("(R)un TestCase, (S)elect Test, (L)ist of Tests, (M)ove up, (Q)uit\n");
 		PCU_PRINTF0("Enter Command: ");
 		get_line(input_buf, sizeof input_buf);
 		PCU_PRINTF0("\n");
@@ -450,11 +444,10 @@ static void select_case(PCU_TestCase *cases)
 			break;
 		case 'm':
 		case 'M':
-			return;
+			return 0;
 		case 'q':
 		case 'Q':
-			PCU_LONGJMP(quit_jmp, 1);
-			break;
+			return 1;
 		default:
 			break;
 		}
@@ -465,11 +458,8 @@ static void select_case(PCU_TestCase *cases)
 void PCU_run_interactive(PCU_TestCase *suite)
 {
 	reset(suite);
-	if (PCU_SETJMP(quit_jmp)) {
-		/* TestCase Menu's Quit */
-		return;
-	}
 	while (1) {
+		int quit;
 		PCU_PRINTF0("************** PCUnit: Interactive Mode **************\n");
 		PCU_PRINTF1("(R)un all, (S)elect TestCase, (L)ist of TestCases, %sable color, (Q)uit\n", 
 				enable_color ? "(D)is" : "(E)n");
@@ -484,7 +474,8 @@ void PCU_run_interactive(PCU_TestCase *suite)
 		case 's':
 		case 'S':
 			show_list_cases(suite);
-			select_case(suite);
+			quit = select_case(suite);
+			if (quit) return;
 			break;
 		case 'l':
 		case 'L':
