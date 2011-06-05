@@ -1,5 +1,6 @@
 #include "../PCUnit/include/PCUnit.h"
 #include <string.h>
+#include <stdio.h>
 
 extern PCU_Test string_tests[];
 extern PCU_Test sprintf_tests[];
@@ -20,6 +21,8 @@ PCU_TestCase suite_assert[] = {
 
 int main(int argc, char **argv)
 {
+	PCU_enable_color();
+	PCU_set_getchar(getchar);
 	if (argc > 1) {
 		if (strcmp(argv[1], "assert") == 0) {
 			PCU_run_interactive(suite_assert);

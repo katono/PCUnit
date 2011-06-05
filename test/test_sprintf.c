@@ -7,6 +7,7 @@
 int PCU_sprintf4(char *buf, const char *format, unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4);
 int PCU_sprintf5(char *buf, const char *format, unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5);
 
+#define PCU_sprintf		sprintf
 
 void test_sprintf(void)
 {

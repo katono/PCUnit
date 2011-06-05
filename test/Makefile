@@ -1,9 +1,6 @@
 CFLAGS = -Wall -ansi -pedantic-errors -g
 CFLAGS += -DPCU_NO_STDLIB
-ifeq ($(STD),C99)
-	CFLAGS += -std=c99
-	C99 = "CFLAGS=-Wall -ansi -pedantic-errors -g -Iinclude -std=c99"
-endif
+CFLAGS += -std=c99
 
 TARGET = PCUnit_test
 
@@ -26,8 +23,11 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 
+
+LIBPCUNIT_CFLAGS = "CFLAGS=-Wall -ansi -pedantic-errors -g -Iinclude -std=c99 -DPCU_printf=printf"
+
 ../PCUnit/libpcunit.a:
-	cd ../PCunit && $(MAKE) $(C99)
+	cd ../PCunit && $(MAKE) $(LIBPCUNIT_CFLAGS)
 
 
 
