@@ -114,10 +114,11 @@ static int set_ascii(char *ascii, const char *tmp, int size, unsigned long flags
 	return size;
 }
 
+#define TMP_SIZE	32
 static int dec2ascii(char *ascii, unsigned int dec, unsigned long flags)
 {
 	int i;
-	char tmp[16];
+	char tmp[TMP_SIZE];
 	const char *num_str = "0123456789";
 	int signed_dec = (int) dec;
 	if (dec == 0) {
@@ -128,13 +129,13 @@ static int dec2ascii(char *ascii, unsigned int dec, unsigned long flags)
 		}
 	} else if (IS_SET_SIGNED_FLAG(flags) && signed_dec < 0) {
 		signed_dec = -signed_dec;
-		for (i = 0; signed_dec > 0 && i < 15; i++) {
+		for (i = 0; signed_dec > 0 && i < TMP_SIZE - 1; i++) {
 			tmp[i] = num_str[signed_dec % 10];
 			signed_dec /= 10;
 		}
 		tmp[i++] = '-';
 	} else {
-		for (i = 0; dec > 0 && i < 15; i++) {
+		for (i = 0; dec > 0 && i < TMP_SIZE - 1; i++) {
 			tmp[i] = num_str[dec % 10];
 			dec /= 10;
 		}
@@ -148,13 +149,13 @@ static int dec2ascii(char *ascii, unsigned int dec, unsigned long flags)
 static int hex2ascii(char *ascii, size_t hex, unsigned long flags)
 {
 	int i;
-	char tmp[16];
+	char tmp[TMP_SIZE];
 	const char *num_str = IS_SET_LARGEX_FLAG(flags) ? "0123456789ABCDEF" : "0123456789abcdef";
 	if (hex == 0) {
 		tmp[0] = '0';
 		i = 1;
 	} else {
-		for (i = 0; hex > 0 && i < 16; i++) {
+		for (i = 0; hex > 0 && i < TMP_SIZE; i++) {
 			tmp[i] = num_str[hex & 0xf];
 			hex >>= 4;
 		}
@@ -254,8 +255,6 @@ static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
 		case 'p':
 			buf[i++] = '0';
 			buf[i++] = 'x';
-			SET_ZERO_FLAG(flags);
-			SET_WIDTH(flags, 8);
 		case 'x':
 		case 'X':
 			tmp_val = arg_list[arg_idx++];
