@@ -69,7 +69,7 @@ int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
 int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
 int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
-#else /* PCU_NO_VSPRINTF */
+#else
 # define PCU_SPRINTF0	PCU_sprintf
 # define PCU_SPRINTF1	PCU_sprintf
 # define PCU_SPRINTF2	PCU_sprintf
@@ -92,7 +92,7 @@ int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 # define PCU_PRINTF9	PCU_printf
 int PCU_sprintf(char *buf, const char *format, ...);
 int PCU_printf(const char *format, ...);
-#endif /* PCU_NO_VSPRINTF */
+#endif
 
 
 #ifdef PCU_NO_STDLIB
