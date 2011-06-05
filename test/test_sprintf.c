@@ -14,6 +14,10 @@ void test_sprintf(void)
 	static char buf[1024];
 	static char sp_buf[1024];
 	int n;
+	unsigned long buf_ret;
+	unsigned long sp_buf_ret;
+	char *buf_endp;
+	char *sp_buf_endp;
 
 	sprintf(sp_buf,   "hogehoge");
 	PCU_sprintf4(buf, "hogehoge", 0, 0, 0, 0);
@@ -112,9 +116,39 @@ void test_sprintf(void)
 /*    printf("%s\n", buf);*/
 	PCU_ASSERT_STRING_EQUAL(sp_buf, buf);
 
+
 	sprintf(sp_buf,   "%p, %p, %p, %p", (void *)0, (void *)buf, (void *)sp_buf, (void *)0);
 	PCU_sprintf4(buf, "%p, %p, %p, %p", 0, (unsigned long)buf, (unsigned long)sp_buf, 0);
-	PCU_MSG2("\n%s\n%s\n", sp_buf, buf);
+	sp_buf_ret = strtoul(sp_buf, &sp_buf_endp, 16);
+	buf_ret = strtoul(buf, &buf_endp, 16);
+	PCU_ASSERT_EQUAL(sp_buf_ret, buf_ret);
+	PCU_ASSERT_EQUAL(',', *sp_buf_endp);
+	PCU_ASSERT_EQUAL(',', *buf_endp);
+	sp_buf_endp++;
+	buf_endp++;
+
+	sp_buf_ret = strtoul(sp_buf_endp, &sp_buf_endp, 16);
+	buf_ret = strtoul(buf_endp, &buf_endp, 16);
+	PCU_ASSERT_EQUAL(sp_buf_ret, buf_ret);
+	PCU_ASSERT_EQUAL(',', *sp_buf_endp);
+	PCU_ASSERT_EQUAL(',', *buf_endp);
+	sp_buf_endp++;
+	buf_endp++;
+
+	sp_buf_ret = strtoul(sp_buf_endp, &sp_buf_endp, 16);
+	buf_ret = strtoul(buf_endp, &buf_endp, 16);
+	PCU_ASSERT_EQUAL(sp_buf_ret, buf_ret);
+	PCU_ASSERT_EQUAL(',', *sp_buf_endp);
+	PCU_ASSERT_EQUAL(',', *buf_endp);
+	sp_buf_endp++;
+	buf_endp++;
+
+	sp_buf_ret = strtoul(sp_buf_endp, &sp_buf_endp, 16);
+	buf_ret = strtoul(buf_endp, &buf_endp, 16);
+	PCU_ASSERT_EQUAL(sp_buf_ret, buf_ret);
+	PCU_ASSERT_EQUAL('\0', *sp_buf_endp);
+	PCU_ASSERT_EQUAL('\0', *buf_endp);
+/*    PCU_MSG2("\n%s\n%s\n", sp_buf, buf);*/
 
 }
 
