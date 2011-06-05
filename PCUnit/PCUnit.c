@@ -161,9 +161,9 @@ static void print_failure(PCU_Test *test)
 			break;
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 		case PCU_TYPE_DBL:
-			PCU_PRINTF1("    expected <%f>\n", pos->expected.dbl);
-			PCU_PRINTF1("    actual   <%f>\n", pos->actual.dbl);
-			PCU_PRINTF1("    delta    <%f>\n", pos->delta);
+			PCU_PRINTF1("    expected <%g>\n", pos->expected.dbl);
+			PCU_PRINTF1("    actual   <%g>\n", pos->actual.dbl);
+			PCU_PRINTF1("    delta    <%g>\n", pos->delta);
 			break;
 #endif
 		case PCU_TYPE_MSG:
