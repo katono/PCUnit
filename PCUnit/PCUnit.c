@@ -7,7 +7,10 @@
 #define LIST_END(list)		(list)
 #define LIST_EMPTY(list)	((list)->next == list)
 
-char PCU_msg_buf[256];
+#ifndef PCU_MSG_BUF_SIZE
+#define PCU_MSG_BUF_SIZE	512
+#endif
+char PCU_msg_buf[PCU_MSG_BUF_SIZE];
 static char input_buf[64];
 static int enable_color;
 
