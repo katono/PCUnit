@@ -128,8 +128,8 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    actual   <%s>\n", pos->actual.num ? true_str : false_str);
 			break;
 		case PCU_TYPE_NUM:
-			PCU_PRINTF2("    expected <%d(0x%x)>\n", pos->expected.num, pos->expected.num);
-			PCU_PRINTF2("    actual   <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
+			PCU_PRINTF2("    expected <%ld(0x%lx)>\n", pos->expected.num, pos->expected.num);
+			PCU_PRINTF2("    actual   <%ld(0x%lx)>\n", pos->actual.num, pos->actual.num);
 			break;
 		case PCU_TYPE_PTR:
 			if (pos->expected.ptr) {
@@ -171,7 +171,7 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    %s\n", pos->expected.str);
 			break;
 		case PCU_TYPE_SETUP:
-			PCU_PRINTF1("    return   <%d>\n", pos->actual.num);
+			PCU_PRINTF1("    return   <%ld>\n", pos->actual.num);
 			break;
 		default:
 			break;
