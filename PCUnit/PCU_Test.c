@@ -5,7 +5,9 @@ static PCU_Test *current_test;
 static int repeat_counter;
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat);
+#ifndef PCU_NO_FPU
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat);
+#endif
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node);
 static PCU_TestFailure *list_pop(PCU_TestFailure *list);
@@ -121,6 +123,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 	return 0;
 }
 
+#ifndef PCU_NO_FPU
 int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line)
 {
 	double dlt = delta;
@@ -155,6 +158,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 	}
 	return 0;
 }
+#endif
 
 void PCU_msg_impl(const char *msg, const char *file, int line)
 {
@@ -269,6 +273,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	return self;
 }
 
+#ifndef PCU_NO_FPU
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
@@ -302,6 +307,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 	self->next = self->prev = 0;
 	return self;
 }
+#endif
 
 static void PCU_TestFailure_delete(PCU_TestFailure *self)
 {

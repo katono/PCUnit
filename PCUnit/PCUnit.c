@@ -159,7 +159,7 @@ static void print_failure(PCU_Test *test)
 				PCU_PRINTF1("    length   <%d>\n", PCU_GET_NSTR_LEN(pos->type));
 			}
 			break;
-#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
+#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
 		case PCU_TYPE_DBL:
 			PCU_PRINTF1("    expected <%g>\n", pos->expected.dbl);
 			PCU_PRINTF1("    actual   <%g>\n", pos->actual.dbl);
