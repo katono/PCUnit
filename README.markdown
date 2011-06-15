@@ -38,7 +38,7 @@ PCUnitのテストはこのような構成になっています。
         * ・・・
     * ・・・
 
-*テスト*は`PCU_Test`という構造体で定義されます。
+*テスト* は`PCU_Test`という構造体で定義されます。
 `PCU_Test`構造体は次のように型定義されています。
 
     typedef struct {
@@ -54,24 +54,25 @@ PCUnitのテストはこのような構成になっています。
 setupが異常の場合、testとteardownは実行されません。
 
 
-*テストケース*は`PCU_TestCase`という構造体で定義されます。
+*テストケース* は`PCU_TestCase`という構造体で定義されます。
 `PCU_TestCase`構造体は次のように型定義されています。
 
     typedef struct {
         const char *name;        /* テストケース名 */
-        PCU_Test *tests;         /* PCU_Testの配列 */
+        PCU_Test *tests;         /* PCU_NULLで終端されたPCU_Testの配列 */
         int (*initialize)(void); /* testsの最初のテストの実行前に呼ばれる関数。0ならば呼ばれない。 */
         int (*cleanup)(void);    /* testsの最後のテストの実行後に呼ばれる関数。0ならば呼ばれない。 */
         ...                      /* 以下、非公開メンバ */
     } PCU_TestCase;
 
+`PCU_TestCase`のtestsは必ず`PCU_NULL`で終端されていなければなりません。
 `PCU_TestCase`のinitializeとcleanupの戻り値は、0ならば正常、非0ならば異常です。
 initializeが異常の場合、testsとcleanupは実行されません。
 
 
-*テストスイート*は`PCU_TestCase`の配列で定義されます。
+*テストスイート* は`PCU_NULL`で終端された`PCU_TestCase`の配列で定義されます。
 
-テストの実行は、*テストスイート*を`PCU_run`関数または`PCU_run_interactive`関数に渡して行います。
+テストの実行は、 *テストスイート* を`PCU_run`関数または`PCU_run_interactive`関数に渡して行います。
 
 
 ## 簡単な使い方
