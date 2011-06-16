@@ -61,18 +61,29 @@ int PCU_getchar(void)
 #define IS_SET_SHARP_FLAG(flags)	((flags) & 0x0040)
 #define GET_WIDTH(flags)			((unsigned char)(((flags) & 0xff00) >> 8))
 
-static int set_ascii(char *ascii, const char *tmp, int size, unsigned long flags)
+static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, unsigned long flags)
 {
 	int i;
 	int width = GET_WIDTH(flags);
+	int full_flag = 0;
 	if (width > 1) {
 		if (IS_SET_LEFT_FLAG(flags)) {
 			for (i = 0; i < size; i++) {
-				ascii[i] = tmp[size - i - 1];
+				if ((size_t) i < ascii_size) {
+					ascii[i] = tmp[size - i - 1];
+				} else {
+					full_flag = 1;
+					goto end;
+				}
 			}
 			if (width > size) {
 				for (i = 0; i < width - size; i++) {
-					ascii[size + i] = ' ';
+					if ((size_t) (size + i) < ascii_size) {
+						ascii[size + i] = ' ';
+					} else {
+						full_flag = 1;
+						goto end;
+					}
 				}
 				size = width;
 			}
@@ -83,39 +94,75 @@ static int set_ascii(char *ascii, const char *tmp, int size, unsigned long flags
 						(IS_SET_SIGNED_FLAG(flags) && tmp[size - 1] == '-'))) {
 					int n = IS_SET_SHARP_FLAG(flags) ? 2 /* "0[xX]" */ : 1 /* "[ +-]" */;
 					for (i = 0; i < n; i++) {
-						ascii[i] = tmp[size - i - 1];
+						if ((size_t) i < ascii_size) {
+							ascii[i] = tmp[size - i - 1];
+						} else {
+							full_flag = 1;
+							goto end;
+						}
 					}
 					for (i = 0; i < width - size; i++) {
-						ascii[i + n] = '0';
+						if ((size_t) (i + n) < ascii_size) {
+							ascii[i + n] = '0';
+						} else {
+							full_flag = 1;
+							goto end;
+						}
 					}
 					for (i = 0; i < size - n; i++) {
-						ascii[width - size + i + n] = tmp[size - i - 1 - n];
+						if ((size_t) (width - size + i + n) < ascii_size) {
+							ascii[width - size + i + n] = tmp[size - i - 1 - n];
+						} else {
+							full_flag = 1;
+							goto end;
+						}
 					}
 				} else {
 					for (i = 0; i < width - size; i++) {
-						ascii[i] = IS_SET_ZERO_FLAG(flags) ? '0' : ' ';
+						if ((size_t) i < ascii_size) {
+							ascii[i] = IS_SET_ZERO_FLAG(flags) ? '0' : ' ';
+						} else {
+							full_flag = 1;
+							goto end;
+						}
 					}
 					for (i = 0; i < size; i++) {
-						ascii[width - size + i] = tmp[size - i - 1];
+						if ((size_t) (width - size + i) < ascii_size) {
+							ascii[width - size + i] = tmp[size - i - 1];
+						} else {
+							full_flag = 1;
+							goto end;
+						}
 					}
 				}
 				size = width;
 			} else {
 				for (i = 0; i < size; i++) {
-					ascii[i] = tmp[size - i - 1];
+					if ((size_t) i < ascii_size) {
+						ascii[i] = tmp[size - i - 1];
+					} else {
+						full_flag = 1;
+						goto end;
+					}
 				}
 			}
 		}
 	} else {
 		for (i = 0; i < size; i++) {
-			ascii[i] = tmp[size - i - 1];
+			if ((size_t) i < ascii_size) {
+				ascii[i] = tmp[size - i - 1];
+			} else {
+				full_flag = 1;
+				goto end;
+			}
 		}
 	}
-	return size;
+end:
+	return full_flag ? ascii_size : size;
 }
 
 #define TMP_SIZE	32
-static int dec2ascii(char *ascii, unsigned int dec, unsigned long flags)
+static int dec2ascii(char *ascii, size_t ascii_size, unsigned int dec, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
@@ -143,10 +190,10 @@ static int dec2ascii(char *ascii, unsigned int dec, unsigned long flags)
 			tmp[i++] = IS_SET_PLUS_FLAG(flags) ? '+' : ' ';
 		}
 	}
-	return set_ascii(ascii, tmp, i, flags);
+	return set_ascii(ascii, ascii_size, tmp, i, flags);
 }
 
-static int hex2ascii(char *ascii, size_t hex, unsigned long flags)
+static int hex2ascii(char *ascii, size_t ascii_size, size_t hex, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
@@ -164,10 +211,10 @@ static int hex2ascii(char *ascii, size_t hex, unsigned long flags)
 			tmp[i++] = '0';
 		}
 	}
-	return set_ascii(ascii, tmp, i, flags);
+	return set_ascii(ascii, ascii_size, tmp, i, flags);
 }
 
-static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
+static int PCU_sprintf_aux(char *buf, size_t size, const char *format, size_t *arg_list)
 {
 	int i;
 	const char *p = format;
@@ -181,11 +228,13 @@ static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
 	while (*p != '\0') {
 		if (*p != '%') {
 			buf[i++] = *(p++);
+			if ((size_t) i >= size - 1) goto end;
 			continue;
 		}
 		p++;
 		if (*p == '%') {
 			buf[i++] = *(p++);
+			if ((size_t) i >= size - 1) goto end;
 			continue;
 		}
 		if (*p == ' ') {
@@ -239,6 +288,7 @@ static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
 		switch (*p) {
 		case 'c':
 			buf[i++] = (char) arg_list[arg_idx++];
+			if ((size_t) i >= size - 1) goto end;
 			p++;
 			break;
 		case 'd':
@@ -248,27 +298,32 @@ static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
 			if (*p != 'u') {
 				SET_SIGNED_FLAG(flags);
 			}
-			inc = dec2ascii(&buf[i], (unsigned int) tmp_val, flags);
+			inc = dec2ascii(&buf[i], size - 1 - (size_t) i, (unsigned int) tmp_val, flags);
 			i += inc;
+			if ((size_t) i >= size - 1) goto end;
 			p++;
 			break;
 		case 'p':
 			buf[i++] = '0';
+			if ((size_t) i >= size - 1) goto end;
 			buf[i++] = 'x';
+			if ((size_t) i >= size - 1) goto end;
 		case 'x':
 		case 'X':
 			tmp_val = arg_list[arg_idx++];
 			if (*p == 'X') {
 				SET_LARGEX_FLAG(flags);
 			}
-			inc = hex2ascii(&buf[i], tmp_val, flags);
+			inc = hex2ascii(&buf[i], size - 1 - (size_t) i, tmp_val, flags);
 			i += inc;
+			if ((size_t) i >= size - 1) goto end;
 			p++;
 			break;
 		case 's':
 			tmp_str = (const char *) arg_list[arg_idx++];
 			while (*tmp_str != '\0') {
 				buf[i++] = *(tmp_str++);
+				if ((size_t) i >= size - 1) goto end;
 			}
 			p++;
 			break;
@@ -278,22 +333,23 @@ static int PCU_sprintf_aux(char *buf, const char *format, size_t *arg_list)
 		}
 		flags = 0;
 	}
+end:
 	buf[i] = '\0';
-	return (int) i;
+	return i;
 }
 
 int PCU_sprintf0(char *buf, const char *format)
 {
 	size_t arg_list[1];
 	arg_list[0] = 0;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf1(char *buf, const char *format, size_t arg1)
 {
 	size_t arg_list[1];
 	arg_list[0] = arg1;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf2(char *buf, const char *format, size_t arg1, size_t arg2)
@@ -301,7 +357,7 @@ int PCU_sprintf2(char *buf, const char *format, size_t arg1, size_t arg2)
 	size_t arg_list[2];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf3(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3)
@@ -310,7 +366,7 @@ int PCU_sprintf3(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf4(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4)
@@ -320,7 +376,7 @@ int PCU_sprintf4(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf5(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
@@ -331,7 +387,7 @@ int PCU_sprintf5(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
@@ -343,7 +399,7 @@ int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7)
@@ -356,7 +412,7 @@ int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8)
@@ -370,7 +426,7 @@ int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
@@ -385,7 +441,7 @@ int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
 	arg_list[8] = arg9;
-	return PCU_sprintf_aux(buf, format, arg_list);
+	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
 }
 
 static int PCU_printf_aux(const char *format, size_t *arg_list)
@@ -397,7 +453,7 @@ static int PCU_printf_aux(const char *format, size_t *arg_list)
 	if (!putchar_func) {
 		return -1;
 	}
-	ret = PCU_sprintf_aux(p, format, arg_list);
+	ret = PCU_sprintf_aux(p, (size_t) -1, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
