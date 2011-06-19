@@ -243,6 +243,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	case PCU_TYPE_BOOL:
 	case PCU_TYPE_NUM:
 	case PCU_TYPE_SETUP:
+	case PCU_TYPE_LLONG:
 		self->expected.num = expected;
 		self->actual.num = actual;
 		break;

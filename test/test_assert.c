@@ -336,6 +336,22 @@ int teardown_err(void)
 	return -2;
 }
 
+static void test_long_long(void)
+{
+	long long a = 0x100000000;
+	long long b = 0x100000000;
+
+	PCU_ASSERT_EQUAL(a, b);
+	b++;
+	PCU_ASSERT_EQUAL(a, b);
+	b -= 2;
+	PCU_ASSERT_EQUAL(a, b);
+	a--;
+	PCU_ASSERT_EQUAL(a, b);
+	a--;
+	PCU_ASSERT_EQUAL(a, b);
+}
+
 
 PCU_Test assert_tests[] = {
 	{ "test_assert"                , test_assert                } ,
@@ -364,5 +380,6 @@ PCU_Test assert_tests[] = {
 	{ "test_msg"                   , test_msg                   } ,
 	{ "test_assert_setup_err"      , test_assert_dummy            , setup_err , 0 } , 
 	{ "test_assert_teardown_err"   , test_assert_dummy            , 0 , teardown_err } , 
+	{ "test_long_long"             , test_long_long             } ,
 	PCU_NULL,
 };
