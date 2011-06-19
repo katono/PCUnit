@@ -1,7 +1,7 @@
 #include "include/PCU_Libc.h"
 #include "include/PCUnit.h"
 
-#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
 #else
@@ -28,7 +28,7 @@ int PCU_getchar(void)
 	return getchar_func();
 }
 
-#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_STDLIB)
 
 /* 
  * flags:
@@ -214,7 +214,7 @@ static int hex2ascii(char *ascii, size_t ascii_size, size_t hex, unsigned long f
 	return set_ascii(ascii, ascii_size, tmp, i, flags);
 }
 
-static int PCU_sprintf_aux(char *buf, size_t size, const char *format, size_t *arg_list)
+static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *arg_list)
 {
 	int i;
 	const char *p = format;
@@ -338,48 +338,48 @@ end:
 	return i;
 }
 
-int PCU_sprintf0(char *buf, const char *format)
+int PCU_snprintf0(char *buf, size_t size, const char *format)
 {
 	size_t arg_list[1];
 	arg_list[0] = 0;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf1(char *buf, const char *format, size_t arg1)
+int PCU_snprintf1(char *buf, size_t size, const char *format, size_t arg1)
 {
 	size_t arg_list[1];
 	arg_list[0] = arg1;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf2(char *buf, const char *format, size_t arg1, size_t arg2)
+int PCU_snprintf2(char *buf, size_t size, const char *format, size_t arg1, size_t arg2)
 {
 	size_t arg_list[2];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf3(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3)
+int PCU_snprintf3(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3)
 {
 	size_t arg_list[3];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf4(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4)
+int PCU_snprintf4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4)
 {
 	size_t arg_list[4];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf5(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
+int PCU_snprintf5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
 {
 	size_t arg_list[5];
 	arg_list[0] = arg1;
@@ -387,10 +387,10 @@ int PCU_sprintf5(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
+int PCU_snprintf6(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
 {
 	size_t arg_list[6];
 	arg_list[0] = arg1;
@@ -399,10 +399,10 @@ int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7)
+int PCU_snprintf7(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7)
 {
 	size_t arg_list[7];
 	arg_list[0] = arg1;
@@ -412,10 +412,10 @@ int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8)
+int PCU_snprintf8(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8)
 {
 	size_t arg_list[8];
 	arg_list[0] = arg1;
@@ -426,10 +426,10 @@ int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
-int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
+int PCU_snprintf9(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
 {
 	size_t arg_list[9];
 	arg_list[0] = arg1;
@@ -441,7 +441,7 @@ int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
 	arg_list[8] = arg9;
-	return PCU_sprintf_aux(buf, (size_t) -1, format, arg_list);
+	return PCU_snprintf_aux(buf, size, format, arg_list);
 }
 
 static int PCU_printf_aux(const char *format, size_t *arg_list)
@@ -453,7 +453,7 @@ static int PCU_printf_aux(const char *format, size_t *arg_list)
 	if (!putchar_func) {
 		return -1;
 	}
-	ret = PCU_sprintf_aux(p, (size_t) -1, format, arg_list);
+	ret = PCU_snprintf_aux(p, PCU_MSG_BUF_SIZE, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
@@ -572,12 +572,12 @@ int PCU_printf9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_
 
 #include <stdarg.h>
 #include <stdio.h>
-int PCU_sprintf(char *buf, const char *format, ...)
+int PCU_snprintf(char *buf, size_t size, const char *format, ...)
 {
 	int ret;
 	va_list ap;
 	va_start(ap, format);
-	ret = vsprintf(buf, format, ap);
+	ret = vsnprintf(buf, size, format, ap);
 	va_end(ap);
 	return ret;
 }
@@ -593,7 +593,7 @@ int PCU_printf(const char *format, ...)
 		return -1;
 	}
 	va_start(ap, format);
-	ret = vsprintf(p, format, ap);
+	ret = vsnprintf(p, PCU_MSG_BUF_SIZE, format, ap);
 	va_end(ap);
 	while (*p) {
 		putchar_func((int) *(p++));

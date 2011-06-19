@@ -27,18 +27,18 @@ void PCU_str_free(char *ptr);
 #endif
 
 
-#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_STDLIB)
 # include <stddef.h> /* size_t */
-# define PCU_SPRINTF0(s, f)                                     PCU_sprintf0(s, f)
-# define PCU_SPRINTF1(s, f, a1)                                 PCU_sprintf1(s, f, (size_t)(a1))
-# define PCU_SPRINTF2(s, f, a1, a2)                             PCU_sprintf2(s, f, (size_t)(a1), (size_t)(a2))
-# define PCU_SPRINTF3(s, f, a1, a2, a3)                         PCU_sprintf3(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3))
-# define PCU_SPRINTF4(s, f, a1, a2, a3, a4)                     PCU_sprintf4(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
-# define PCU_SPRINTF5(s, f, a1, a2, a3, a4, a5)                 PCU_sprintf5(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
-# define PCU_SPRINTF6(s, f, a1, a2, a3, a4, a5, a6)             PCU_sprintf6(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6))
-# define PCU_SPRINTF7(s, f, a1, a2, a3, a4, a5, a6, a7)         PCU_sprintf7(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
-# define PCU_SPRINTF8(s, f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_sprintf8(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
-# define PCU_SPRINTF9(s, f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_sprintf9(s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
+# define PCU_SNPRINTF0(b, s, f)                                     PCU_snprintf0(b, s, f)
+# define PCU_SNPRINTF1(b, s, f, a1)                                 PCU_snprintf1(b, s, f, (size_t)(a1))
+# define PCU_SNPRINTF2(b, s, f, a1, a2)                             PCU_snprintf2(b, s, f, (size_t)(a1), (size_t)(a2))
+# define PCU_SNPRINTF3(b, s, f, a1, a2, a3)                         PCU_snprintf3(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3))
+# define PCU_SNPRINTF4(b, s, f, a1, a2, a3, a4)                     PCU_snprintf4(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
+# define PCU_SNPRINTF5(b, s, f, a1, a2, a3, a4, a5)                 PCU_snprintf5(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
+# define PCU_SNPRINTF6(b, s, f, a1, a2, a3, a4, a5, a6)             PCU_snprintf6(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6))
+# define PCU_SNPRINTF7(b, s, f, a1, a2, a3, a4, a5, a6, a7)         PCU_snprintf7(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
+# define PCU_SNPRINTF8(b, s, f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_snprintf8(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
+# define PCU_SNPRINTF9(b, s, f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_snprintf9(b, s, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
 # define PCU_PRINTF0(f)                                     PCU_printf0(f)
 # define PCU_PRINTF1(f, a1)                                 PCU_printf1(f, (size_t)(a1))
 # define PCU_PRINTF2(f, a1, a2)                             PCU_printf2(f, (size_t)(a1), (size_t)(a2))
@@ -59,27 +59,27 @@ int PCU_printf6(const char *format, size_t arg1, size_t arg2, size_t arg3, size_
 int PCU_printf7(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
 int PCU_printf8(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
 int PCU_printf9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
-int PCU_sprintf0(char *buf, const char *format);
-int PCU_sprintf1(char *buf, const char *format, size_t arg1);
-int PCU_sprintf2(char *buf, const char *format, size_t arg1, size_t arg2);
-int PCU_sprintf3(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3);
-int PCU_sprintf4(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
-int PCU_sprintf5(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
-int PCU_sprintf6(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6);
-int PCU_sprintf7(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
-int PCU_sprintf8(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
-int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
+int PCU_snprintf0(char *buf, size_t size, const char *format);
+int PCU_snprintf1(char *buf, size_t size, const char *format, size_t arg1);
+int PCU_snprintf2(char *buf, size_t size, const char *format, size_t arg1, size_t arg2);
+int PCU_snprintf3(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3);
+int PCU_snprintf4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
+int PCU_snprintf5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
+int PCU_snprintf6(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6);
+int PCU_snprintf7(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
+int PCU_snprintf8(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
+int PCU_snprintf9(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
 #else
-# define PCU_SPRINTF0	PCU_sprintf
-# define PCU_SPRINTF1	PCU_sprintf
-# define PCU_SPRINTF2	PCU_sprintf
-# define PCU_SPRINTF3	PCU_sprintf
-# define PCU_SPRINTF4	PCU_sprintf
-# define PCU_SPRINTF5	PCU_sprintf
-# define PCU_SPRINTF6	PCU_sprintf
-# define PCU_SPRINTF7	PCU_sprintf
-# define PCU_SPRINTF8	PCU_sprintf
-# define PCU_SPRINTF9	PCU_sprintf
+# define PCU_SNPRINTF0	PCU_snprintf
+# define PCU_SNPRINTF1	PCU_snprintf
+# define PCU_SNPRINTF2	PCU_snprintf
+# define PCU_SNPRINTF3	PCU_snprintf
+# define PCU_SNPRINTF4	PCU_snprintf
+# define PCU_SNPRINTF5	PCU_snprintf
+# define PCU_SNPRINTF6	PCU_snprintf
+# define PCU_SNPRINTF7	PCU_snprintf
+# define PCU_SNPRINTF8	PCU_snprintf
+# define PCU_SNPRINTF9	PCU_snprintf
 # define PCU_PRINTF0	PCU_printf
 # define PCU_PRINTF1	PCU_printf
 # define PCU_PRINTF2	PCU_printf
@@ -90,7 +90,7 @@ int PCU_sprintf9(char *buf, const char *format, size_t arg1, size_t arg2, size_t
 # define PCU_PRINTF7	PCU_printf
 # define PCU_PRINTF8	PCU_printf
 # define PCU_PRINTF9	PCU_printf
-int PCU_sprintf(char *buf, const char *format, ...);
+int PCU_snprintf(char *buf, size_t size, const char *format, ...);
 int PCU_printf(const char *format, ...);
 #endif
 

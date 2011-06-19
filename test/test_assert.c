@@ -2,7 +2,7 @@
 #undef PCU_NO_STDLIB
 #include "../PCUnit/include/PCUnit.h"
 
-#define PCU_sprintf		sprintf
+#define PCU_snprintf		snprintf
 
 static void test_assert(void)
 {

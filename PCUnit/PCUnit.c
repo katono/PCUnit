@@ -7,9 +7,6 @@
 #define LIST_END(list)		(list)
 #define LIST_EMPTY(list)	((list)->next == list)
 
-#ifndef PCU_MSG_BUF_SIZE
-#define PCU_MSG_BUF_SIZE	512
-#endif
 char PCU_msg_buf[PCU_MSG_BUF_SIZE];
 static char input_buf[64];
 static int enable_color;
@@ -128,7 +125,7 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    actual   <%s>\n", pos->actual.num ? true_str : false_str);
 			break;
 		case PCU_TYPE_NUM:
-#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_STDLIB)
 			if (sizeof(int) < sizeof(size_t) && 
 					(pos->expected.num > 0xFFFF || pos->actual.num > 0xFFFF)) {
 				PCU_PRINTF1("    expected <0x%x>\n", pos->expected.num);
@@ -170,7 +167,7 @@ static void print_failure(PCU_Test *test)
 				PCU_PRINTF1("    length   <%d>\n", PCU_GET_NSTR_LEN(pos->type));
 			}
 			break;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_STDLIB)
+#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_STDLIB)
 		case PCU_TYPE_DBL:
 			PCU_PRINTF1("    expected <%g>\n", pos->expected.dbl);
 			PCU_PRINTF1("    actual   <%g>\n", pos->actual.dbl);

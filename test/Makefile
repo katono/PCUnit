@@ -22,6 +22,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
+	./$(TARGET)
 
 
 LIBPCUNIT_CFLAGS = "CFLAGS=-Wall -ansi -pedantic-errors -g -Iinclude -std=c99 -DPCU_printf=printf"

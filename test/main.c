@@ -3,12 +3,12 @@
 #include <stdio.h>
 
 extern PCU_Test string_tests[];
-extern PCU_Test sprintf_tests[];
+extern PCU_Test snprintf_tests[];
 extern PCU_Test strtol_tests[];
 extern PCU_Test assert_tests[];
 
 PCU_TestCase suite[] = {
-	{ "sprintf_tests", sprintf_tests },
+	{ "snprintf_tests", snprintf_tests },
 	{ "string_tests", string_tests },
 	{ "strtol_tests", strtol_tests },
 	PCU_NULL,
