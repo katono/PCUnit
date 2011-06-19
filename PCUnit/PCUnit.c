@@ -128,8 +128,19 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    actual   <%s>\n", pos->actual.num ? true_str : false_str);
 			break;
 		case PCU_TYPE_NUM:
-			PCU_PRINTF2("    expected <%ld(0x%lx)>\n", pos->expected.num, pos->expected.num);
-			PCU_PRINTF2("    actual   <%ld(0x%lx)>\n", pos->actual.num, pos->actual.num);
+#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_STDLIB)
+			if (sizeof(int) < sizeof(size_t) && 
+					(pos->expected.num > 0xFFFF || pos->actual.num > 0xFFFF)) {
+				PCU_PRINTF1("    expected <0x%x>\n", pos->expected.num);
+				PCU_PRINTF1("    actual   <0x%x>\n", pos->actual.num);
+			} else {
+				PCU_PRINTF2("    expected <%d(0x%x)>\n", pos->expected.num, pos->expected.num);
+				PCU_PRINTF2("    actual   <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
+			}
+#else
+			PCU_PRINTF2("    expected <%d(0x%x)>\n", pos->expected.num, pos->expected.num);
+			PCU_PRINTF2("    actual   <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
+#endif
 			break;
 		case PCU_TYPE_PTR:
 			if (pos->expected.ptr) {
@@ -171,7 +182,7 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    %s\n", pos->expected.str);
 			break;
 		case PCU_TYPE_SETUP:
-			PCU_PRINTF1("    return   <%ld>\n", pos->actual.num);
+			PCU_PRINTF1("    return   <0x%x>\n", pos->actual.num);
 			break;
 		default:
 			break;
@@ -206,7 +217,7 @@ static void print_result(PCU_TestCase *testcase)
 	PCU_PRINTF1("TestCase: %s\n", testcase->name);
 	if (testcase->initialize_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! INITIALIZE FAILED <%d> !!!!\n", testcase->initialize_error);
+		PCU_PRINTF1("!!!! INITIALIZE FAILED <0x%x> !!!!\n", testcase->initialize_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 		return;
@@ -229,7 +240,7 @@ static void print_result(PCU_TestCase *testcase)
 	}
 	if (testcase->cleanup_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! CLEANUP FAILED <%d> !!!!\n", testcase->cleanup_error);
+		PCU_PRINTF1("!!!! CLEANUP FAILED <0x%x> !!!!\n", testcase->cleanup_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 	}
