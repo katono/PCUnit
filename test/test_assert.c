@@ -1,5 +1,5 @@
 #include <stdio.h>
-#undef PCU_NO_STDLIB
+#undef PCU_FREESTANDING
 #include "../PCUnit/PCUnit.h"
 
 #define PCU_snprintf		snprintf

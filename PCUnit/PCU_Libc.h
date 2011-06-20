@@ -8,7 +8,7 @@ extern "C" {
 int PCU_getchar(void);
 
 
-#if defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_MALLOC) || defined(PCU_FREESTANDING)
 # include <stddef.h> /* size_t */
 # define PCU_MALLOC		PCU_malloc
 # define PCU_FREE		PCU_free
@@ -27,7 +27,7 @@ void PCU_str_free(char *ptr);
 #endif
 
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_FREESTANDING)
 # include <stddef.h> /* size_t */
 # define PCU_SNPRINTF0(b, s, f)                                     PCU_snprintf0(b, s, f)
 # define PCU_SNPRINTF1(b, s, f, a1)                                 PCU_snprintf1(b, s, f, (size_t)(a1))
@@ -95,7 +95,7 @@ int PCU_printf(const char *format, ...);
 #endif
 
 
-#ifdef PCU_NO_STDLIB
+#ifdef PCU_FREESTANDING
 # include <stddef.h> /* size_t */
 # define PCU_STRLEN		PCU_strlen
 # define PCU_STRCMP		PCU_strcmp

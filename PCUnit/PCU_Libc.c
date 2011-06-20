@@ -1,7 +1,7 @@
 #include "PCU_Libc.h"
 #include "PCUnit.h"
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_FREESTANDING)
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
 #else
@@ -28,7 +28,7 @@ int PCU_getchar(void)
 	return getchar_func();
 }
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_FREESTANDING)
 
 /* 
  * flags:
@@ -603,7 +603,7 @@ int PCU_printf(const char *format, ...)
 
 #endif
 
-#if defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
+#if defined(PCU_NO_MALLOC) || defined(PCU_FREESTANDING)
 
 #ifndef PCU_MAX_FAILURE_NUM
 #define PCU_MAX_FAILURE_NUM	64
@@ -663,7 +663,7 @@ void PCU_str_free(char *ptr)
 
 #endif
 
-#ifdef PCU_NO_STDLIB
+#ifdef PCU_FREESTANDING
 
 size_t PCU_strlen(const char *s)
 {
