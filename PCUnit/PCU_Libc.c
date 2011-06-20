@@ -158,7 +158,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 		}
 	}
 end:
-	return full_flag ? ascii_size : size;
+	return full_flag ? (int) ascii_size : size;
 }
 
 #define TMP_SIZE	32
