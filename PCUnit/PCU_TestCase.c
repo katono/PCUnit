@@ -1,6 +1,6 @@
-#include "include/PCU_TestCase.h"
-#include "include/PCU_Test.h"
-#include "include/PCU_Libc.h"
+#include "PCU_TestCase.h"
+#include "PCU_Test.h"
+#include "PCU_Libc.h"
 
 static PCU_TestCase *current_case;
 

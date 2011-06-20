@@ -1,7 +1,7 @@
-#include "include/PCUnit.h"
-#include "include/PCU_TestCase.h"
-#include "include/PCU_Test.h"
-#include "include/PCU_Libc.h"
+#include "PCUnit.h"
+#include "PCU_TestCase.h"
+#include "PCU_Test.h"
+#include "PCU_Libc.h"
 
 #define LIST_BEGIN(list)	(list)->next
 #define LIST_END(list)		(list)

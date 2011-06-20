@@ -1,5 +1,5 @@
-#include "include/PCU_Test.h"
-#include "include/PCU_Libc.h"
+#include "PCU_Test.h"
+#include "PCU_Libc.h"
 
 static PCU_Test *current_test;
 static int repeat_counter;

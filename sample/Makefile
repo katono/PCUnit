@@ -1,5 +1,5 @@
 CFLAGS = -Wall -ansi -pedantic-errors -g
-CFLAGS += -I../PCUnit/include
+CFLAGS += -I../PCUnit
 # CFLAGS += -DPCU_NO_STDLIB
 LFLAGS = -L../PCUnit -lpcunit
 TARGET = sample

@@ -25,7 +25,7 @@ $(TARGET): $(OBJS)
 	./$(TARGET)
 
 
-LIBPCUNIT_CFLAGS = "CFLAGS=-Wall -ansi -pedantic-errors -g -Iinclude -std=c99 -DPCU_printf=printf"
+LIBPCUNIT_CFLAGS = "CFLAGS=-Wall -ansi -pedantic-errors -g -std=c99 -DPCU_printf=printf"
 
 ../PCUnit/libpcunit.a:
 	cd ../PCunit && $(MAKE) $(LIBPCUNIT_CFLAGS)
@@ -37,5 +37,5 @@ clean:
 	rm -f *.o $(TARGET) ../PCUnit/*.o ../PCUnit/*.a
 
 
-../PCUnit/PCU_Libc.o: ../PCUnit/include/PCU_Libc.h ../PCUnit/include/PCUnit.h
+../PCUnit/PCU_Libc.o: ../PCUnit/PCU_Libc.h ../PCUnit/PCUnit.h
 

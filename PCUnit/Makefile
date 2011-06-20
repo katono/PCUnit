@@ -24,9 +24,9 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f *.o *.a
 
-PCUnit.o: include/PCU_TestCase.h include/PCU_Libc.h include/PCUnit.h
-include/PCU_Test.h: include/PCUnit.h
-PCU_Test.o: include/PCU_Test.h include/PCU_Libc.h include/PCUnit.h
-include/PCU_TestCase.h: include/PCUnit.h
-PCU_TestCase.o: include/PCU_Test.h include/PCU_TestCase.h include/PCU_Libc.h include/PCUnit.h
-PCU_Libc.o: include/PCU_Libc.h include/PCUnit.h
+PCUnit.o: PCU_TestCase.h PCU_Libc.h PCUnit.h
+PCU_Test.h: PCUnit.h
+PCU_Test.o: PCU_Test.h PCU_Libc.h PCUnit.h
+PCU_TestCase.h: PCUnit.h
+PCU_TestCase.o: PCU_Test.h PCU_TestCase.h PCU_Libc.h PCUnit.h
+PCU_Libc.o: PCU_Libc.h PCUnit.h

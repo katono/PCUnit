@@ -1,6 +1,6 @@
 #include <stdio.h>
 #undef PCU_NO_STDLIB
-#include "../PCUnit/include/PCUnit.h"
+#include "../PCUnit/PCUnit.h"
 
 #define PCU_snprintf		snprintf
 

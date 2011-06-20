@@ -1,5 +1,5 @@
-#include "include/PCU_Libc.h"
-#include "include/PCUnit.h"
+#include "PCU_Libc.h"
+#include "PCUnit.h"
 
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_STDLIB)
 static PCU_Putchar putchar_func;
