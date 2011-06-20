@@ -6,7 +6,7 @@ TARGET = PCUnit_test
 
 OBJS = main.o
 OBJS += ../PCUnit/PCU_Libc.o
-OBJS += test_sprintf.o
+OBJS += test_snprintf.o
 OBJS += test_string.o
 OBJS += test_strtol.o
 OBJS += test_assert.o
