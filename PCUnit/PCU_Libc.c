@@ -61,15 +61,15 @@ int PCU_getchar(void)
 #define IS_SET_SHARP_FLAG(flags)	((flags) & 0x0040)
 #define GET_WIDTH(flags)			((unsigned char)(((flags) & 0xff00) >> 8))
 
-static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, unsigned long flags)
+static int set_ascii(char *ascii, int ascii_size, const char *tmp, int size, unsigned long flags)
 {
 	int i;
-	int width = GET_WIDTH(flags);
+	const int width = GET_WIDTH(flags);
 	int full_flag = 0;
 	if (width > 1) {
 		if (IS_SET_LEFT_FLAG(flags)) {
 			for (i = 0; i < size; i++) {
-				if ((size_t) i < ascii_size) {
+				if (i < ascii_size) {
 					ascii[i] = tmp[size - i - 1];
 				} else {
 					full_flag = 1;
@@ -78,7 +78,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 			}
 			if (width > size) {
 				for (i = 0; i < width - size; i++) {
-					if ((size_t) (size + i) < ascii_size) {
+					if (size + i < ascii_size) {
 						ascii[size + i] = ' ';
 					} else {
 						full_flag = 1;
@@ -92,9 +92,9 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 				if (IS_SET_ZERO_FLAG(flags) && 
 						(IS_SET_SHARP_FLAG(flags) || IS_SET_PLUS_FLAG(flags) || IS_SET_SPACE_FLAG(flags) || 
 						(IS_SET_SIGNED_FLAG(flags) && tmp[size - 1] == '-'))) {
-					int n = IS_SET_SHARP_FLAG(flags) ? 2 /* "0[xX]" */ : 1 /* "[ +-]" */;
+					const int n = IS_SET_SHARP_FLAG(flags) ? 2 /* "0[xX]" */ : 1 /* "[ +-]" */;
 					for (i = 0; i < n; i++) {
-						if ((size_t) i < ascii_size) {
+						if (i < ascii_size) {
 							ascii[i] = tmp[size - i - 1];
 						} else {
 							full_flag = 1;
@@ -102,7 +102,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 						}
 					}
 					for (i = 0; i < width - size; i++) {
-						if ((size_t) (i + n) < ascii_size) {
+						if (i + n < ascii_size) {
 							ascii[i + n] = '0';
 						} else {
 							full_flag = 1;
@@ -110,7 +110,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 						}
 					}
 					for (i = 0; i < size - n; i++) {
-						if ((size_t) (width - size + i + n) < ascii_size) {
+						if (width - size + i + n < ascii_size) {
 							ascii[width - size + i + n] = tmp[size - i - 1 - n];
 						} else {
 							full_flag = 1;
@@ -119,7 +119,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 					}
 				} else {
 					for (i = 0; i < width - size; i++) {
-						if ((size_t) i < ascii_size) {
+						if (i < ascii_size) {
 							ascii[i] = IS_SET_ZERO_FLAG(flags) ? '0' : ' ';
 						} else {
 							full_flag = 1;
@@ -127,7 +127,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 						}
 					}
 					for (i = 0; i < size; i++) {
-						if ((size_t) (width - size + i) < ascii_size) {
+						if (width - size + i < ascii_size) {
 							ascii[width - size + i] = tmp[size - i - 1];
 						} else {
 							full_flag = 1;
@@ -138,7 +138,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 				size = width;
 			} else {
 				for (i = 0; i < size; i++) {
-					if ((size_t) i < ascii_size) {
+					if (i < ascii_size) {
 						ascii[i] = tmp[size - i - 1];
 					} else {
 						full_flag = 1;
@@ -149,7 +149,7 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 		}
 	} else {
 		for (i = 0; i < size; i++) {
-			if ((size_t) i < ascii_size) {
+			if (i < ascii_size) {
 				ascii[i] = tmp[size - i - 1];
 			} else {
 				full_flag = 1;
@@ -158,15 +158,15 @@ static int set_ascii(char *ascii, size_t ascii_size, const char *tmp, int size, 
 		}
 	}
 end:
-	return full_flag ? (int) ascii_size : size;
+	return full_flag ? ascii_size : size;
 }
 
 #define TMP_SIZE	32
-static int dec2ascii(char *ascii, size_t ascii_size, unsigned int dec, unsigned long flags)
+static int dec2ascii(char *ascii, int ascii_size, unsigned int dec, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
-	const char *num_str = "0123456789";
+	const char * const num_str = "0123456789";
 	int signed_dec = (int) dec;
 	if (dec == 0) {
 		tmp[0] = '0';
@@ -193,11 +193,11 @@ static int dec2ascii(char *ascii, size_t ascii_size, unsigned int dec, unsigned 
 	return set_ascii(ascii, ascii_size, tmp, i, flags);
 }
 
-static int hex2ascii(char *ascii, size_t ascii_size, size_t hex, unsigned long flags)
+static int hex2ascii(char *ascii, int ascii_size, size_t hex, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
-	const char *num_str = IS_SET_LARGEX_FLAG(flags) ? "0123456789ABCDEF" : "0123456789abcdef";
+	const char * const num_str = IS_SET_LARGEX_FLAG(flags) ? "0123456789ABCDEF" : "0123456789abcdef";
 	if (hex == 0) {
 		tmp[0] = '0';
 		i = 1;
@@ -223,18 +223,22 @@ static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *
 	size_t tmp_val;
 	unsigned long flags = 0;
 	int inc;
+	const int buf_size = (int) size;
+
+	if (buf_size <= 0) return -1;
 
 	i = 0;
+	if (buf_size == 1) goto end;
 	while (*p != '\0') {
 		if (*p != '%') {
 			buf[i++] = *(p++);
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			continue;
 		}
 		p++;
 		if (*p == '%') {
 			buf[i++] = *(p++);
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			continue;
 		}
 		if (*p == ' ') {
@@ -288,7 +292,7 @@ static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *
 		switch (*p) {
 		case 'c':
 			buf[i++] = (char) arg_list[arg_idx++];
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			p++;
 			break;
 		case 'd':
@@ -298,32 +302,32 @@ static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *
 			if (*p != 'u') {
 				SET_SIGNED_FLAG(flags);
 			}
-			inc = dec2ascii(&buf[i], size - 1 - (size_t) i, (unsigned int) tmp_val, flags);
+			inc = dec2ascii(&buf[i], buf_size - 1 - i, (unsigned int) tmp_val, flags);
 			i += inc;
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			p++;
 			break;
 		case 'p':
 			buf[i++] = '0';
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			buf[i++] = 'x';
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 		case 'x':
 		case 'X':
 			tmp_val = arg_list[arg_idx++];
 			if (*p == 'X') {
 				SET_LARGEX_FLAG(flags);
 			}
-			inc = hex2ascii(&buf[i], size - 1 - (size_t) i, tmp_val, flags);
+			inc = hex2ascii(&buf[i], buf_size - 1 - i, tmp_val, flags);
 			i += inc;
-			if ((size_t) i >= size - 1) goto end;
+			if (i >= buf_size - 1) goto end;
 			p++;
 			break;
 		case 's':
 			tmp_str = (const char *) arg_list[arg_idx++];
 			while (*tmp_str != '\0') {
 				buf[i++] = *(tmp_str++);
-				if ((size_t) i >= size - 1) goto end;
+				if (i >= buf_size - 1) goto end;
 			}
 			p++;
 			break;
@@ -621,7 +625,7 @@ static PCU_TestFailure failure_pool[PCU_MAX_FAILURE_NUM];
 void *PCU_malloc(size_t size)
 {
 	PCU_TestFailure *p = failure_pool;
-	const PCU_TestFailure *end = &failure_pool[PCU_MAX_FAILURE_NUM];
+	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURE_NUM];
 	(void) size;
 	for (; p != end; p++) {
 		/* exprを使用フラグとして使う */
@@ -647,7 +651,7 @@ static char *str_pool_next_ptr = str_pool;
 char *PCU_str_malloc(size_t size)
 {
 	char *p = str_pool_next_ptr;
-	const char *end = &str_pool[PCU_STRING_POOL_SIZE];
+	const char * const end = &str_pool[PCU_STRING_POOL_SIZE];
 	if (str_pool_next_ptr + size > end) {
 		return 0;
 	}

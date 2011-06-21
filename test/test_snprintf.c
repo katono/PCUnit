@@ -11,8 +11,8 @@ int PCU_snprintf5(char *buf, size_t size, const char *format, size_t arg1, size_
 
 void test_snprintf(void)
 {
-	static char buf[1024];
-	static char sp_buf[1024];
+	static char buf[1024] = "foo";
+	static char sp_buf[1024] = "bar";
 	int n;
 	unsigned long buf_ret;
 	unsigned long sp_buf_ret;
@@ -176,8 +176,8 @@ void test_snprintf(void)
 
 void test_snprintf_shorten(void)
 {
-	char buf[8];
-	char sp_buf[8];
+	char buf[8] = "foo";
+	char sp_buf[8] = "bar";
 	int n;
 	int ret1;
 	int ret2;
@@ -298,8 +298,39 @@ void test_snprintf_shorten(void)
 	PCU_ASSERT_STRING_EQUAL(sp_buf, buf);
 }
 
+void test_snprintf_size0(void)
+{
+	char buf[8] = "foobar";
+	char sp_buf[8] = "foobar";
+	int ret1;
+	int ret2;
+	ret1 = snprintf(sp_buf, 0,  "hogehoge");
+	ret2 = PCU_snprintf4(buf, 0,"hogehoge", 0, 0, 0, 0);
+	PCU_ASSERT_TRUE(ret2 < 0);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, buf);
+	PCU_ASSERT_STRING_EQUAL("foobar", buf);
+
+}
+
+void test_snprintf_size1(void)
+{
+	char buf[8] = "foo";
+	char sp_buf[8] = "bar";
+	int ret1;
+	int ret2;
+	ret1 = snprintf(sp_buf, 1,  "hogehoge");
+	ret2 = PCU_snprintf4(buf, 1,"hogehoge", 0, 0, 0, 0);
+	PCU_ASSERT_EQUAL(0, ret2);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, buf);
+	PCU_ASSERT_STRING_EQUAL("", buf);
+
+}
+
+
 PCU_Test snprintf_tests[] = {
 	{ "test_snprintf", test_snprintf },
 	{ "test_snprintf_shorten", test_snprintf_shorten },
+	{ "test_snprintf_size0", test_snprintf_size0 },
+	{ "test_snprintf_size1", test_snprintf_size1 },
 	PCU_NULL,
 };
