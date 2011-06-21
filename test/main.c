@@ -24,10 +24,11 @@ int main(int argc, char **argv)
 	PCU_enable_color();
 	PCU_set_getchar(getchar);
 	if (argc > 1) {
+		PCU_set_mode(PCU_MODE_INTERACTIVE);
 		if (strcmp(argv[1], "assert") == 0) {
-			PCU_run_interactive(suite_assert);
+			PCU_run(suite_assert);
 		} else {
-			PCU_run_interactive(suite);
+			PCU_run(suite);
 		}
 	} else {
 		PCU_run(suite);

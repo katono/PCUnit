@@ -16,10 +16,9 @@ int main(int argc, char **argv)
 	PCU_enable_color();
 /*    PCU_disable_color();*/
 	if (argc >= 2) {
-		PCU_run_interactive(suite);
-	} else {
-		PCU_run(suite);
+		PCU_set_mode(PCU_MODE_INTERACTIVE);
 	}
+	PCU_run(suite);
 	return 0;
 }
 

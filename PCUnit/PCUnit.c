@@ -10,6 +10,7 @@
 char PCU_msg_buf[PCU_MSG_BUF_SIZE];
 static char input_buf[64];
 static int enable_color;
+static PCU_Mode pcu_mode = PCU_MODE_NORMAL;
 
 static PCU_Result result;
 
@@ -461,9 +462,8 @@ static int select_case(PCU_TestCase *cases)
 	}
 }
 
-void PCU_run_interactive(PCU_TestCase *suite)
+static void run_interactive(PCU_TestCase *suite)
 {
-	reset(suite);
 	while (1) {
 		int quit;
 		PCU_PRINTF0("************** PCUnit: Interactive Mode **************\n");
@@ -505,10 +505,22 @@ void PCU_run_interactive(PCU_TestCase *suite)
 	}
 }
 
-
 void PCU_run(PCU_TestCase *suite)
 {
 	reset(suite);
-	run_all(suite);
+	switch (pcu_mode) {
+	case PCU_MODE_INTERACTIVE:
+		run_interactive(suite);
+		break;
+	case PCU_MODE_NORMAL:
+	default:
+		run_all(suite);
+		break;
+	}
+}
+
+void PCU_set_mode(PCU_Mode mode)
+{
+	pcu_mode = mode;
 }
 

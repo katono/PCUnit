@@ -117,11 +117,16 @@ typedef struct {
 typedef int (*PCU_Putchar)(int c);
 typedef int (*PCU_Getchar)(void);
 
+typedef enum PCU_Mode {
+	PCU_MODE_NORMAL,
+	PCU_MODE_INTERACTIVE
+} PCU_Mode;
+
 /* 
  * PCUnit API
  */
 void PCU_run(PCU_TestCase *suite);
-void PCU_run_interactive(PCU_TestCase *suite);
+void PCU_set_mode(PCU_Mode mode);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);
 int PCU_repeat_counter(void);
