@@ -3,6 +3,7 @@
 
 static PCU_Test *current_test;
 static int repeat_counter;
+static PCU_jmp_buf fatal_jmp;
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat);
 #ifndef PCU_NO_FPU
@@ -69,7 +70,9 @@ void PCU_Test_run(PCU_Test *self)
 			}
 			continue;
 		}
-		self->test();
+		if (PCU_SETJMP(fatal_jmp) == 0) {
+			self->test();
+		}
 		err = PCU_Test_teardown(self);
 		if (err) {
 			PCU_TestFailure *node;
@@ -104,7 +107,7 @@ int PCU_Test_is_failed(PCU_Test *self)
 	return 0;
 }
 
-int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line)
+int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int fatal_flag)
 {
 	PCU_TestFailure *node;
 	current_test->result.num_asserts++;
@@ -120,11 +123,14 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 	if (node) {
 		list_push(&current_test->assertion_list, node);
 	}
+	if (fatal_flag) {
+		PCU_LONGJMP(fatal_jmp, 1);
+	}
 	return 0;
 }
 
 #ifndef PCU_NO_FPU
-int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line)
+int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int fatal_flag)
 {
 	double dlt = delta;
 	int not_flag;
@@ -155,6 +161,9 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 	node = PCU_TestFailure_new_double(expected, actual, delta, type, expr, file, line, repeat_counter);
 	if (node) {
 		list_push(&current_test->assertion_list, node);
+	}
+	if (fatal_flag) {
+		PCU_LONGJMP(fatal_jmp, 1);
 	}
 	return 0;
 }

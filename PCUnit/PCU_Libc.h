@@ -95,6 +95,18 @@ int PCU_printf(const char *format, ...);
 #endif
 
 
+#if defined(PCU_NO_SETJMP) || defined(PCU_FREESTANDING)
+typedef int PCU_jmp_buf;
+# define PCU_SETJMP(j)	((void)(j), 0)
+# define PCU_LONGJMP(j, v)
+#else
+# include <setjmp.h>
+typedef jmp_buf PCU_jmp_buf;
+# define PCU_SETJMP		setjmp
+# define PCU_LONGJMP	longjmp
+#endif
+
+
 #ifdef PCU_FREESTANDING
 # include <stddef.h> /* size_t */
 # define PCU_STRLEN		PCU_strlen
