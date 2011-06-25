@@ -14,8 +14,11 @@ PCU_Suite suites[] = {
 	PCU_NULL,
 };
 
+int assert_tests_setup(void);
+int assert_tests_teardown(void);
+
 PCU_Suite suites_assert[] = {
-	{ "assert_tests", assert_tests },
+	{ "assert_tests", assert_tests, assert_tests_setup, assert_tests_teardown },
 	PCU_NULL,
 };
 

@@ -19,8 +19,9 @@ static void PCU_Test_clear_result(PCU_Test *self)
 	PCU_MEMSET(&self->result, 0, sizeof(self->result));
 }
 
-void PCU_Test_reset(PCU_Test *self)
+void PCU_Test_reset(PCU_Test *self, const PCU_Suite *suite)
 {
+	self->suite = suite;
 	if (!self->assertion_list.next) {
 		self->assertion_list.next = &self->assertion_list;
 		self->assertion_list.prev = &self->assertion_list;
@@ -37,8 +38,8 @@ void PCU_Test_reset(PCU_Test *self)
 static int PCU_Test_setup(const PCU_Test *self)
 {
 	int ret = 0;
-	if (self->setup) {
-		ret = self->setup();
+	if (self->suite->setup) {
+		ret = self->suite->setup();
 	}
 	return ret;
 }
@@ -46,8 +47,8 @@ static int PCU_Test_setup(const PCU_Test *self)
 static int PCU_Test_teardown(const PCU_Test *self)
 {
 	int ret = 0;
-	if (self->teardown) {
-		ret = self->teardown();
+	if (self->suite->teardown) {
+		ret = self->suite->teardown();
 	}
 	return ret;
 }

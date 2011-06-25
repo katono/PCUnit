@@ -21,7 +21,7 @@ int RingBuf_tests_cleanup(void)
 	return 0;
 }
 
-static int setup(void)
+int RingBuf_tests_setup(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
 	RingBuf_init(rb, rb_buffer, sizeof rb_buffer);
@@ -29,7 +29,7 @@ static int setup(void)
 	return 0;
 }
 
-static int teardown(void)
+int RingBuf_tests_teardown(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
 	printf("  teardown: %s\n", PCU_test_name());
@@ -110,8 +110,8 @@ static void test_rb_pop(void)
 
 
 PCU_Test RingBuf_tests[] = {
-	{ "test_rb_init" , test_rb_init , setup , teardown } , 
-	{ "test_rb_push" , test_rb_push , setup , teardown } , 
-	{ "test_rb_pop"  , test_rb_pop  , setup , teardown } , 
+	{ "test_rb_init" , test_rb_init } , 
+	{ "test_rb_push" , test_rb_push } , 
+	{ "test_rb_pop"  , test_rb_pop  } , 
 	PCU_NULL,
 };

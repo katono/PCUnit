@@ -3,8 +3,8 @@
 #include <stdio.h>
 
 PCU_Suite suites[] = {
-	{ "RingBuf_tests", RingBuf_tests, RingBuf_tests_initialize, RingBuf_tests_cleanup },
-	{ "StrToken_tests", StrToken_tests },
+	{ "RingBuf_tests", RingBuf_tests, RingBuf_tests_setup, RingBuf_tests_teardown, RingBuf_tests_initialize, RingBuf_tests_cleanup },
+	{ "StrToken_tests", StrToken_tests, StrToken_tests_setup, StrToken_tests_teardown },
 	PCU_NULL,
 };
 

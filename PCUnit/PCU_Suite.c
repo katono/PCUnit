@@ -16,7 +16,7 @@ void PCU_Suite_reset(PCU_Suite *self)
 	int i;
 	PCU_Test *p;
 	for (i = 0, p = self->tests; p->name != 0; i++, p++) {
-		PCU_Test_reset(p);
+		PCU_Test_reset(p, self);
 	}
 	PCU_Suite_clear_result(self);
 	self->result.num_tests = i;

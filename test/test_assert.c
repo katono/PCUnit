@@ -326,14 +326,20 @@ static void test_assert_dummy(void)
 	PCU_ASSERT(0);
 }
 
-int setup_err(void)
+int assert_tests_setup(void)
 {
-	return -1;
+	if (strcmp(PCU_test_name(), "test_assert_setup_err") == 0) {
+		return -1;
+	}
+	return 0;
 }
 
-int teardown_err(void)
+int assert_tests_teardown(void)
 {
-	return -2;
+	if (strcmp(PCU_test_name(), "test_assert_teardown_err") == 0) {
+		return -2;
+	}
+	return 0;
 }
 
 static void test_long_long(void)
@@ -378,8 +384,8 @@ PCU_Test assert_tests[] = {
 	{ "test_msg8"                  , test_msg8                  } ,
 	{ "test_msg9"                  , test_msg9                  } ,
 	{ "test_msg"                   , test_msg                   } ,
-	{ "test_assert_setup_err"      , test_assert_dummy            , setup_err , 0 } , 
-	{ "test_assert_teardown_err"   , test_assert_dummy            , 0 , teardown_err } , 
+	{ "test_assert_setup_err"      , test_assert_dummy          } ,
+	{ "test_assert_teardown_err"   , test_assert_dummy          } ,
 	{ "test_long_long"             , test_long_long             } ,
 	PCU_NULL,
 };

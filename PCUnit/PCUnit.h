@@ -90,29 +90,33 @@ typedef struct PCU_TestFailure {
  */
 #define PCU_NULL	{0}
 
-typedef struct {
+typedef struct PCU_Test PCU_Test;
+typedef struct PCU_Suite PCU_Suite;
+
+struct PCU_Test {
 	/* public */
 	const char *name;
 	void (*test)(void);
-	int (*setup)(void);
-	int (*teardown)(void);
 	int repeat;
 	/* private */
+	const PCU_Suite *suite;
 	PCU_TestResult result;
 	PCU_TestFailure assertion_list;
-} PCU_Test;
+};
 
-typedef struct {
+struct PCU_Suite {
 	/* public */
 	const char *name;
 	PCU_Test *tests;
+	int (*setup)(void);
+	int (*teardown)(void);
 	int (*initialize)(void);
 	int (*cleanup)(void);
 	/* private */
 	int initialize_error;
 	int cleanup_error;
 	PCU_SuiteResult result;
-} PCU_Suite;
+};
 
 typedef int (*PCU_Putchar)(int c);
 typedef int (*PCU_Getchar)(void);
