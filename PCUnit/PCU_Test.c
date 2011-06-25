@@ -6,7 +6,7 @@ static int repeat_counter;
 static PCU_jmp_buf fatal_jmp;
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat);
-#ifndef PCU_NO_FPU
+#ifndef PCU_NO_FLOATINGPOINT
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat);
 #endif
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
@@ -129,7 +129,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 	return 0;
 }
 
-#ifndef PCU_NO_FPU
+#ifndef PCU_NO_FLOATINGPOINT
 int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int fatal_flag)
 {
 	double dlt = delta;
@@ -283,7 +283,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	return self;
 }
 
-#ifndef PCU_NO_FPU
+#ifndef PCU_NO_FLOATINGPOINT
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));

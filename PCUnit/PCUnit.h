@@ -61,7 +61,7 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
+#if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		double dbl;
 #endif
 	} expected;
@@ -69,11 +69,11 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
+#if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		double dbl;
 #endif
 	} actual;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
+#if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 	double delta;
 #endif
 	unsigned long type;
@@ -167,7 +167,7 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_NSTRING_EQUAL_FATAL(expected, actual, n)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | (n)), "PCU_ASSERT_NSTRING_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
 #define PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(expected, actual, n)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
 
-#ifndef PCU_NO_FPU
+#ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)			PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)		PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)		PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
@@ -205,7 +205,7 @@ void PCU_disable_color(void);
 #endif
 
 int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int fatal_flag);
-#ifndef PCU_NO_FPU
+#ifndef PCU_NO_FLOATINGPOINT
 int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int fatal_flag);
 #endif
 
