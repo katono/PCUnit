@@ -47,13 +47,13 @@ typedef struct {
 	int num_errors_initialize;
 	int num_errors_cleanup;
 	PCU_TestResult test_result;
-} PCU_TestCaseResult;
+} PCU_SuiteResult;
 
 typedef struct {
-	int num_cases;
-	int num_cases_ran;
-	int num_cases_failed;
-	PCU_TestCaseResult case_result;
+	int num_suites;
+	int num_suites_ran;
+	int num_suites_failed;
+	PCU_SuiteResult suite_result;
 } PCU_Result;
 
 typedef struct PCU_TestFailure {
@@ -111,8 +111,8 @@ typedef struct {
 	/* private */
 	int initialize_error;
 	int cleanup_error;
-	PCU_TestCaseResult result;
-} PCU_TestCase;
+	PCU_SuiteResult result;
+} PCU_Suite;
 
 typedef int (*PCU_Putchar)(int c);
 typedef int (*PCU_Getchar)(void);
@@ -125,13 +125,13 @@ typedef enum PCU_Mode {
 /* 
  * PCUnit API
  */
-void PCU_run(PCU_TestCase *suite);
+void PCU_run(PCU_Suite *suite);
 void PCU_set_mode(PCU_Mode mode);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);
 int PCU_repeat_counter(void);
 const char *PCU_test_name(void);
-const char *PCU_case_name(void);
+const char *PCU_suite_name(void);
 void PCU_enable_color(void);
 void PCU_disable_color(void);
 

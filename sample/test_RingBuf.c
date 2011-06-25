@@ -9,15 +9,15 @@ static unsigned char rb_buffer[RB_BUF_SIZE];
 
 int RingBuf_tests_initialize(void)
 {
-	/* TestCaseの最初に呼ばれる */
-	printf("initialize: %s\n", PCU_case_name());
+	/* Suiteの最初に呼ばれる */
+	printf("initialize: %s\n", PCU_suite_name());
 	return 0;
 }
 
 int RingBuf_tests_cleanup(void)
 {
-	/* TestCaseの最後に呼ばれる */
-	printf("cleanup   : %s\n", PCU_case_name());
+	/* Suiteの最後に呼ばれる */
+	printf("cleanup   : %s\n", PCU_suite_name());
 	return 0;
 }
 

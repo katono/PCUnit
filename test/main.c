@@ -7,14 +7,14 @@ extern PCU_Test snprintf_tests[];
 extern PCU_Test strtol_tests[];
 extern PCU_Test assert_tests[];
 
-PCU_TestCase suite[] = {
+PCU_Suite suites[] = {
 	{ "snprintf_tests", snprintf_tests },
 	{ "string_tests", string_tests },
 	{ "strtol_tests", strtol_tests },
 	PCU_NULL,
 };
 
-PCU_TestCase suite_assert[] = {
+PCU_Suite suites_assert[] = {
 	{ "assert_tests", assert_tests },
 	PCU_NULL,
 };
@@ -26,12 +26,12 @@ int main(int argc, char **argv)
 	if (argc > 1) {
 		PCU_set_mode(PCU_MODE_INTERACTIVE);
 		if (strcmp(argv[1], "assert") == 0) {
-			PCU_run(suite_assert);
+			PCU_run(suites_assert);
 		} else {
-			PCU_run(suite);
+			PCU_run(suites);
 		}
 	} else {
-		PCU_run(suite);
+		PCU_run(suites);
 	}
 	return 0;
 }

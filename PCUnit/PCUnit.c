@@ -1,5 +1,5 @@
 #include "PCUnit.h"
-#include "PCU_TestCase.h"
+#include "PCU_Suite.h"
 #include "PCU_Test.h"
 #include "PCU_Libc.h"
 
@@ -14,16 +14,16 @@ static PCU_Mode pcu_mode = PCU_MODE_NORMAL;
 
 static PCU_Result result;
 
-static void reset(PCU_TestCase *cases)
+static void reset(PCU_Suite *suites)
 {
-	PCU_TestCase *p;
+	PCU_Suite *p;
 	PCU_MEMSET(&result, 0, sizeof(result));
-	for (p = cases; p->name != 0; p++) {
-		PCU_TestCaseResult case_result;
-		PCU_TestCase_reset(p);
-		PCU_TestCase_get_result(p, &case_result);
-		result.num_cases++;
-		result.case_result.num_tests += case_result.num_tests;
+	for (p = suites; p->name != 0; p++) {
+		PCU_SuiteResult suite_result;
+		PCU_Suite_reset(p);
+		PCU_Suite_get_result(p, &suite_result);
+		result.num_suites++;
+		result.suite_result.num_tests += suite_result.num_tests;
 	}
 }
 
@@ -197,9 +197,9 @@ static void print_failure(PCU_Test *test)
 	}
 }
 
-static void print_result_selected(PCU_TestCase *testcase, int idx)
+static void print_result_selected(PCU_Suite *suite, int idx)
 {
-	PCU_Test *test = &testcase->tests[idx];
+	PCU_Test *test = &suite->tests[idx];
 	print_failure(test);
 	if (!PCU_Test_is_failed(test)) {
 		set_color(COLOR_GREEN);
@@ -209,90 +209,90 @@ static void print_result_selected(PCU_TestCase *testcase, int idx)
 	}
 }
 
-static void print_result(PCU_TestCase *testcase)
+static void print_result(PCU_Suite *suite)
 {
 	PCU_Test *p;
-	PCU_PRINTF1("TestCase: %s\n", testcase->name);
-	if (testcase->initialize_error) {
+	PCU_PRINTF1("Suite: %s\n", suite->name);
+	if (suite->initialize_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! INITIALIZE FAILED <0x%x> !!!!\n", testcase->initialize_error);
+		PCU_PRINTF1("!!!! INITIALIZE FAILED <0x%x> !!!!\n", suite->initialize_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 		return;
 	}
 	PCU_PRINTF0("\n");
-	for (p = testcase->tests; p->name != 0; p++) {
+	for (p = suite->tests; p->name != 0; p++) {
 		print_failure(p);
 	}
-	if (testcase->result.num_tests_failed == 0) {
+	if (suite->result.num_tests_failed == 0) {
 		set_color(COLOR_GREEN);
-		PCU_PRINTF1("OK (%d Tests)\n", testcase->result.num_tests_ran);
+		PCU_PRINTF1("OK (%d Tests)\n", suite->result.num_tests_ran);
 		reset_color();
 		PCU_PRINTF0("\n");
 	} else {
 		set_color(COLOR_RED);
 		PCU_PRINTF2("%d Tests, %d Failures\n", 
-				testcase->result.num_tests_ran, testcase->result.num_tests_failed);
+				suite->result.num_tests_ran, suite->result.num_tests_failed);
 		reset_color();
 		PCU_PRINTF0("\n");
 	}
-	if (testcase->cleanup_error) {
+	if (suite->cleanup_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! CLEANUP FAILED <0x%x> !!!!\n", testcase->cleanup_error);
+		PCU_PRINTF1("!!!! CLEANUP FAILED <0x%x> !!!!\n", suite->cleanup_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 	}
 }
 
-static void add_result(const PCU_TestCaseResult *c_result)
+static void add_result(const PCU_SuiteResult *suite_result)
 {
-	result.case_result.num_tests_ran         += c_result->num_tests_ran;
-	result.case_result.num_tests_failed      += c_result->num_tests_failed;
-	result.case_result.num_errors_initialize += c_result->num_errors_initialize;
-	result.case_result.num_errors_cleanup    += c_result->num_errors_cleanup;
-	result.case_result.test_result.num_asserts         += c_result->test_result.num_asserts;
-	result.case_result.test_result.num_asserts_ran     += c_result->test_result.num_asserts_ran;
-	result.case_result.test_result.num_asserts_failed  += c_result->test_result.num_asserts_failed;
-	result.case_result.test_result.num_errors_setup    += c_result->test_result.num_errors_setup;
-	result.case_result.test_result.num_errors_teardown += c_result->test_result.num_errors_teardown;
-	result.num_cases_ran++;
-	if (c_result->num_tests_failed > 0) {
-		result.num_cases_failed++;
+	result.suite_result.num_tests_ran         += suite_result->num_tests_ran;
+	result.suite_result.num_tests_failed      += suite_result->num_tests_failed;
+	result.suite_result.num_errors_initialize += suite_result->num_errors_initialize;
+	result.suite_result.num_errors_cleanup    += suite_result->num_errors_cleanup;
+	result.suite_result.test_result.num_asserts         += suite_result->test_result.num_asserts;
+	result.suite_result.test_result.num_asserts_ran     += suite_result->test_result.num_asserts_ran;
+	result.suite_result.test_result.num_asserts_failed  += suite_result->test_result.num_asserts_failed;
+	result.suite_result.test_result.num_errors_setup    += suite_result->test_result.num_errors_setup;
+	result.suite_result.test_result.num_errors_teardown += suite_result->test_result.num_errors_teardown;
+	result.num_suites_ran++;
+	if (suite_result->num_tests_failed > 0) {
+		result.num_suites_failed++;
 	}
 }
 
-static void run_all(PCU_TestCase *cases)
+static void run_all(PCU_Suite *suites)
 {
-	PCU_TestCase *p;
-	for (p = cases; p->name != 0; p++) {
-		PCU_TestCaseResult case_result;
-		PCU_TestCase_run(p);
-		PCU_TestCase_get_result(p, &case_result);
-		add_result(&case_result);
+	PCU_Suite *p;
+	for (p = suites; p->name != 0; p++) {
+		PCU_SuiteResult suite_result;
+		PCU_Suite_run(p);
+		PCU_Suite_get_result(p, &suite_result);
+		add_result(&suite_result);
 		PCU_PRINTF0("----\n");
 		print_result(p);
 	}
-	reset(cases);
+	reset(suites);
 }
 
-static void run_selected_case(PCU_TestCase *cases, int case_idx)
+static void run_selected_suite(PCU_Suite *suites, int suite_idx)
 {
-	PCU_TestCaseResult case_result;
-	PCU_TestCase_run(&cases[case_idx]);
-	PCU_TestCase_get_result(&cases[case_idx], &case_result);
-	add_result(&case_result);
-	print_result(&cases[case_idx]);
-	reset(cases);
+	PCU_SuiteResult suite_result;
+	PCU_Suite_run(&suites[suite_idx]);
+	PCU_Suite_get_result(&suites[suite_idx], &suite_result);
+	add_result(&suite_result);
+	print_result(&suites[suite_idx]);
+	reset(suites);
 }
 
-static void run_selected_test(PCU_TestCase *cases, int case_idx, int test_idx)
+static void run_selected_test(PCU_Suite *suites, int suite_idx, int test_idx)
 {
-	PCU_TestCaseResult case_result;
-	PCU_TestCase_run_selected(&cases[case_idx], test_idx);
-	PCU_TestCase_get_result(&cases[case_idx], &case_result);
-	add_result(&case_result);
-	print_result_selected(&cases[case_idx], test_idx);
-	reset(cases);
+	PCU_SuiteResult suite_result;
+	PCU_Suite_run_selected(&suites[suite_idx], test_idx);
+	PCU_Suite_get_result(&suites[suite_idx], &suite_result);
+	add_result(&suite_result);
+	print_result_selected(&suites[suite_idx], test_idx);
+	reset(suites);
 }
 
 static void show_list_tests(const PCU_Test *tests)
@@ -307,13 +307,13 @@ static void show_list_tests(const PCU_Test *tests)
 	PCU_PRINTF0("\n");
 }
 
-static void show_list_cases(const PCU_TestCase *cases)
+static void show_list_suites(const PCU_Suite *suites)
 {
 	int i;
-	const PCU_TestCase *p;
-	PCU_PRINTF0("List of TestCases\n");
+	const PCU_Suite *p;
+	PCU_PRINTF0("List of Suites\n");
 	PCU_PRINTF0("  Number  Name\n");
-	for (i = 1, p = cases; p->name != 0; i++, p++) {
+	for (i = 1, p = suites; p->name != 0; i++, p++) {
 		PCU_PRINTF2("  %-6d  %s\n", i, p->name);
 	}
 	PCU_PRINTF0("\n");
@@ -360,16 +360,16 @@ static void get_line(char *buf, int size)
 	buf[i] = '\0';
 }
 
-static void select_test(PCU_TestCase *cases, int case_idx)
+static void select_test(PCU_Suite *suites, int suite_idx)
 {
 	int idx;
-	PCU_TestCase *testcase = &cases[case_idx];
+	PCU_Suite *suite = &suites[suite_idx];
 	PCU_PRINTF0("Enter Test's Number or Name: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_test_number(testcase->tests, input_buf);
+	idx = find_test_number(suite->tests, input_buf);
 	if (idx == -1) {
-		idx = find_test_name(testcase->tests, input_buf);
+		idx = find_test_name(suite->tests, input_buf);
 		if (idx == -1) {
 			PCU_PRINTF0("\nTest not found.\n");
 			return;
@@ -377,14 +377,14 @@ static void select_test(PCU_TestCase *cases, int case_idx)
 	}
 	PCU_PRINTF0("\n");
 
-	run_selected_test(cases, case_idx, idx);
+	run_selected_test(suites, suite_idx, idx);
 }
 
-static int find_case_name(const PCU_TestCase *cases, const char *input_str)
+static int find_suite_name(const PCU_Suite *suites, const char *input_str)
 {
 	int i;
-	const PCU_TestCase *p;
-	for (i = 0, p = cases; p->name != 0; i++, p++) {
+	const PCU_Suite *p;
+	for (i = 0, p = suites; p->name != 0; i++, p++) {
 		if (PCU_STRCMP(p->name, input_str) == 0) {
 			return i;
 		}
@@ -392,62 +392,62 @@ static int find_case_name(const PCU_TestCase *cases, const char *input_str)
 	return -1;
 }
 
-static int get_ncases(const PCU_TestCase *cases)
+static int get_nsuites(const PCU_Suite *suites)
 {
 	int i;
-	const PCU_TestCase *p;
-	for (i = 0, p = cases; p->name != 0; i++, p++) ;
+	const PCU_Suite *p;
+	for (i = 0, p = suites; p->name != 0; i++, p++) ;
 	return i;
 }
 
-static int find_case_number(const PCU_TestCase *cases, const char *input_str)
+static int find_suite_number(const PCU_Suite *suites, const char *input_str)
 {
 	int n;
 	n = PCU_ATOI(input_str);
-	if (n <= 0 || get_ncases(cases) + 1 <= n) {
+	if (n <= 0 || get_nsuites(suites) + 1 <= n) {
 		return -1;
 	}
 	return n - 1;
 }
 
-static int select_case(PCU_TestCase *cases)
+static int select_suite(PCU_Suite *suites)
 {
 	int idx;
-	PCU_TestCase *selected_case;
-	PCU_PRINTF0("Enter TestCase's Number or Name: ");
+	PCU_Suite *selected_suite;
+	PCU_PRINTF0("Enter Suite's Number or Name: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_case_number(cases, input_buf);
+	idx = find_suite_number(suites, input_buf);
 	if (idx == -1) {
-		idx = find_case_name(cases, input_buf);
+		idx = find_suite_name(suites, input_buf);
 		if (idx == -1) {
-			PCU_PRINTF0("\nTestCase not found.\n");
+			PCU_PRINTF0("\nSuite not found.\n");
 			return 0;
 		}
 	}
 
-	selected_case = &cases[idx];
+	selected_suite = &suites[idx];
 
 	PCU_PRINTF0("\n");
 	while (1) {
-		PCU_PRINTF1("============== TestCase: %s ==============\n", selected_case->name);
-		PCU_PRINTF0("(R)un TestCase, (S)elect Test, (L)ist of Tests, (M)ove up, (Q)uit\n");
+		PCU_PRINTF1("============== Suite: %s ==============\n", selected_suite->name);
+		PCU_PRINTF0("(R)un Suite, (S)elect Test, (L)ist of Tests, (M)ove up, (Q)uit\n");
 		PCU_PRINTF0("Enter Command: ");
 		get_line(input_buf, sizeof input_buf);
 		PCU_PRINTF0("\n");
 		switch (input_buf[0]) {
 		case 'r':
 		case 'R':
-			run_selected_case(cases, idx);
+			run_selected_suite(suites, idx);
 			break;
 		case 's':
 		case 'S':
-			show_list_tests(selected_case->tests);
-			select_test(cases, idx);
+			show_list_tests(selected_suite->tests);
+			select_test(suites, idx);
 			break;
 		case 'l':
 		case 'L':
-			show_list_tests(selected_case->tests);
+			show_list_tests(selected_suite->tests);
 			break;
 		case 'm':
 		case 'M':
@@ -462,12 +462,12 @@ static int select_case(PCU_TestCase *cases)
 	}
 }
 
-static void run_interactive(PCU_TestCase *suite)
+static void run_interactive(PCU_Suite *suites)
 {
 	while (1) {
 		int quit;
 		PCU_PRINTF0("************** PCUnit: Interactive Mode **************\n");
-		PCU_PRINTF1("(R)un all, (S)elect TestCase, (L)ist of TestCases, %sable color, (Q)uit\n", 
+		PCU_PRINTF1("(R)un all, (S)elect Suite, (L)ist of Suites, %sable color, (Q)uit\n", 
 				enable_color ? "(D)is" : "(E)n");
 		PCU_PRINTF0("Enter Command: ");
 		get_line(input_buf, sizeof input_buf);
@@ -475,17 +475,17 @@ static void run_interactive(PCU_TestCase *suite)
 		switch (input_buf[0]) {
 		case 'r':
 		case 'R':
-			run_all(suite);
+			run_all(suites);
 			break;
 		case 's':
 		case 'S':
-			show_list_cases(suite);
-			quit = select_case(suite);
+			show_list_suites(suites);
+			quit = select_suite(suites);
 			if (quit) return;
 			break;
 		case 'l':
 		case 'L':
-			show_list_cases(suite);
+			show_list_suites(suites);
 			break;
 		case 'e':
 		case 'E':
@@ -505,16 +505,16 @@ static void run_interactive(PCU_TestCase *suite)
 	}
 }
 
-void PCU_run(PCU_TestCase *suite)
+void PCU_run(PCU_Suite *suites)
 {
-	reset(suite);
+	reset(suites);
 	switch (pcu_mode) {
 	case PCU_MODE_INTERACTIVE:
-		run_interactive(suite);
+		run_interactive(suites);
 		break;
 	case PCU_MODE_NORMAL:
 	default:
-		run_all(suite);
+		run_all(suites);
 		break;
 	}
 }

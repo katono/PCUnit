@@ -1,28 +1,28 @@
-#include "PCU_TestCase.h"
+#include "PCU_Suite.h"
 #include "PCU_Test.h"
 #include "PCU_Libc.h"
 
-static PCU_TestCase *current_case;
+static PCU_Suite *current_suite;
 
-static void PCU_TestCase_clear_result(PCU_TestCase *self)
+static void PCU_Suite_clear_result(PCU_Suite *self)
 {
 	self->initialize_error = 0;
 	self->cleanup_error = 0;
 	PCU_MEMSET(&self->result, 0, sizeof(self->result));
 }
 
-void PCU_TestCase_reset(PCU_TestCase *self)
+void PCU_Suite_reset(PCU_Suite *self)
 {
 	int i;
 	PCU_Test *p;
 	for (i = 0, p = self->tests; p->name != 0; i++, p++) {
 		PCU_Test_reset(p);
 	}
-	PCU_TestCase_clear_result(self);
+	PCU_Suite_clear_result(self);
 	self->result.num_tests = i;
 }
 
-static int PCU_TestCase_initialize(const PCU_TestCase *self)
+static int PCU_Suite_initialize(const PCU_Suite *self)
 {
 	int ret = 0;
 	if (self->initialize) {
@@ -31,7 +31,7 @@ static int PCU_TestCase_initialize(const PCU_TestCase *self)
 	return ret;
 }
 
-static int PCU_TestCase_cleanup(const PCU_TestCase *self)
+static int PCU_Suite_cleanup(const PCU_Suite *self)
 {
 	int ret = 0;
 	if (self->cleanup) {
@@ -40,12 +40,12 @@ static int PCU_TestCase_cleanup(const PCU_TestCase *self)
 	return ret;
 }
 
-void PCU_TestCase_run(PCU_TestCase *self)
+void PCU_Suite_run(PCU_Suite *self)
 {
 	PCU_Test *p;
-	current_case = self;
+	current_suite = self;
 
-	self->initialize_error = PCU_TestCase_initialize(self);
+	self->initialize_error = PCU_Suite_initialize(self);
 	if (self->initialize_error) {
 		self->result.num_errors_initialize++;
 		return;
@@ -64,19 +64,19 @@ void PCU_TestCase_run(PCU_TestCase *self)
 			self->result.num_tests_failed++;
 		}
 	}
-	self->cleanup_error = PCU_TestCase_cleanup(self);
+	self->cleanup_error = PCU_Suite_cleanup(self);
 	if (self->cleanup_error) {
 		self->result.num_errors_cleanup++;
 		return;
 	}
 }
 
-void PCU_TestCase_run_selected(PCU_TestCase *self, int idx)
+void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
 	PCU_TestResult test_result;
-	current_case = self;
+	current_suite = self;
 
-	self->initialize_error = PCU_TestCase_initialize(self);
+	self->initialize_error = PCU_Suite_initialize(self);
 	if (self->initialize_error) {
 		self->result.num_errors_initialize++;
 		return;
@@ -92,20 +92,20 @@ void PCU_TestCase_run_selected(PCU_TestCase *self, int idx)
 	if (test_result.num_asserts_failed > 0 || test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
 		self->result.num_tests_failed++;
 	}
-	self->cleanup_error = PCU_TestCase_cleanup(self);
+	self->cleanup_error = PCU_Suite_cleanup(self);
 	if (self->cleanup_error) {
 		self->result.num_errors_cleanup++;
 		return;
 	}
 }
 
-void PCU_TestCase_get_result(PCU_TestCase *self, PCU_TestCaseResult *result)
+void PCU_Suite_get_result(PCU_Suite *self, PCU_SuiteResult *result)
 {
 	*result = self->result;
 }
 
-const char *PCU_case_name(void)
+const char *PCU_suite_name(void)
 {
-	return current_case->name;
+	return current_suite->name;
 }
 

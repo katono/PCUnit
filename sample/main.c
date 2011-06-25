@@ -2,7 +2,7 @@
 #include "test.h"
 #include <stdio.h>
 
-PCU_TestCase suite[] = {
+PCU_Suite suites[] = {
 	{ "RingBuf_tests", RingBuf_tests, RingBuf_tests_initialize, RingBuf_tests_cleanup },
 	{ "StrToken_tests", StrToken_tests },
 	PCU_NULL,
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 	if (argc >= 2) {
 		PCU_set_mode(PCU_MODE_INTERACTIVE);
 	}
-	PCU_run(suite);
+	PCU_run(suites);
 	return 0;
 }
 
