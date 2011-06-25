@@ -1,6 +1,6 @@
 CFLAGS = -Wall -ansi -pedantic-errors -g
 CFLAGS += -I../PCUnit
-# CFLAGS += -DPCU_FREESTANDING
+# CFLAGS += -DPCU_NO_LIBC
 LFLAGS = -L../PCUnit -lpcunit
 TARGET = sample
 OBJS = main.o

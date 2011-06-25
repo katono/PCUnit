@@ -61,7 +61,7 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_FREESTANDING)
+#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		double dbl;
 #endif
 	} expected;
@@ -69,11 +69,11 @@ typedef struct PCU_TestFailure {
 		size_t num;
 		char *str;
 		const void *ptr;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_FREESTANDING)
+#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		double dbl;
 #endif
 	} actual;
-#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_FREESTANDING)
+#if !defined(PCU_NO_FPU) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 	double delta;
 #endif
 	unsigned long type;
@@ -199,7 +199,7 @@ void PCU_disable_color(void);
 #define PCU_FAIL8_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_F(); return; } while (0)
 #define PCU_FAIL9_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_F(); return; } while (0)
 
-#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_FREESTANDING) && __STDC_VERSION__ >= 199901L
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
 #define PCU_FAIL(format, ...)		do { PCU_snprintf(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
 #define PCU_FAIL_FATAL(format, ...)	do { PCU_snprintf(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, __VA_ARGS__); PCU_FAIL_IMPL_F(); return; } while (0)
 #endif
@@ -223,7 +223,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 #define PCU_MSG8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
 #define PCU_MSG9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
 
-#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_FREESTANDING) && __STDC_VERSION__ >= 199901L
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
 #define PCU_MSG(format, ...)		do { PCU_snprintf(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
 #endif
 

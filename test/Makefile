@@ -1,5 +1,5 @@
 CFLAGS = -Wall -ansi -pedantic-errors -g
-CFLAGS += -DPCU_FREESTANDING
+CFLAGS += -DPCU_NO_LIBC
 CFLAGS += -std=c99
 
 TARGET = PCUnit_test

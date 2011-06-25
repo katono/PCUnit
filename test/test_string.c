@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#undef PCU_FREESTANDING
+#undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
 size_t PCU_strlen(const char *s);
 int PCU_strcmp(const char *s1, const char *s2);

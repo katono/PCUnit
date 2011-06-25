@@ -8,7 +8,7 @@ extern "C" {
 int PCU_getchar(void);
 
 
-#if defined(PCU_NO_MALLOC) || defined(PCU_FREESTANDING)
+#if defined(PCU_NO_MALLOC) || defined(PCU_NO_LIBC)
 # include <stddef.h> /* size_t */
 # define PCU_MALLOC		PCU_malloc
 # define PCU_FREE		PCU_free
@@ -27,7 +27,7 @@ void PCU_str_free(char *ptr);
 #endif
 
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_FREESTANDING)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
 # include <stddef.h> /* size_t */
 # define PCU_SNPRINTF0(b, s, f)                                     PCU_snprintf0(b, s, f)
 # define PCU_SNPRINTF1(b, s, f, a1)                                 PCU_snprintf1(b, s, f, (size_t)(a1))
@@ -95,7 +95,7 @@ int PCU_printf(const char *format, ...);
 #endif
 
 
-#if defined(PCU_NO_SETJMP) || defined(PCU_FREESTANDING)
+#if defined(PCU_NO_SETJMP) || defined(PCU_NO_LIBC)
 typedef int PCU_jmp_buf;
 # define PCU_SETJMP(j)	((void)(j), 0)
 # define PCU_LONGJMP(j, v)
@@ -107,7 +107,7 @@ typedef jmp_buf PCU_jmp_buf;
 #endif
 
 
-#ifdef PCU_FREESTANDING
+#ifdef PCU_NO_LIBC
 # include <stddef.h> /* size_t */
 # define PCU_STRLEN		PCU_strlen
 # define PCU_STRCMP		PCU_strcmp

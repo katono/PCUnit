@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#undef PCU_FREESTANDING
+#undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
 int PCU_snprintf4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
 int PCU_snprintf5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
