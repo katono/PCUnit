@@ -129,7 +129,7 @@ typedef enum PCU_Mode {
 /* 
  * PCUnit API
  */
-void PCU_run(PCU_Suite *suite);
+void PCU_run(PCU_Suite *suites);
 void PCU_set_mode(PCU_Mode mode);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);
