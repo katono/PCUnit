@@ -5,9 +5,9 @@ static PCU_Test *current_test;
 static int repeat_counter;
 static PCU_jmp_buf fatal_jmp;
 
-static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat);
+static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat);
 #ifndef PCU_NO_FLOATINGPOINT
-static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat);
+static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat);
 #endif
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node);
@@ -108,7 +108,7 @@ int PCU_Test_is_failed(PCU_Test *self)
 	return 0;
 }
 
-int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int fatal_flag)
+int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag)
 {
 	PCU_TestFailure *node;
 	current_test->result.num_asserts++;
@@ -131,7 +131,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 }
 
 #ifndef PCU_NO_FLOATINGPOINT
-int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int fatal_flag)
+int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag)
 {
 	double dlt = delta;
 	int not_flag;
@@ -170,7 +170,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 }
 #endif
 
-void PCU_msg_impl(const char *msg, const char *file, int line)
+void PCU_msg_impl(const char *msg, const char *file, unsigned int line)
 {
 	PCU_TestFailure *node;
 	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MSG", file, line, repeat_counter);
@@ -238,11 +238,11 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 	return 1;
 }
 
-static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int repeat)
+static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
 	if (!self) {
-		PCU_PRINTF3("malloc failed: %s(%d): %s\n", file, line, expr);
+		PCU_PRINTF3("malloc failed: %s(%u): %s\n", file, line, expr);
 		return 0;
 	}
 
@@ -266,7 +266,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!copy_string(&self->expected.str, &self->actual.str, (const char *) expected, (const char *) actual, type)) {
-			PCU_PRINTF3("string malloc failed: %s(%d): %s\n", file, line, expr);
+			PCU_PRINTF3("string malloc failed: %s(%u): %s\n", file, line, expr);
 			PCU_FREE(self);
 			return 0;
 		}
@@ -285,11 +285,11 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 }
 
 #ifndef PCU_NO_FLOATINGPOINT
-static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int repeat)
+static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
 	if (!self) {
-		PCU_PRINTF3("malloc failed: %s(%d): %s\n", file, line, expr);
+		PCU_PRINTF3("malloc failed: %s(%u): %s\n", file, line, expr);
 		return 0;
 	}
 

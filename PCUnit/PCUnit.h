@@ -79,7 +79,7 @@ typedef struct PCU_TestFailure {
 	unsigned long type;
 	const char *expr;
 	const char *file;
-	int line;
+	unsigned int line;
 	int repeat;
 	struct PCU_TestFailure *next;
 	struct PCU_TestFailure *prev;
@@ -208,9 +208,9 @@ void PCU_disable_color(void);
 #define PCU_FAIL_FATAL(format, ...)	do { PCU_snprintf(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, __VA_ARGS__); PCU_FAIL_IMPL_F(); return; } while (0)
 #endif
 
-int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, int line, int fatal_flag);
+int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag);
 #ifndef PCU_NO_FLOATINGPOINT
-int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, int line, int fatal_flag);
+int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag);
 #endif
 
 
@@ -231,7 +231,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 #define PCU_MSG(format, ...)		do { PCU_snprintf(PCU_msg_buf, PCU_MSG_BUF_SIZE, format, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
 #endif
 
-void PCU_msg_impl(const char *msg, const char *file, int line);
+void PCU_msg_impl(const char *msg, const char *file, unsigned int line);
 
 
 #ifdef __cplusplus

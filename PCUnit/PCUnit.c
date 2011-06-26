@@ -117,7 +117,7 @@ static void print_failure(PCU_Test *test)
 		if (type == PCU_TYPE_SETUP) {
 			PCU_PRINTF2("  %d) %s\n", n++, test->name);
 		} else {
-			PCU_PRINTF3("  %d) %s:%d\n", n++, pos->file, pos->line);
+			PCU_PRINTF3("  %d) %s:%u\n", n++, pos->file, pos->line);
 		}
 		PCU_PRINTF1("   %s\n", pos->expr);
 		switch (type) {
