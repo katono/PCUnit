@@ -58,7 +58,7 @@ void PCU_Test_run(PCU_Test *self)
 	int repeat;
 	current_test = self;
 
-	repeat = (self->repeat > 0) ? self->repeat : 1;
+	repeat = (self->repeat != 0) ? self->repeat : 1;
 	for (repeat_counter = 0; repeat_counter < repeat; repeat_counter++) {
 		int err;
 		err = PCU_Test_setup(self);

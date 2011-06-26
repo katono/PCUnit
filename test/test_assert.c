@@ -358,6 +358,11 @@ static void test_long_long(void)
 	PCU_ASSERT_EQUAL(a, b);
 }
 
+static void test_skip(void)
+{
+	PCU_ASSERT(0);
+}
+
 
 PCU_Test assert_tests[] = {
 	{ "test_assert"                , test_assert                } ,
@@ -387,5 +392,6 @@ PCU_Test assert_tests[] = {
 	{ "test_assert_setup_err"      , test_assert_dummy          } ,
 	{ "test_assert_teardown_err"   , test_assert_dummy          } ,
 	{ "test_long_long"             , test_long_long             } ,
+	{ "test_skip"                  , test_skip, -1              } ,
 	PCU_NULL,
 };
