@@ -364,6 +364,29 @@ static void test_skip(void)
 }
 
 
+static void test_assert_operator(void)
+{
+	int a, b;
+	a = 0x100;
+	b = 0x100;
+	PCU_ASSERT_OPERATOR(0, <, 1);
+	PCU_ASSERT_OPERATOR(0, <=, 1);
+	PCU_ASSERT_OPERATOR(0, >, 1);
+	PCU_ASSERT_OPERATOR(0, >=, 1);
+	PCU_ASSERT_OPERATOR(a, ==, b);
+	PCU_ASSERT_OPERATOR(a, ^, b);
+	PCU_ASSERT_OPERATOR(a, ^, b+1);
+	PCU_ASSERT_OPERATOR(a, &, b);
+	PCU_ASSERT_OPERATOR(a, |, b);
+	b++;
+	PCU_ASSERT_OPERATOR(a, ==, b);
+	b = 0;
+	PCU_ASSERT_OPERATOR(a, &, b);
+	PCU_ASSERT_OPERATOR(0x10 <= a, &&, a < 0x100);
+	PCU_ASSERT_OPERATOR(a < 0x10, ||, 0x100 < a);
+}
+
+
 PCU_Test assert_tests[] = {
 	{ "test_assert"                , test_assert                } ,
 	{ "test_assert_true"           , test_assert_true           } ,
@@ -393,5 +416,6 @@ PCU_Test assert_tests[] = {
 	{ "test_assert_teardown_err"   , test_assert_dummy          } ,
 	{ "test_long_long"             , test_long_long             } ,
 	{ "test_skip"                  , test_skip, -1              } ,
+	{ "test_assert_operator"       , test_assert_operator       } ,
 	PCU_NULL,
 };

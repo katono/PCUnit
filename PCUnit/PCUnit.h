@@ -25,6 +25,7 @@ extern char PCU_msg_buf[];
 #define PCU_TYPE_SETUP	0x00000012
 #define PCU_TYPE_DBL	0x00000014
 #define PCU_TYPE_LLONG	0x00000018
+#define PCU_TYPE_OP		0x00000020
 #define PCU_TYPE_NSTR	0x40000000
 #define PCU_TYPE_NOT	0x80000000
 
@@ -177,6 +178,8 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)		PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)	PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
 #endif
+
+#define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), (sizeof(lhs) > sizeof(size_t) || sizeof(rhs) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_OP, "PCU_ASSERT_OPERATOR(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 0)
 
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)

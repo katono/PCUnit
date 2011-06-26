@@ -140,6 +140,21 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF2("    actual   <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
 #endif
 			break;
+		case PCU_TYPE_OP:
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
+			if (sizeof(int) < sizeof(size_t) && 
+					(pos->expected.num > 0xFFFF || pos->actual.num > 0xFFFF)) {
+				PCU_PRINTF1("    lhs <0x%x>\n", pos->expected.num);
+				PCU_PRINTF1("    rhs <0x%x>\n", pos->actual.num);
+			} else {
+				PCU_PRINTF2("    lhs <%d(0x%x)>\n", pos->expected.num, pos->expected.num);
+				PCU_PRINTF2("    rhs <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
+			}
+#else
+			PCU_PRINTF2("    lhs <%d(0x%x)>\n", pos->expected.num, pos->expected.num);
+			PCU_PRINTF2("    rhs <%d(0x%x)>\n", pos->actual.num, pos->actual.num);
+#endif
+			break;
 		case PCU_TYPE_PTR:
 			if (pos->expected.ptr) {
 				PCU_PRINTF1("    expected <%p>\n", pos->expected.ptr);
