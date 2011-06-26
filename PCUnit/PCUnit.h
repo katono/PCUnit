@@ -180,6 +180,7 @@ void PCU_disable_color(void);
 #endif
 
 #define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), (sizeof(lhs) > sizeof(size_t) || sizeof(rhs) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_OP, "PCU_ASSERT_OPERATOR(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), (sizeof(lhs) > sizeof(size_t) || sizeof(rhs) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_OP, "PCU_ASSERT_OPERATOR_FATAL(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 1)
 
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)

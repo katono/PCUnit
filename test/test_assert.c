@@ -377,13 +377,18 @@ static void test_assert_operator(void)
 	PCU_ASSERT_OPERATOR(a, ^, b);
 	PCU_ASSERT_OPERATOR(a, ^, b+1);
 	PCU_ASSERT_OPERATOR(a, &, b);
+	PCU_ASSERT_OPERATOR(a, &, ~b);
 	PCU_ASSERT_OPERATOR(a, |, b);
 	b++;
 	PCU_ASSERT_OPERATOR(a, ==, b);
 	b = 0;
 	PCU_ASSERT_OPERATOR(a, &, b);
+	PCU_ASSERT_OPERATOR(0, |, b);
 	PCU_ASSERT_OPERATOR(0x10 <= a, &&, a < 0x100);
 	PCU_ASSERT_OPERATOR(a < 0x10, ||, 0x100 < a);
+	PCU_ASSERT_OPERATOR_FATAL(0, <, 1);
+	PCU_ASSERT_OPERATOR_FATAL(0, ==, 1);
+	PCU_ASSERT_OPERATOR(0, >, 1);
 }
 
 
