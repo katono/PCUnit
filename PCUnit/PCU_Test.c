@@ -297,7 +297,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 	self->type = type;
 	switch (PCU_GET_ASSERT_TYPE(type)) {
 	case PCU_TYPE_DBL:
-#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		self->expected.dbl = expected;
 		self->actual.dbl = actual;
 		self->delta = delta;
