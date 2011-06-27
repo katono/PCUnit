@@ -251,10 +251,19 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	case PCU_TYPE_NONE:
 		break;
 	case PCU_TYPE_BOOL:
-	case PCU_TYPE_NUM:
+	case PCU_TYPE_NUM_CHAR:
+	case PCU_TYPE_NUM_SHORT:
+	case PCU_TYPE_NUM_INT:
+	case PCU_TYPE_NUM_LONG:
+	case PCU_TYPE_NUM_SIZET:
+	case PCU_TYPE_NUM_LLONG:
+	case PCU_TYPE_OP_CHAR:
+	case PCU_TYPE_OP_SHORT:
+	case PCU_TYPE_OP_INT:
+	case PCU_TYPE_OP_LONG:
+	case PCU_TYPE_OP_SIZET:
+	case PCU_TYPE_OP_LLONG:
 	case PCU_TYPE_SETUP:
-	case PCU_TYPE_LLONG:
-	case PCU_TYPE_OP:
 		self->expected.num = expected;
 		self->actual.num = actual;
 		break;

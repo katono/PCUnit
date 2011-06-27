@@ -15,23 +15,34 @@ extern "C" {
 #endif
 extern char PCU_msg_buf[];
 
-#define PCU_TYPE_NONE	0x00000000
-#define PCU_TYPE_BOOL	0x00000001
-#define PCU_TYPE_NUM	0x00000002
-#define PCU_TYPE_PTR	0x00000004
-#define PCU_TYPE_STR	0x00000008
-#define PCU_TYPE_MSG	0x00000010
-#define PCU_TYPE_FAIL	0x00000011
-#define PCU_TYPE_SETUP	0x00000012
-#define PCU_TYPE_DBL	0x00000014
-#define PCU_TYPE_LLONG	0x00000018
-#define PCU_TYPE_OP		0x00000020
-#define PCU_TYPE_NSTR	0x40000000
-#define PCU_TYPE_NOT	0x80000000
+#define PCU_TYPE_NONE      0x00000000
+#define PCU_TYPE_BOOL      0x00000001
+#define PCU_TYPE_NUM_CHAR  0x00000002
+#define PCU_TYPE_NUM_SHORT 0x00000003
+#define PCU_TYPE_NUM_INT   0x00000004
+#define PCU_TYPE_NUM_LONG  0x00000005
+#define PCU_TYPE_NUM_SIZET 0x00000006
+#define PCU_TYPE_NUM_LLONG 0x00000007
+#define PCU_TYPE_OP_CHAR   0x00000008
+#define PCU_TYPE_OP_SHORT  0x00000009
+#define PCU_TYPE_OP_INT    0x0000000a
+#define PCU_TYPE_OP_LONG   0x0000000b
+#define PCU_TYPE_OP_SIZET  0x0000000c
+#define PCU_TYPE_OP_LLONG  0x0000000d
+#define PCU_TYPE_PTR       0x0000000e
+#define PCU_TYPE_STR       0x0000000f
+#define PCU_TYPE_DBL       0x00000010
+#define PCU_TYPE_MSG       0x00000011
+#define PCU_TYPE_FAIL      0x00000012
+#define PCU_TYPE_SETUP     0x00000013
+#define PCU_TYPE_NSTR      0x40000000
+#define PCU_TYPE_NOT       0x80000000
 
 #define PCU_GET_ASSERT_TYPE(type)		(((type) & PCU_TYPE_NSTR) ? PCU_TYPE_NSTR : ((type) & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT)))
 #define PCU_GET_NSTR_LEN(type)			(size_t)((type) & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT))
 #define PCU_GET_NOT_FLAG(type)			((type) & PCU_TYPE_NOT)
+
+unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int is_operator);
 
 typedef struct {
 	int num_asserts;
@@ -152,10 +163,11 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_FALSE(expr)			PCU_assert_impl(((expr) == 0), 0, 1, PCU_TYPE_BOOL, "PCU_ASSERT_FALSE(" #expr ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_FALSE_FATAL(expr)	PCU_assert_impl(((expr) == 0), 0, 1, PCU_TYPE_BOOL, "PCU_ASSERT_FALSE_FATAL(" #expr ")", __FILE__, __LINE__, 1)
 
-#define PCU_ASSERT_EQUAL(expected, actual)				PCU_assert_impl(((expected) == (actual)), (size_t)(expected), (size_t)(actual), (sizeof(expected) > sizeof(size_t) || sizeof(actual) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_NUM, "PCU_ASSERT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
-#define PCU_ASSERT_NOT_EQUAL(expected, actual)			PCU_assert_impl(((expected) != (actual)), (size_t)(expected), (size_t)(actual), (sizeof(expected) > sizeof(size_t) || sizeof(actual) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_NUM | PCU_TYPE_NOT, "PCU_ASSERT_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
-#define PCU_ASSERT_EQUAL_FATAL(expected, actual)		PCU_assert_impl(((expected) == (actual)), (size_t)(expected), (size_t)(actual), (sizeof(expected) > sizeof(size_t) || sizeof(actual) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_NUM, "PCU_ASSERT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
-#define PCU_ASSERT_NOT_EQUAL_FATAL(expected, actual)	PCU_assert_impl(((expected) != (actual)), (size_t)(expected), (size_t)(actual), (sizeof(expected) > sizeof(size_t) || sizeof(actual) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_NUM | PCU_TYPE_NOT, "PCU_ASSERT_NOT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
+
+#define PCU_ASSERT_EQUAL(expected, actual)				PCU_assert_impl(((expected) == (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0), "PCU_ASSERT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_NOT_EQUAL(expected, actual)			PCU_assert_impl(((expected) != (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0) | PCU_TYPE_NOT, "PCU_ASSERT_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_EQUAL_FATAL(expected, actual)		PCU_assert_impl(((expected) == (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0), "PCU_ASSERT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_NOT_EQUAL_FATAL(expected, actual)	PCU_assert_impl(((expected) != (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0) | PCU_TYPE_NOT, "PCU_ASSERT_NOT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
 
 #define PCU_ASSERT_PTR_EQUAL(expected, actual)				PCU_assert_impl(((const void *)(expected) == (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR, "PCU_ASSERT_PTR_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)			PCU_assert_impl(((const void *)(expected) != (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
@@ -179,8 +191,8 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)	PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
 #endif
 
-#define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), (sizeof(lhs) > sizeof(size_t) || sizeof(rhs) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_OP, "PCU_ASSERT_OPERATOR(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 0)
-#define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), (sizeof(lhs) > sizeof(size_t) || sizeof(rhs) > sizeof(size_t)) ? PCU_TYPE_LLONG : PCU_TYPE_OP, "PCU_ASSERT_OPERATOR_FATAL(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_OPERATOR(lhs, op, rhs)		PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR_FATAL(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 1)
 
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)
