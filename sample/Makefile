@@ -6,6 +6,7 @@ TARGET = sample
 OBJS = main.o
 OBJS += RingBuf.o test_RingBuf.o
 OBJS += StrToken.o test_StrToken.o
+OBJS += ../PCUnit/libpcunit.a
 
 all: $(TARGET)
 
@@ -15,13 +16,17 @@ all: $(TARGET)
 	$(CC) $(CFLAGS) -c $<
 
 
+../PCUnit/libpcunit.a:
+	cd ../PCunit && $(MAKE)
+
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
+	./$(TARGET)
 
 
 .PHONY: clean
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o $(TARGET) ../PCUnit/*.o ../PCUnit/*.a
 
 main.o: test.h
 StrToken.o: StrToken.h
