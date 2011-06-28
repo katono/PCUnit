@@ -450,14 +450,13 @@ int PCU_snprintf9(char *buf, size_t size, const char *format, size_t arg1, size_
 
 static int PCU_printf_aux(const char *format, size_t *arg_list)
 {
-	extern char PCU_msg_buf[];
 	char *p = PCU_msg_buf;
 	int ret;
 
 	if (!putchar_func) {
 		return -1;
 	}
-	ret = PCU_snprintf_aux(p, PCU_MSG_BUF_SIZE, format, arg_list);
+	ret = PCU_snprintf_aux(p, sizeof PCU_msg_buf, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
@@ -588,7 +587,6 @@ int PCU_snprintf(char *buf, size_t size, const char *format, ...)
 
 int PCU_printf(const char *format, ...)
 {
-	extern char PCU_msg_buf[];
 	char *p = PCU_msg_buf;
 	int ret;
 	va_list ap;
@@ -597,7 +595,7 @@ int PCU_printf(const char *format, ...)
 		return -1;
 	}
 	va_start(ap, format);
-	ret = vsnprintf(p, PCU_MSG_BUF_SIZE, format, ap);
+	ret = vsnprintf(p, sizeof PCU_msg_buf, format, ap);
 	va_end(ap);
 	while (*p) {
 		putchar_func((int) *(p++));
