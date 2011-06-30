@@ -120,7 +120,7 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 			do {\
 				const type e = (type) pos->expected.num;\
 				const type a = (type) pos->actual.num;\
-				if (sizeof(int) < sizeof(size_t) && (e > 0xFFFF || a > 0xFFFF)) {\
+				if (sizeof(int) == 2 && (e > 0xFFFF || a > 0xFFFF)) {\
 					PCU_PRINTF1("    " expected_str " <0x%" len_str "x>\n", e);\
 					PCU_PRINTF1("    " actual_str   " <0x%" len_str "x>\n", a);\
 				} else {\
@@ -166,25 +166,13 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    actual   <%s>\n", pos->actual.num ? true_str : false_str);
 			break;
 		case PCU_TYPE_NUM_CHAR:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned char, "expected", "actual  ", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned char, "expected", "actual  ", "");
-#endif
 			break;
 		case PCU_TYPE_NUM_SHORT:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned short, "expected", "actual  ", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned short, "expected", "actual  ", "");
-#endif
 			break;
 		case PCU_TYPE_NUM_INT:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned int, "expected", "actual  ", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned int, "expected", "actual  ", "");
-#endif
 			break;
 		case PCU_TYPE_NUM_LONG:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
@@ -201,25 +189,13 @@ static void print_failure(PCU_Test *test)
 #endif
 			break;
 		case PCU_TYPE_OP_CHAR:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned char, "lhs", "rhs", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned char, "lhs", "rhs", "");
-#endif
 			break;
 		case PCU_TYPE_OP_SHORT:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned short, "lhs", "rhs", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned short, "lhs", "rhs", "");
-#endif
 			break;
 		case PCU_TYPE_OP_INT:
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL1(unsigned int, "lhs", "rhs", "");
-#else
 			PRINT_EXPECTED_ACTUAL2(unsigned int, "lhs", "rhs", "");
-#endif
 			break;
 		case PCU_TYPE_OP_LONG:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
