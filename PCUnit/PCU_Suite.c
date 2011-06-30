@@ -15,7 +15,7 @@ void PCU_Suite_reset(PCU_Suite *self)
 {
 	int i;
 	PCU_Test *p;
-	for (i = 0, p = self->tests; p->name != 0; i++, p++) {
+	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
 		PCU_Test_reset(p, self);
 	}
 	PCU_Suite_clear_result(self);
@@ -42,6 +42,7 @@ static int PCU_Suite_cleanup(const PCU_Suite *self)
 
 void PCU_Suite_run(PCU_Suite *self)
 {
+	int i;
 	PCU_Test *p;
 	current_suite = self;
 
@@ -50,7 +51,7 @@ void PCU_Suite_run(PCU_Suite *self)
 		self->result.num_errors_initialize++;
 		return;
 	}
-	for (p = self->tests; p->name != 0; p++) {
+	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
 		PCU_TestResult test_result;
 		PCU_Test_run(p);
 		PCU_Test_get_result(p, &test_result);

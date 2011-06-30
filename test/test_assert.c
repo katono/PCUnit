@@ -326,7 +326,7 @@ static void test_assert_dummy(void)
 	PCU_ASSERT(0);
 }
 
-int assert_tests_setup(void)
+static int setup(void)
 {
 	if (strcmp(PCU_test_name(), "test_assert_setup_err") == 0) {
 		return -1;
@@ -334,7 +334,7 @@ int assert_tests_setup(void)
 	return 0;
 }
 
-int assert_tests_teardown(void)
+static int teardown(void)
 {
 	if (strcmp(PCU_test_name(), "test_assert_teardown_err") == 0) {
 		return -2;
@@ -392,35 +392,39 @@ static void test_assert_operator(void)
 }
 
 
-PCU_Test assert_tests[] = {
-	{ "test_assert"                , test_assert                } ,
-	{ "test_assert_true"           , test_assert_true           } ,
-	{ "test_assert_false"          , test_assert_false          } ,
-	{ "test_assert_equal"          , test_assert_equal          } ,
-	{ "test_assert_not_equal"      , test_assert_not_equal      } ,
-	{ "test_assert_ptr_equal"      , test_assert_ptr_equal      } ,
-	{ "test_assert_ptr_not_equal"  , test_assert_ptr_not_equal  } ,
-	{ "test_assert_str_equal"      , test_assert_str_equal      } ,
-	{ "test_assert_str_not_equal"  , test_assert_str_not_equal  } ,
-	{ "test_assert_nstr_equal"     , test_assert_nstr_equal     } ,
-	{ "test_assert_nstr_not_equal" , test_assert_nstr_not_equal } ,
-	{ "test_assert_dbl_equal"      , test_assert_dbl_equal      } ,
-	{ "test_assert_dbl_not_equal"  , test_assert_dbl_not_equal  } ,
-	{ "test_msg0"                  , test_msg0                  } ,
-	{ "test_msg1"                  , test_msg1                  } ,
-	{ "test_msg2"                  , test_msg2                  } ,
-	{ "test_msg3"                  , test_msg3                  } ,
-	{ "test_msg4"                  , test_msg4                  } ,
-	{ "test_msg5"                  , test_msg5                  } ,
-	{ "test_msg6"                  , test_msg6                  } ,
-	{ "test_msg7"                  , test_msg7                  } ,
-	{ "test_msg8"                  , test_msg8                  } ,
-	{ "test_msg9"                  , test_msg9                  } ,
-	{ "test_msg"                   , test_msg                   } ,
-	{ "test_assert_setup_err"      , test_assert_dummy          } ,
-	{ "test_assert_teardown_err"   , test_assert_dummy          } ,
-	{ "test_long_long"             , test_long_long             } ,
-	{ "test_skip"                  , test_skip, -1              } ,
-	{ "test_assert_operator"       , test_assert_operator       } ,
-	PCU_NULL,
-};
+PCU_Suite *AssertTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_assert"                , test_assert                } ,
+		{ "test_assert_true"           , test_assert_true           } ,
+		{ "test_assert_false"          , test_assert_false          } ,
+		{ "test_assert_equal"          , test_assert_equal          } ,
+		{ "test_assert_not_equal"      , test_assert_not_equal      } ,
+		{ "test_assert_ptr_equal"      , test_assert_ptr_equal      } ,
+		{ "test_assert_ptr_not_equal"  , test_assert_ptr_not_equal  } ,
+		{ "test_assert_str_equal"      , test_assert_str_equal      } ,
+		{ "test_assert_str_not_equal"  , test_assert_str_not_equal  } ,
+		{ "test_assert_nstr_equal"     , test_assert_nstr_equal     } ,
+		{ "test_assert_nstr_not_equal" , test_assert_nstr_not_equal } ,
+		{ "test_assert_dbl_equal"      , test_assert_dbl_equal      } ,
+		{ "test_assert_dbl_not_equal"  , test_assert_dbl_not_equal  } ,
+		{ "test_msg0"                  , test_msg0                  } ,
+		{ "test_msg1"                  , test_msg1                  } ,
+		{ "test_msg2"                  , test_msg2                  } ,
+		{ "test_msg3"                  , test_msg3                  } ,
+		{ "test_msg4"                  , test_msg4                  } ,
+		{ "test_msg5"                  , test_msg5                  } ,
+		{ "test_msg6"                  , test_msg6                  } ,
+		{ "test_msg7"                  , test_msg7                  } ,
+		{ "test_msg8"                  , test_msg8                  } ,
+		{ "test_msg9"                  , test_msg9                  } ,
+		{ "test_msg"                   , test_msg                   } ,
+		{ "test_assert_setup_err"      , test_assert_dummy          } ,
+		{ "test_assert_teardown_err"   , test_assert_dummy          } ,
+		{ "test_long_long"             , test_long_long             } ,
+		{ "test_skip"                  , test_skip, -1              } ,
+		{ "test_assert_operator"       , test_assert_operator       } ,
+	};
+	static PCU_Suite suite = { "AsseertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
+	return &suite;
+}

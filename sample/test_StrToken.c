@@ -29,7 +29,7 @@ static struct StrTokenTestData test_data[] = {
 static StrToken *tok;
 static struct StrTokenTestData *data;
 
-int StrToken_tests_setup(void)
+static int setup(void)
 {
 	data = &test_data[PCU_repeat_counter()];
 
@@ -37,14 +37,14 @@ int StrToken_tests_setup(void)
 	return tok == 0;
 }
 
-int StrToken_tests_teardown(void)
+static int teardown(void)
 {
 	StrToken_delete(tok);
 	tok = 0;
 	return 0;
 }
 
-static void StrToken_test(void)
+static void test_StrToken(void)
 {
 	size_t i;
 
@@ -59,8 +59,12 @@ static void StrToken_test(void)
 }
 
 
-PCU_Test StrToken_tests[] = {
-	{ "StrToken_test", StrToken_test, sizeof test_data / sizeof test_data[0] },
-	PCU_NULL,
-};
+PCU_Suite *StrTokenTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_StrToken", test_StrToken, sizeof test_data / sizeof test_data[0] },
+	};
+	static PCU_Suite suite = { "StrTokenTest", tests, sizeof tests / sizeof tests[0], setup, teardown };
+	return &suite;
+}
 

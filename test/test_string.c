@@ -197,13 +197,16 @@ void test_memset(void)
 
 
 
-PCU_Test string_tests[] = {
-	{ "test_strlen", test_strlen },
-	{ "test_strcmp", test_strcmp },
-	{ "test_strncmp", test_strncmp },
-	{ "test_strcpy", test_strcpy },
-	{ "test_strncpy", test_strncpy },
-	{ "test_memset", test_memset },
-	PCU_NULL,
-};
-
+PCU_Suite *StringTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_strlen", test_strlen },
+		{ "test_strcmp", test_strcmp },
+		{ "test_strncmp", test_strncmp },
+		{ "test_strcpy", test_strcpy },
+		{ "test_strncpy", test_strncpy },
+		{ "test_memset", test_memset },
+	};
+	static PCU_Suite suite = { "StringTest", tests, sizeof tests / sizeof tests[0] };
+	return &suite;
+}

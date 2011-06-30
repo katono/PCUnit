@@ -14,11 +14,13 @@ static PCU_Mode pcu_mode = PCU_MODE_NORMAL;
 
 static PCU_Result result;
 
-static void reset(PCU_Suite *suites)
+static void reset(PCU_SuiteMethod *suite_methods, int num)
 {
-	PCU_Suite *p;
+	int i;
+	PCU_SuiteMethod *method = suite_methods;
 	PCU_MEMSET(&result, 0, sizeof(result));
-	for (p = suites; p->name != 0; p++) {
+	for (i = 0; i < num; i++, method++) {
+		PCU_Suite *p = (*method)();
 		PCU_SuiteResult suite_result;
 		PCU_Suite_reset(p);
 		PCU_Suite_get_result(p, &suite_result);
@@ -304,6 +306,7 @@ static void print_result_selected(PCU_Suite *suite, int idx)
 
 static void print_result(PCU_Suite *suite)
 {
+	int i;
 	PCU_Test *p;
 	PCU_PRINTF1("Suite: %s\n", suite->name);
 	if (suite->initialize_error) {
@@ -314,7 +317,7 @@ static void print_result(PCU_Suite *suite)
 		return;
 	}
 	PCU_PRINTF0("\n");
-	for (p = suite->tests; p->name != 0; p++) {
+	for (i = 0, p = suite->tests; i < suite->ntests; i++, p++) {
 		print_failure(p);
 	}
 	if (suite->result.num_tests_failed == 0) {
@@ -354,69 +357,76 @@ static void add_result(const PCU_SuiteResult *suite_result)
 	}
 }
 
-static void run_all(PCU_Suite *suites)
+static void run_all(PCU_SuiteMethod *suite_methods, int num)
 {
-	PCU_Suite *p;
-	for (p = suites; p->name != 0; p++) {
+	int i;
+	PCU_SuiteMethod *method = suite_methods;
+	for (i = 0; i < num; i++, method++) {
 		PCU_SuiteResult suite_result;
+		PCU_Suite *p = (*method)();
 		PCU_Suite_run(p);
 		PCU_Suite_get_result(p, &suite_result);
 		add_result(&suite_result);
 		PCU_PRINTF0("----\n");
 		print_result(p);
 	}
-	reset(suites);
+	reset(suite_methods, num);
 }
 
-static void run_selected_suite(PCU_Suite *suites, int suite_idx)
+static void run_selected_suite(PCU_SuiteMethod *suite_methods, int num, int suite_idx)
 {
 	PCU_SuiteResult suite_result;
-	PCU_Suite_run(&suites[suite_idx]);
-	PCU_Suite_get_result(&suites[suite_idx], &suite_result);
+	PCU_Suite *p = (suite_methods[suite_idx])();
+	PCU_Suite_run(p);
+	PCU_Suite_get_result(p, &suite_result);
 	add_result(&suite_result);
-	print_result(&suites[suite_idx]);
-	reset(suites);
+	print_result(p);
+	reset(suite_methods, num);
 }
 
-static void run_selected_test(PCU_Suite *suites, int suite_idx, int test_idx)
+static void run_selected_test(PCU_SuiteMethod *suite_methods, int num, int suite_idx, int test_idx)
 {
 	PCU_SuiteResult suite_result;
-	PCU_Suite_run_selected(&suites[suite_idx], test_idx);
-	PCU_Suite_get_result(&suites[suite_idx], &suite_result);
+	PCU_Suite *p = (suite_methods[suite_idx])();
+	PCU_Suite_run_selected(p, test_idx);
+	PCU_Suite_get_result(p, &suite_result);
 	add_result(&suite_result);
-	print_result_selected(&suites[suite_idx], test_idx);
-	reset(suites);
+	print_result_selected(p, test_idx);
+	reset(suite_methods, num);
 }
 
-static void show_list_tests(const PCU_Test *tests)
+static void show_list_tests(const PCU_Test *tests, int num)
 {
 	int i;
+	int j;
 	const PCU_Test *p;
 	PCU_PRINTF0("List of Tests\n");
 	PCU_PRINTF0("  Number  Name\n");
-	for (i = 1, p = tests; p->name != 0; i++, p++) {
-		PCU_PRINTF2("  %-6d  %s\n", i, p->name);
+	for (i = 0, j = 1, p = tests; i < num; i++, j++, p++) {
+		PCU_PRINTF2("  %-6d  %s\n", j, p->name);
 	}
 	PCU_PRINTF0("\n");
 }
 
-static void show_list_suites(const PCU_Suite *suites)
+static void show_list_suites(PCU_SuiteMethod *suite_methods, int num)
 {
 	int i;
-	const PCU_Suite *p;
+	int j;
+	PCU_SuiteMethod *method = suite_methods;
 	PCU_PRINTF0("List of Suites\n");
 	PCU_PRINTF0("  Number  Name\n");
-	for (i = 1, p = suites; p->name != 0; i++, p++) {
-		PCU_PRINTF2("  %-6d  %s\n", i, p->name);
+	for (i = 0, j = 1; i < num; i++, j++, method++) {
+		const PCU_Suite *p = (*method)();
+		PCU_PRINTF2("  %-6d  %s\n", j, p->name);
 	}
 	PCU_PRINTF0("\n");
 }
 
-static int find_test_name(const PCU_Test *tests, const char *input_str)
+static int find_test_name(const PCU_Test *tests, int num, const char *input_str)
 {
 	int i;
 	const PCU_Test *p;
-	for (i = 0, p = tests; p->name != 0; i++, p++) {
+	for (i = 0, p = tests; i < num; i++, p++) {
 		if (PCU_STRCMP(p->name, input_str) == 0) {
 			return i;
 		}
@@ -424,19 +434,11 @@ static int find_test_name(const PCU_Test *tests, const char *input_str)
 	return -1;
 }
 
-static int get_ntests(const PCU_Test *tests)
-{
-	int i;
-	const PCU_Test *p;
-	for (i = 0, p = tests; p->name != 0; i++, p++) ;
-	return i;
-}
-
-static int find_test_number(const PCU_Test *tests, const char *input_str)
+static int find_test_number(int num, const char *input_str)
 {
 	int n;
 	n = PCU_ATOI(input_str);
-	if (n <= 0 || get_ntests(tests) + 1 <= n) {
+	if (n <= 0 || num + 1 <= n) {
 		return -1;
 	}
 	return n - 1;
@@ -455,16 +457,16 @@ static void get_line(char *buf, int size)
 	buf[i] = '\0';
 }
 
-static void select_test(PCU_Suite *suites, int suite_idx)
+static void select_test(PCU_SuiteMethod *suite_methods, int num, int suite_idx)
 {
 	int idx;
-	PCU_Suite *suite = &suites[suite_idx];
+	PCU_Suite *suite = (suite_methods[suite_idx])();
 	PCU_PRINTF0("Enter Test's Number or Name: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_test_number(suite->tests, input_buf);
+	idx = find_test_number(suite->ntests, input_buf);
 	if (idx == -1) {
-		idx = find_test_name(suite->tests, input_buf);
+		idx = find_test_name(suite->tests, suite->ntests, input_buf);
 		if (idx == -1) {
 			PCU_PRINTF0("\nTest not found.\n");
 			return;
@@ -472,14 +474,15 @@ static void select_test(PCU_Suite *suites, int suite_idx)
 	}
 	PCU_PRINTF0("\n");
 
-	run_selected_test(suites, suite_idx, idx);
+	run_selected_test(suite_methods, num, suite_idx, idx);
 }
 
-static int find_suite_name(const PCU_Suite *suites, const char *input_str)
+static int find_suite_name(PCU_SuiteMethod *suite_methods, int num, const char *input_str)
 {
 	int i;
-	const PCU_Suite *p;
-	for (i = 0, p = suites; p->name != 0; i++, p++) {
+	PCU_SuiteMethod *method = suite_methods;
+	for (i = 0; i < num; i++, method++) {
+		const PCU_Suite *p = (*method)();
 		if (PCU_STRCMP(p->name, input_str) == 0) {
 			return i;
 		}
@@ -487,41 +490,33 @@ static int find_suite_name(const PCU_Suite *suites, const char *input_str)
 	return -1;
 }
 
-static int get_nsuites(const PCU_Suite *suites)
-{
-	int i;
-	const PCU_Suite *p;
-	for (i = 0, p = suites; p->name != 0; i++, p++) ;
-	return i;
-}
-
-static int find_suite_number(const PCU_Suite *suites, const char *input_str)
+static int find_suite_number(int num, const char *input_str)
 {
 	int n;
 	n = PCU_ATOI(input_str);
-	if (n <= 0 || get_nsuites(suites) + 1 <= n) {
+	if (n <= 0 || num + 1 <= n) {
 		return -1;
 	}
 	return n - 1;
 }
 
-static int select_suite(PCU_Suite *suites)
+static int select_suite(PCU_SuiteMethod *suite_methods, int num)
 {
 	int idx;
 	PCU_Suite *selected_suite;
 	PCU_PRINTF0("Enter Suite's Number or Name: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_suite_number(suites, input_buf);
+	idx = find_suite_number(num, input_buf);
 	if (idx == -1) {
-		idx = find_suite_name(suites, input_buf);
+		idx = find_suite_name(suite_methods, num, input_buf);
 		if (idx == -1) {
 			PCU_PRINTF0("\nSuite not found.\n");
 			return 0;
 		}
 	}
 
-	selected_suite = &suites[idx];
+	selected_suite = (suite_methods[idx])();
 
 	PCU_PRINTF0("\n");
 	while (1) {
@@ -533,16 +528,16 @@ static int select_suite(PCU_Suite *suites)
 		switch (input_buf[0]) {
 		case 'r':
 		case 'R':
-			run_selected_suite(suites, idx);
+			run_selected_suite(suite_methods, num, idx);
 			break;
 		case 's':
 		case 'S':
-			show_list_tests(selected_suite->tests);
-			select_test(suites, idx);
+			show_list_tests(selected_suite->tests, selected_suite->ntests);
+			select_test(suite_methods, num, idx);
 			break;
 		case 'l':
 		case 'L':
-			show_list_tests(selected_suite->tests);
+			show_list_tests(selected_suite->tests, selected_suite->ntests);
 			break;
 		case 'm':
 		case 'M':
@@ -557,7 +552,7 @@ static int select_suite(PCU_Suite *suites)
 	}
 }
 
-static void run_interactive(PCU_Suite *suites)
+static void run_interactive(PCU_SuiteMethod *suite_methods, int num)
 {
 	while (1) {
 		int quit;
@@ -570,17 +565,17 @@ static void run_interactive(PCU_Suite *suites)
 		switch (input_buf[0]) {
 		case 'r':
 		case 'R':
-			run_all(suites);
+			run_all(suite_methods, num);
 			break;
 		case 's':
 		case 'S':
-			show_list_suites(suites);
-			quit = select_suite(suites);
+			show_list_suites(suite_methods, num);
+			quit = select_suite(suite_methods, num);
 			if (quit) return;
 			break;
 		case 'l':
 		case 'L':
-			show_list_suites(suites);
+			show_list_suites(suite_methods, num);
 			break;
 		case 'e':
 		case 'E':
@@ -600,16 +595,16 @@ static void run_interactive(PCU_Suite *suites)
 	}
 }
 
-void PCU_run(PCU_Suite *suites)
+void PCU_run(PCU_SuiteMethod *suite_methods, int num)
 {
-	reset(suites);
+	reset(suite_methods, num);
 	switch (pcu_mode) {
 	case PCU_MODE_INTERACTIVE:
-		run_interactive(suites);
+		run_interactive(suite_methods, num);
 		break;
 	case PCU_MODE_NORMAL:
 	default:
-		run_all(suites);
+		run_all(suite_methods, num);
 		break;
 	}
 }

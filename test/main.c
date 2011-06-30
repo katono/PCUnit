@@ -2,39 +2,34 @@
 #include <string.h>
 #include <stdio.h>
 
-extern PCU_Test string_tests[];
-extern PCU_Test snprintf_tests[];
-extern PCU_Test strtol_tests[];
-extern PCU_Test assert_tests[];
 
-PCU_Suite suites[] = {
-	{ "snprintf_tests", snprintf_tests },
-	{ "string_tests", string_tests },
-	{ "strtol_tests", strtol_tests },
-	PCU_NULL,
-};
-
-int assert_tests_setup(void);
-int assert_tests_teardown(void);
-
-PCU_Suite suites_assert[] = {
-	{ "assert_tests", assert_tests, assert_tests_setup, assert_tests_teardown },
-	PCU_NULL,
-};
+PCU_Suite *AssertTest_suite(void);
+PCU_Suite *SnprintfTest_suite(void);
+PCU_Suite *StringTest_suite(void);
+PCU_Suite *StrtolTest_suite(void);
 
 int main(int argc, char **argv)
 {
+	PCU_SuiteMethod assert_suites[] = {
+		AssertTest_suite,
+	};
+	PCU_SuiteMethod suites[] = {
+		SnprintfTest_suite,
+		StringTest_suite,
+		StrtolTest_suite,
+	};
+
 	PCU_enable_color();
 	PCU_set_getchar(getchar);
 	if (argc > 1) {
 		PCU_set_mode(PCU_MODE_INTERACTIVE);
 		if (strcmp(argv[1], "assert") == 0) {
-			PCU_run(suites_assert);
+			PCU_run(assert_suites, sizeof assert_suites / sizeof *assert_suites);
 		} else {
-			PCU_run(suites);
+			PCU_run(suites, sizeof suites / sizeof *suites);
 		}
 	} else {
-		PCU_run(suites);
+		PCU_run(suites, sizeof suites / sizeof *suites);
 	}
 	return 0;
 }

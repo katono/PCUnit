@@ -327,10 +327,14 @@ void test_snprintf_size1(void)
 }
 
 
-PCU_Test snprintf_tests[] = {
-	{ "test_snprintf", test_snprintf },
-	{ "test_snprintf_shorten", test_snprintf_shorten },
-	{ "test_snprintf_size0", test_snprintf_size0 },
-	{ "test_snprintf_size1", test_snprintf_size1 },
-	PCU_NULL,
-};
+PCU_Suite *SnprintfTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_snprintf", test_snprintf },
+		{ "test_snprintf_shorten", test_snprintf_shorten },
+		{ "test_snprintf_size0", test_snprintf_size0 },
+		{ "test_snprintf_size1", test_snprintf_size1 },
+	};
+	static PCU_Suite suite = { "SnprintfTest", tests, sizeof tests / sizeof tests[0] };
+	return &suite;
+}

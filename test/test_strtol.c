@@ -162,10 +162,14 @@ void test_atoi(void)
 	ASSERT_ATOI("zzz");
 }
 
-PCU_Test strtol_tests[] = {
-	{ "test_strtol", test_strtol },
-	{ "test_strtoul", test_strtoul },
-	{ "test_atoi", test_atoi },
-	PCU_NULL,
-};
 
+PCU_Suite *StrtolTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_strtol", test_strtol },
+		{ "test_strtoul", test_strtoul },
+		{ "test_atoi", test_atoi },
+	};
+	static PCU_Suite suite = { "StrtolTest", tests, sizeof tests / sizeof tests[0] };
+	return &suite;
+}

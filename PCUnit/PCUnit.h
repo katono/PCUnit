@@ -100,8 +100,6 @@ typedef struct PCU_TestFailure {
 /* 
  * public
  */
-#define PCU_NULL	{0}
-
 typedef struct PCU_Test PCU_Test;
 typedef struct PCU_Suite PCU_Suite;
 
@@ -120,6 +118,7 @@ struct PCU_Suite {
 	/* public */
 	const char *name;
 	PCU_Test *tests;
+	int ntests;
 	int (*setup)(void);
 	int (*teardown)(void);
 	int (*initialize)(void);
@@ -129,6 +128,8 @@ struct PCU_Suite {
 	int cleanup_error;
 	PCU_SuiteResult result;
 };
+
+typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 
 typedef int (*PCU_Putchar)(int c);
 typedef int (*PCU_Getchar)(void);
@@ -141,7 +142,7 @@ typedef enum PCU_Mode {
 /* 
  * PCUnit API
  */
-void PCU_run(PCU_Suite *suites);
+void PCU_run(PCU_SuiteMethod *suite_methods, int num);
 void PCU_set_mode(PCU_Mode mode);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);

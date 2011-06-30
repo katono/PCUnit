@@ -7,21 +7,21 @@ static RingBuf ringbuf;
 static RingBuf *rb = &ringbuf;
 static unsigned char rb_buffer[RB_BUF_SIZE];
 
-int RingBuf_tests_initialize(void)
+static int initialize(void)
 {
 	/* Suiteの最初に呼ばれる */
 	printf("initialize: %s\n", PCU_suite_name());
 	return 0;
 }
 
-int RingBuf_tests_cleanup(void)
+static int cleanup(void)
 {
 	/* Suiteの最後に呼ばれる */
 	printf("cleanup   : %s\n", PCU_suite_name());
 	return 0;
 }
 
-int RingBuf_tests_setup(void)
+static int setup(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
 	RingBuf_init(rb, rb_buffer, sizeof rb_buffer);
@@ -29,7 +29,7 @@ int RingBuf_tests_setup(void)
 	return 0;
 }
 
-int RingBuf_tests_teardown(void)
+static int teardown(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
 	printf("  teardown: %s\n", PCU_test_name());
@@ -108,10 +108,14 @@ static void test_rb_pop(void)
 }
 
 
+PCU_Suite *RingBufTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_rb_init", test_rb_init },
+		{ "test_rb_push", test_rb_push },
+		{ "test_rb_pop", test_rb_pop },
+	};
+	static PCU_Suite suite = { "RingBufTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup };
+	return &suite;
+}
 
-PCU_Test RingBuf_tests[] = {
-	{ "test_rb_init" , test_rb_init } , 
-	{ "test_rb_push" , test_rb_push } , 
-	{ "test_rb_pop"  , test_rb_pop  } , 
-	PCU_NULL,
-};
