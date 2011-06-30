@@ -43,14 +43,14 @@ enum {
 	COLOR_GREEN,
 	COLOR_RED
 };
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 #include <windows.h>
 static CONSOLE_SCREEN_BUFFER_INFO csbi;
 static int csbi_init_flag = 0;
 #endif
 static void set_color(int color)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 	HANDLE h;
 	WORD attr;
 	if (!enable_color) return;
@@ -87,7 +87,7 @@ static void set_color(int color)
 }
 static void reset_color(void)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 	HANDLE h;
 	if (!enable_color) return;
 	if (!csbi_init_flag) return;
