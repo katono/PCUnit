@@ -730,6 +730,16 @@ void *PCU_memset(void *b, int c, size_t len)
 	return b;
 }
 
+void *PCU_memcpy(void *dst, const void *src, size_t len)
+{
+	char *p = dst;
+	const char *q = src;
+	for (; len > 0; len--) {
+		*(p++) = *(q++);
+	}
+	return dst;
+}
+
 static int ascii2hex(char c)
 {
 	if ('0' <= c && c <= '9') {

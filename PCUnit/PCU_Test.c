@@ -89,7 +89,7 @@ void PCU_Test_run(PCU_Test *self)
 
 void PCU_Test_get_result(PCU_Test *self, PCU_TestResult *result)
 {
-	*result = self->result;
+	PCU_MEMCPY(result, &self->result, sizeof *result);
 }
 
 int PCU_Test_is_repeated_test(PCU_Test *self)

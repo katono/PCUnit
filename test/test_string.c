@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
@@ -10,6 +11,7 @@ int PCU_strncmp(const char *s1, const char *s2, size_t len);
 char *PCU_strcpy(char *dst, const char *src);
 char *PCU_strncpy(char *dst, const char *src, size_t len);
 void *PCU_memset(void *b, int c, size_t len);
+void *PCU_memcpy(void *dst, const void *src, size_t len);
 
 
 void test_strlen(void)
@@ -194,8 +196,47 @@ void test_memset(void)
 
 }
 
+void test_memcpy(void)
+{
+	static char c_buf[256];
+	static char c_buf2[256];
+	static int i_buf[256];
+	static int i_buf2[256];
+	static struct {
+		int a;
+		char b[3];
+	} st_buf[10], st_buf2[10];
+	char *p;
+	size_t i;
 
+	srand(time(0));
+	for (i = 0; i < sizeof c_buf; i++) {
+		c_buf[i] = (char) rand();
+	}
+	for (i = 0; i < sizeof i_buf; i++) {
+		((char *)i_buf)[i] = (char) rand();
+	}
+	for (i = 0; i < sizeof st_buf; i++) {
+		((char *)st_buf)[i] = (char) rand();
+	}
 
+	p = PCU_memcpy(c_buf2, c_buf, sizeof(c_buf2));
+	PCU_ASSERT_PTR_EQUAL(c_buf2, p);
+	for (i = 0; i < sizeof(c_buf2); i++) {
+		PCU_ASSERT_EQUAL(c_buf[i], p[i]);
+	}
+
+	p = PCU_memcpy(i_buf2, i_buf, sizeof(i_buf2));
+	PCU_ASSERT_PTR_EQUAL(i_buf2, p);
+	for (i = 0; i < sizeof(i_buf2); i++) {
+		PCU_ASSERT_EQUAL(((char *)i_buf)[i], p[i]);
+	}
+
+	p = PCU_memcpy(st_buf2, st_buf, sizeof(st_buf2));
+	PCU_ASSERT_PTR_EQUAL(st_buf2, p);
+	for (i = 0; i < sizeof(st_buf2); i++) {
+		PCU_ASSERT_EQUAL(((char *)st_buf)[i], p[i]);
+	}
 
 PCU_Suite *StringTest_suite(void)
 {
@@ -206,6 +247,7 @@ PCU_Suite *StringTest_suite(void)
 		{ "test_strcpy", test_strcpy },
 		{ "test_strncpy", test_strncpy },
 		{ "test_memset", test_memset },
+		{ "test_memcpy", test_memcpy },
 	};
 	static PCU_Suite suite = { "StringTest", tests, sizeof tests / sizeof tests[0] };
 	return &suite;

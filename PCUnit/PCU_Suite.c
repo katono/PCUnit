@@ -102,7 +102,7 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 
 void PCU_Suite_get_result(PCU_Suite *self, PCU_SuiteResult *result)
 {
-	*result = self->result;
+	PCU_MEMCPY(result, &self->result, sizeof *result);
 }
 
 const char *PCU_suite_name(void)
