@@ -26,11 +26,11 @@ static void PCU_Test_clear_result(PCU_Test *self)
 void PCU_Test_reset(PCU_Test *self, const PCU_Suite *suite)
 {
 	self->suite = suite;
-	if (!self->assertion_list.next) {
-		self->assertion_list.next = &self->assertion_list;
-		self->assertion_list.prev = &self->assertion_list;
+	if (!self->failure_list.next) {
+		self->failure_list.next = &self->failure_list;
+		self->failure_list.prev = &self->failure_list;
 	} else {
-		PCU_TestFailure *list = &self->assertion_list;
+		PCU_TestFailure *list = &self->failure_list;
 		while (!LIST_EMPTY(list)) {
 			PCU_TestFailure *tmp = list_pop(list);
 			PCU_TestFailure_delete(tmp);
@@ -71,7 +71,7 @@ void PCU_Test_run(PCU_Test *self)
 			self->result.num_errors_setup++;
 			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
-				list_push(&current_test->assertion_list, node);
+				list_push(&current_test->failure_list, node);
 			}
 			continue;
 		}
@@ -84,7 +84,7 @@ void PCU_Test_run(PCU_Test *self)
 			self->result.num_errors_teardown++;
 			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
-				list_push(&current_test->assertion_list, node);
+				list_push(&current_test->failure_list, node);
 			}
 			continue;
 		}
@@ -126,7 +126,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 
 	node = PCU_TestFailure_new(expected, actual, type, expr, file, line, repeat_counter);
 	if (node) {
-		list_push(&current_test->assertion_list, node);
+		list_push(&current_test->failure_list, node);
 	}
 	if (fatal_flag) {
 		PCU_LONGJMP(fatal_jmp, 1);
@@ -165,7 +165,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 
 	node = PCU_TestFailure_new_double(expected, actual, delta, type, expr, file, line, repeat_counter);
 	if (node) {
-		list_push(&current_test->assertion_list, node);
+		list_push(&current_test->failure_list, node);
 	}
 	if (fatal_flag) {
 		PCU_LONGJMP(fatal_jmp, 1);
@@ -179,7 +179,7 @@ void PCU_msg_impl(const char *msg, const char *file, unsigned int line)
 	PCU_TestFailure *node;
 	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MSG", file, line, repeat_counter);
 	if (node) {
-		list_push(&current_test->assertion_list, node);
+		list_push(&current_test->failure_list, node);
 	}
 }
 

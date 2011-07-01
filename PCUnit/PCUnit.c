@@ -140,13 +140,13 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 static void print_failure(PCU_Test *test)
 {
 	PCU_TestFailure *pos;
-	PCU_TestFailure *list = &test->assertion_list;
+	PCU_TestFailure *list = &test->failure_list;
 	int n = 1;
 	if (PCU_Test_is_failed(test)) {
 		set_color(COLOR_RED);
 		PCU_PRINTF0(" !!!! Failure !!!!\n");
 	}
-	if (!LIST_EMPTY(&test->assertion_list)) {
+	if (!LIST_EMPTY(&test->failure_list)) {
 		PCU_PRINTF1(" Test: %s\n", test->name);
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
@@ -260,7 +260,7 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("    repeat   <%d>\n", pos->repeat);
 		}
 	}
-	if (!LIST_EMPTY(&test->assertion_list)) {
+	if (!LIST_EMPTY(&test->failure_list)) {
 		PCU_PRINTF0("\n");
 	}
 	if (PCU_Test_is_failed(test)) {

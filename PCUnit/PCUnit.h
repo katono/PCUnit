@@ -111,7 +111,7 @@ struct PCU_Test {
 	/* private */
 	const PCU_Suite *suite;
 	PCU_TestResult result;
-	PCU_TestFailure assertion_list;
+	PCU_TestFailure failure_list;
 };
 
 struct PCU_Suite {
