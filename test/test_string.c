@@ -237,6 +237,7 @@ void test_memcpy(void)
 	for (i = 0; i < sizeof(st_buf2); i++) {
 		PCU_ASSERT_EQUAL(((char *)st_buf)[i], p[i]);
 	}
+}
 
 PCU_Suite *StringTest_suite(void)
 {
