@@ -10,10 +10,10 @@ PCU_Suite *StrtolTest_suite(void);
 
 int main(int argc, char **argv)
 {
-	PCU_SuiteMethod assert_suites[] = {
+	const PCU_SuiteMethod assert_suites[] = {
 		AssertTest_suite,
 	};
-	PCU_SuiteMethod suites[] = {
+	const PCU_SuiteMethod suites[] = {
 		SnprintfTest_suite,
 		StringTest_suite,
 		StrtolTest_suite,

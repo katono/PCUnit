@@ -7,7 +7,7 @@ PCU_Suite *StrTokenTest_suite(void);
 
 int main(int argc, char **argv)
 {
-	PCU_SuiteMethod suites[] = {
+	const PCU_SuiteMethod suites[] = {
 		RingBufTest_suite,
 		StrTokenTest_suite,
 	};
