@@ -30,11 +30,12 @@ extern char PCU_msg_buf[PCU_MSG_BUF_SIZE];
 #define PCU_TYPE_OP_SIZET  0x0000000c
 #define PCU_TYPE_OP_LLONG  0x0000000d
 #define PCU_TYPE_PTR       0x0000000e
-#define PCU_TYPE_STR       0x0000000f
-#define PCU_TYPE_DBL       0x00000010
-#define PCU_TYPE_MSG       0x00000011
-#define PCU_TYPE_FAIL      0x00000012
-#define PCU_TYPE_SETUP     0x00000013
+#define PCU_TYPE_PTR_NULL  0x0000000f
+#define PCU_TYPE_STR       0x00000010
+#define PCU_TYPE_DBL       0x00000011
+#define PCU_TYPE_MSG       0x00000012
+#define PCU_TYPE_FAIL      0x00000013
+#define PCU_TYPE_SETUP     0x00000014
 #define PCU_TYPE_NSTR      0x40000000
 #define PCU_TYPE_NOT       0x80000000
 
@@ -173,6 +174,11 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)			PCU_assert_impl(((const void *)(expected) != (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_PTR_EQUAL_FATAL(expected, actual)		PCU_assert_impl(((const void *)(expected) == (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR, "PCU_ASSERT_PTR_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
 #define PCU_ASSERT_PTR_NOT_EQUAL_FATAL(expected, actual)	PCU_assert_impl(((const void *)(expected) != (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
+
+#define PCU_ASSERT_PTR_NULL(value)				PCU_assert_impl(((const void *)(value) == 0), 0, (size_t)(value), PCU_TYPE_PTR_NULL, "PCU_ASSERT_PTR_NULL(" #value ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_PTR_NOT_NULL(value)			PCU_assert_impl(((const void *)(value) != 0), 1, (size_t)(value), PCU_TYPE_PTR_NULL | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_NULL(" #value ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_PTR_NULL_FATAL(value)		PCU_assert_impl(((const void *)(value) == 0), 0, (size_t)(value), PCU_TYPE_PTR_NULL, "PCU_ASSERT_PTR_NULL_FATAL(" #value ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_PTR_NOT_NULL_FATAL(value)	PCU_assert_impl(((const void *)(value) != 0), 1, (size_t)(value), PCU_TYPE_PTR_NULL | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_NULL_FATAL(" #value ")", __FILE__, __LINE__, 1)
 
 #define PCU_ASSERT_STRING_EQUAL(expected, actual)			PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRCMP((expected), (actual)) == 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STR, "PCU_ASSERT_STRING_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRCMP((expected), (actual)) != 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STR | PCU_TYPE_NOT, "PCU_ASSERT_STRING_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)

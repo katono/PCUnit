@@ -272,6 +272,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 		self->actual.num = actual;
 		break;
 	case PCU_TYPE_PTR:
+	case PCU_TYPE_PTR_NULL:
 		self->expected.ptr = (const void *) expected;
 		self->actual.ptr = (const void *) actual;
 		break;

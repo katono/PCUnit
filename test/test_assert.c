@@ -88,6 +88,38 @@ static void test_assert_ptr_not_equal(void)
 
 }
 
+static void test_assert_ptr_null(void)
+{
+	int a;
+	int *p = NULL;
+	PCU_ASSERT_PTR_NULL(p);
+	PCU_ASSERT_PTR_NULL(NULL);
+	PCU_ASSERT_PTR_NULL_FATAL(p);
+	PCU_ASSERT_PTR_NULL_FATAL(NULL);
+
+	p = &a;
+	PCU_ASSERT_PTR_NULL(p);
+	PCU_ASSERT_PTR_NULL(&a);
+	PCU_ASSERT_PTR_NULL_FATAL(p);
+	PCU_ASSERT_PTR_NULL(p);
+}
+
+static void test_assert_ptr_not_null(void)
+{
+	int a;
+	int *p = &a;
+	PCU_ASSERT_PTR_NOT_NULL(p);
+	PCU_ASSERT_PTR_NOT_NULL(&a);
+	PCU_ASSERT_PTR_NOT_NULL_FATAL(p);
+
+	p = NULL;
+	PCU_ASSERT_PTR_NOT_NULL(p);
+	PCU_ASSERT_PTR_NOT_NULL(NULL);
+	PCU_ASSERT_PTR_NOT_NULL_FATAL(p);
+	PCU_ASSERT_PTR_NOT_NULL(NULL);
+
+}
+
 static void test_assert_str_equal(void)
 {
 	const char *a, *b;
@@ -402,6 +434,8 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_assert_not_equal"      , test_assert_not_equal      } ,
 		{ "test_assert_ptr_equal"      , test_assert_ptr_equal      } ,
 		{ "test_assert_ptr_not_equal"  , test_assert_ptr_not_equal  } ,
+		{ "test_assert_ptr_null"       , test_assert_ptr_null       } ,
+		{ "test_assert_ptr_not_null"   , test_assert_ptr_not_null   } ,
 		{ "test_assert_str_equal"      , test_assert_str_equal      } ,
 		{ "test_assert_str_not_equal"  , test_assert_str_not_equal  } ,
 		{ "test_assert_nstr_equal"     , test_assert_nstr_equal     } ,
