@@ -151,8 +151,6 @@ static void print_failure(PCU_Test *test)
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
 		unsigned long type;
-		const char *true_str = "TRUE";
-		const char *false_str = "FALSE";
 		type = PCU_GET_ASSERT_TYPE(pos->type);
 		if (type == PCU_TYPE_SETUP) {
 			PCU_PRINTF2("  %d) %s\n", n++, test->name);
@@ -161,10 +159,6 @@ static void print_failure(PCU_Test *test)
 		}
 		PCU_PRINTF1("   %s\n", pos->expr);
 		switch (type) {
-		case PCU_TYPE_BOOL:
-			PCU_PRINTF1("    expected <%s>\n", pos->expected.num ? true_str : false_str);
-			PCU_PRINTF1("    actual   <%s>\n", pos->actual.num ? true_str : false_str);
-			break;
 		case PCU_TYPE_NUM_CHAR:
 			PRINT_EXPECTED_ACTUAL2(unsigned char, "expected", "actual  ", "");
 			break;
