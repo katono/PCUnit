@@ -1,3 +1,7 @@
+#ifdef _WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "PCU_Libc.h"
 #include "PCUnit.h"
 
@@ -626,7 +630,7 @@ void *PCU_malloc(size_t size)
 	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURE_NUM];
 	(void) size;
 	for (; p != end; p++) {
-		/* exprを使用フラグとして使う */
+		/* p->expr is used as used_flag */
 		if (p->expr == 0) {
 			return p;
 		}
@@ -784,11 +788,12 @@ static int PCU_isspace(char c)
 	return 0;
 }
 
-/* baseは0,10,16のみ対応
- * baseが0の場合の8進数未対応
- * オーバーフロー未対応 */
 long PCU_strtol(const char *s, char **endptr, int base)
 {
+	/* 
+	 * supported base: 0, 10, 16
+	 * no overflow check
+	 */
 	long ret = 0;
 	int state = 0;
 	int signed_state = 0;
