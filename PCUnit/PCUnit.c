@@ -121,11 +121,11 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 		const type e = (type) pos->expected.num;\
 		const type a = (type) pos->actual.num;\
 		if (sizeof(int) == 2 && (e > 0xFFFF || a > 0xFFFF)) {\
-			PCU_PRINTF1("    " expected_str " <0x%" len_str "x>\n", e);\
-			PCU_PRINTF1("    " actual_str   " <0x%" len_str "x>\n", a);\
+			PCU_PRINTF2("    " expected_str " <0x%0*" len_str "x>\n", sizeof(type) * 2, e);\
+			PCU_PRINTF2("    " actual_str   " <0x%0*" len_str "x>\n", sizeof(type) * 2, a);\
 		} else {\
-			PCU_PRINTF2("    " expected_str " <%d(0x%" len_str "x)>\n", pos->expected.num, e);\
-			PCU_PRINTF2("    " actual_str   " <%d(0x%" len_str "x)>\n", pos->actual.num, a);\
+			PCU_PRINTF3("    " expected_str " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, e, pos->expected.num);\
+			PCU_PRINTF3("    " actual_str   " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, a, pos->actual.num);\
 		}\
 	} while (0)
 
@@ -133,8 +133,8 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 	do {\
 		const type e = (type) pos->expected.num;\
 		const type a = (type) pos->actual.num;\
-		PCU_PRINTF2("    " expected_str " <%d(0x%" len_str "x)>\n", pos->expected.num, e);\
-		PCU_PRINTF2("    " actual_str   " <%d(0x%" len_str "x)>\n", pos->actual.num, a);\
+		PCU_PRINTF3("    " expected_str " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, e, pos->expected.num);\
+		PCU_PRINTF3("    " actual_str   " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, a, pos->actual.num);\
 	} while (0)
 
 static void print_failure(PCU_Test *test)
