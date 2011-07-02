@@ -28,9 +28,9 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f *.o $(TARGET) ../PCUnit/*.o ../PCUnit/*.a
 
-main.o: test.h
+main.o: 
 StrToken.o: StrToken.h
-test_StrToken.o: StrToken.h test.h
+test_StrToken.o: StrToken.h
 RingBuf.o: RingBuf.h
-test_RingBuf.o: RingBuf.h test.h
+test_RingBuf.o: RingBuf.h
 
