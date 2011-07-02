@@ -53,7 +53,7 @@ static void test_StrToken(void)
 	for (i = 0; i < data->expected_count; i++) {
 		if (!PCU_ASSERT_STRING_EQUAL(data->expected_token[i], StrToken_get(tok, i))) {
 			/* 失敗したら追加メッセージを表示する */
-			PCU_MSG1("%dth token err", i);
+			PCU_MESSAGE1("%dth token err", i);
 		}
 	}
 }

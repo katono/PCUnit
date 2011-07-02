@@ -10,10 +10,10 @@ extern "C" {
 /* 
  * private
  */
-#ifndef PCU_MSG_BUF_SIZE
-#define PCU_MSG_BUF_SIZE	256
+#ifndef PCU_MESSAGE_BUF_SIZE
+#define PCU_MESSAGE_BUF_SIZE	256
 #endif
-extern char PCU_msg_buf[PCU_MSG_BUF_SIZE];
+extern char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 
 #define PCU_TYPE_NONE      0x00000000
 #define PCU_TYPE_BOOL      0x00000001
@@ -238,19 +238,19 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 
 #define PCU_MSG_IMPL()	PCU_msg_impl(PCU_msg_buf, __FILE__, __LINE__)
 
-#define PCU_MSG0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MSG9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
 
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
-#define PCU_MSG(format, ...)		do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, format, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE(format, ...)		do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, format, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
 #endif
 
 void PCU_msg_impl(const char *msg, const char *file, unsigned int line);

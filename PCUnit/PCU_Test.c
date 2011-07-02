@@ -177,7 +177,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 void PCU_msg_impl(const char *msg, const char *file, unsigned int line)
 {
 	PCU_TestFailure *node;
-	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MSG", file, line, repeat_counter);
+	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MESSAGE", file, line, repeat_counter);
 	if (node) {
 		list_push(&current_test->failure_list, node);
 	}

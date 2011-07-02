@@ -7,7 +7,7 @@
 #define LIST_END(list)		(list)
 #define LIST_EMPTY(list)	((list)->next == list)
 
-char PCU_msg_buf[PCU_MSG_BUF_SIZE];
+char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 static char input_buf[64];
 static int enable_color;
 static PCU_Mode pcu_mode = PCU_MODE_NORMAL;
