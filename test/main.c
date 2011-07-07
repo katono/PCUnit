@@ -22,9 +22,8 @@ int main(int argc, char **argv)
 	PCU_enable_color();
 	PCU_set_getchar(getchar);
 	if (argc > 1) {
-		PCU_set_mode(PCU_MODE_INTERACTIVE);
 		if (strcmp(argv[1], "assert") == 0) {
-			PCU_run(assert_suites, sizeof assert_suites / sizeof *assert_suites);
+			PCU_console_run(assert_suites, sizeof assert_suites / sizeof *assert_suites);
 		} else {
 			PCU_run(suites, sizeof suites / sizeof *suites);
 		}

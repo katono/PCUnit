@@ -10,7 +10,6 @@
 char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 static char input_buf[64];
 static int enable_color;
-static PCU_Mode pcu_mode = PCU_MODE_NORMAL;
 
 static PCU_Result result;
 
@@ -431,7 +430,7 @@ static void select_test(const PCU_SuiteMethod *suite_methods, int num, int suite
 {
 	int idx;
 	PCU_Suite *suite = (suite_methods[suite_idx])();
-	PCU_PRINTF0("Enter Test's Number or Name: ");
+	PCU_PRINTF0("Enter Number or Name of Test: ");
 	get_line(input_buf, sizeof input_buf);
 
 	idx = find_test_number(suite->ntests, input_buf);
@@ -474,7 +473,7 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 {
 	int idx;
 	PCU_Suite *selected_suite;
-	PCU_PRINTF0("Enter Suite's Number or Name: ");
+	PCU_PRINTF0("Enter Number or Name of Suite: ");
 	get_line(input_buf, sizeof input_buf);
 
 	idx = find_suite_number(num, input_buf);
@@ -522,11 +521,12 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 	}
 }
 
-static void run_interactive(const PCU_SuiteMethod *suite_methods, int num)
+void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 {
+	reset(suite_methods, num);
 	while (1) {
 		int quit;
-		PCU_PRINTF0("************** PCUnit: Interactive Mode **************\n");
+		PCU_PRINTF0("************** PCUnit Console **************\n");
 		PCU_PRINTF1("(R)un all, (S)elect Suite, (L)ist of Suites, %sable color, (Q)uit\n", 
 				enable_color ? "(D)is" : "(E)n");
 		PCU_PRINTF0("Enter Command: ");
@@ -568,19 +568,6 @@ static void run_interactive(const PCU_SuiteMethod *suite_methods, int num)
 void PCU_run(const PCU_SuiteMethod *suite_methods, int num)
 {
 	reset(suite_methods, num);
-	switch (pcu_mode) {
-	case PCU_MODE_INTERACTIVE:
-		run_interactive(suite_methods, num);
-		break;
-	case PCU_MODE_NORMAL:
-	default:
-		run_all(suite_methods, num);
-		break;
-	}
-}
-
-void PCU_set_mode(PCU_Mode mode)
-{
-	pcu_mode = mode;
+	run_all(suite_methods, num);
 }
 

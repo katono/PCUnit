@@ -135,16 +135,11 @@ typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 typedef int (*PCU_Putchar)(int c);
 typedef int (*PCU_Getchar)(void);
 
-typedef enum PCU_Mode {
-	PCU_MODE_NORMAL,
-	PCU_MODE_INTERACTIVE
-} PCU_Mode;
-
 /* 
  * PCUnit API
  */
 void PCU_run(const PCU_SuiteMethod *suite_methods, int num);
-void PCU_set_mode(PCU_Mode mode);
+void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);
 int PCU_repeat_counter(void);

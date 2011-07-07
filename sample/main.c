@@ -17,10 +17,10 @@ int main(int argc, char **argv)
 	PCU_enable_color();
 /*    PCU_disable_color();*/
 	if (argc >= 2) {
-		PCU_set_mode(PCU_MODE_INTERACTIVE);
+		PCU_console_run(suites, sizeof suites / sizeof suites[0]);
+	} else {
+		PCU_run(suites, sizeof suites / sizeof suites[0]);
 	}
-
-	PCU_run(suites, sizeof suites / sizeof suites[0]);
 	return 0;
 }
 
