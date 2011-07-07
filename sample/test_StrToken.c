@@ -4,14 +4,14 @@
 #include "PCUnit.h"
 #include "StrToken.h"
 
-struct StrTokenTestData {
+typedef struct {
 	const char *src;
 	const char *delims;
 	size_t expected_count;
 	const char *expected_token[9];
-};
+} StrTokenTestData;
 
-static struct StrTokenTestData test_data[] = {
+static const StrTokenTestData test_data[] = {
      { "abc;def;gh;ij"     , ";"  , 4 , { "abc", "def", "gh", "ij"}},
      { "abc;def;gh;ij;"    , ";"  , 4 , { "abc", "def", "gh", "ij"}},
      { ";abc;def;gh;ij"    , ";"  , 4 , { "abc", "def", "gh", "ij"}},
@@ -27,7 +27,7 @@ static struct StrTokenTestData test_data[] = {
 };
 
 static StrToken *tok;
-static struct StrTokenTestData *data;
+static const StrTokenTestData *data;
 
 static int setup(void)
 {
