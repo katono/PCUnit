@@ -459,6 +459,6 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_skip"                  , test_skip, -1              } ,
 		{ "test_assert_operator"       , test_assert_operator       } ,
 	};
-	static PCU_Suite suite = { "AsseertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
+	static PCU_Suite suite = { "AssertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
 	return &suite;
 }
