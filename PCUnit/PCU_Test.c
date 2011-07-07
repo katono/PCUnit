@@ -71,7 +71,7 @@ void PCU_Test_run(PCU_Test *self)
 			self->result.num_errors_setup++;
 			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
-				list_push(&current_test->failure_list, node);
+				list_push(&self->failure_list, node);
 			}
 			continue;
 		}
@@ -84,7 +84,7 @@ void PCU_Test_run(PCU_Test *self)
 			self->result.num_errors_teardown++;
 			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
-				list_push(&current_test->failure_list, node);
+				list_push(&self->failure_list, node);
 			}
 			continue;
 		}
