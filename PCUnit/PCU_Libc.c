@@ -611,8 +611,8 @@ int PCU_printf(const char *format, ...)
 
 #if defined(PCU_NO_MALLOC) || defined(PCU_NO_LIBC)
 
-#ifndef PCU_MAX_FAILURE_NUM
-#define PCU_MAX_FAILURE_NUM	64
+#ifndef PCU_MAX_FAILURES
+#define PCU_MAX_FAILURES	64
 #endif
 
 #ifndef PCU_STRING_POOL_SIZE
@@ -622,12 +622,12 @@ int PCU_printf(const char *format, ...)
 /* 
  * malloc for PCU_TestFailure
  */
-static PCU_TestFailure failure_pool[PCU_MAX_FAILURE_NUM];
+static PCU_TestFailure failure_pool[PCU_MAX_FAILURES];
 
 void *PCU_malloc(size_t size)
 {
 	PCU_TestFailure *p = failure_pool;
-	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURE_NUM];
+	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURES];
 	(void) size;
 	for (; p != end; p++) {
 		/* p->expr is used as used_flag */
