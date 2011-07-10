@@ -60,7 +60,9 @@ void PCU_Suite_run(PCU_Suite *self)
 		self->result.test_result.num_asserts_failed  += test_result.num_asserts_failed;
 		self->result.test_result.num_errors_setup    += test_result.num_errors_setup;
 		self->result.test_result.num_errors_teardown += test_result.num_errors_teardown;
-		self->result.num_tests_ran++;
+		if (!PCU_Test_is_skipped(p)) {
+			self->result.num_tests_ran++;
+		}
 		if (test_result.num_asserts_failed > 0 || test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
 			self->result.num_tests_failed++;
 		}
@@ -89,7 +91,9 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 	self->result.test_result.num_asserts_failed  += test_result.num_asserts_failed;
 	self->result.test_result.num_errors_setup    += test_result.num_errors_setup;
 	self->result.test_result.num_errors_teardown += test_result.num_errors_teardown;
-	self->result.num_tests_ran++;
+	if (!PCU_Test_is_skipped(&self->tests[idx])) {
+		self->result.num_tests_ran++;
+	}
 	if (test_result.num_asserts_failed > 0 || test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
 		self->result.num_tests_failed++;
 	}

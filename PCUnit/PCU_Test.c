@@ -104,6 +104,14 @@ int PCU_Test_is_repeated_test(PCU_Test *self)
 	return 0;
 }
 
+int PCU_Test_is_skipped(PCU_Test *self)
+{
+	if (self->repeat < 0) {
+		return 1;
+	}
+	return 0;
+}
+
 int PCU_Test_is_failed(PCU_Test *self)
 {
 	if (self->result.num_asserts_failed > 0 || self->result.num_errors_setup > 0 || self->result.num_errors_teardown > 0) {
