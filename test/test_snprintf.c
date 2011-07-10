@@ -138,8 +138,8 @@ void test_snprintf(void)
 	PCU_ASSERT_STRING_EQUAL(sp_buf, buf);
 
 
-	ret1 = snprintf(sp_buf, sizeof sp_buf, "%p, %p, %p, %p", (void *)0, (void *)buf, (void *)sp_buf, (void *)0);
-	ret2 = PCU_snprintf4(buf, sizeof buf,  "%p, %p, %p, %p", 0, (size_t)buf, (size_t)sp_buf, 0);
+	ret1 = snprintf(sp_buf, sizeof sp_buf, "%p, %p, %p, %p", (void *)1, (void *)buf, (void *)sp_buf, (void *)1);
+	ret2 = PCU_snprintf4(buf, sizeof buf,  "%p, %p, %p, %p", 1, (size_t)buf, (size_t)sp_buf, 1);
 	PCU_ASSERT_EQUAL(ret1, ret2);
 	sp_buf_ret = strtoul(sp_buf, &sp_buf_endp, 16);
 	buf_ret = strtoul(buf, &buf_endp, 16);
