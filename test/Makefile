@@ -28,7 +28,7 @@ $(TARGET): $(OBJS)
 LIBPCUNIT_CFLAGS = "CFLAGS=-Wall -ansi -pedantic-errors -g -std=c99 -DPCU_printf=printf"
 
 ../PCUnit/libpcunit.a:
-	cd ../PCunit && $(MAKE) $(LIBPCUNIT_CFLAGS)
+	cd ../PCUnit && $(MAKE) $(LIBPCUNIT_CFLAGS)
 
 
 

@@ -17,7 +17,7 @@ all: $(TARGET)
 
 
 ../PCUnit/libpcunit.a:
-	cd ../PCunit && $(MAKE)
+	cd ../PCUnit && $(MAKE)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
