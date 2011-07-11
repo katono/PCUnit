@@ -59,7 +59,7 @@ static int PCU_Test_teardown(const PCU_Test *self)
 
 void PCU_Test_run(PCU_Test *self)
 {
-	int repeat;
+	volatile int repeat;
 	current_test = self;
 
 	repeat = (self->repeat != 0) ? self->repeat : 1;
