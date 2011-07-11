@@ -183,7 +183,7 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)	PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)
 #endif
 
-#define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR((" #lhs ") " #op " (" #rhs "))", __FILE__, __LINE__, 0)
 
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)
@@ -247,7 +247,7 @@ void PCU_disable_color(void);
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)	PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
 #endif
 
-#define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR_FATAL(" #lhs " " #op " " #rhs ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR_FATAL((" #lhs ") " #op " (" #rhs "))", __FILE__, __LINE__, 1)
 
 #define PCU_FAIL0_FATAL(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL_F(); } while (0)
 #define PCU_FAIL1_FATAL(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_FAIL_IMPL_F(); } while (0)
