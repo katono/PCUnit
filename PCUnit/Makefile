@@ -1,7 +1,11 @@
 CC = gcc
 AR = ar
-CFLAGS = -Wall -std=c99 -pedantic-errors -Os
+CFLAGS = -Wall -Wextra -std=c99 -pedantic-errors -Os
 # CFLAGS += -DPCU_NO_LIBC
+# CFLAGS += -DPCU_NO_VSNPRINTF
+# CFLAGS += -DPCU_NO_MALLOC
+# CFLAGS += -DPCU_NO_SETJMP
+# CFLAGS += -DPCU_NO_FLOATINGPOINT
 TARGET = libpcunit.a
 OBJS = PCUnit.o
 OBJS += PCU_Test.o

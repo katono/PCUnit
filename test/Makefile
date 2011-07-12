@@ -1,4 +1,4 @@
-CFLAGS = -Wall -ansi -pedantic-errors -g
+CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -ansi -pedantic-errors -g
 CFLAGS += -DPCU_NO_LIBC
 CFLAGS += -std=c99
 
