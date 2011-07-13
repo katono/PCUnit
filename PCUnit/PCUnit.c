@@ -120,11 +120,11 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 		const type e = (type) pos->expected.num;\
 		const type a = (type) pos->actual.num;\
 		if (sizeof(int) == 2 && (e > 0xFFFF || a > 0xFFFF)) {\
-			PCU_PRINTF2("        " expected_str " <0x%0*" len_str "x>\n", sizeof(type) * 2, e);\
-			PCU_PRINTF2("        " actual_str   " <0x%0*" len_str "x>\n", sizeof(type) * 2, a);\
+			PCU_PRINTF2("        " expected_str " : 0x%0*" len_str "x\n", sizeof(type) * 2, e);\
+			PCU_PRINTF2("        " actual_str   " : 0x%0*" len_str "x\n", sizeof(type) * 2, a);\
 		} else {\
-			PCU_PRINTF3("        " expected_str " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, e, pos->expected.num);\
-			PCU_PRINTF3("        " actual_str   " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, a, pos->actual.num);\
+			PCU_PRINTF3("        " expected_str " : 0x%0*" len_str "x (%d)\n", sizeof(type) * 2, e, pos->expected.num);\
+			PCU_PRINTF3("        " actual_str   " : 0x%0*" len_str "x (%d)\n", sizeof(type) * 2, a, pos->actual.num);\
 		}\
 	} while (0)
 
@@ -132,8 +132,8 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 	do {\
 		const type e = (type) pos->expected.num;\
 		const type a = (type) pos->actual.num;\
-		PCU_PRINTF3("        " expected_str " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, e, pos->expected.num);\
-		PCU_PRINTF3("        " actual_str   " <0x%0*" len_str "x (%d)>\n", sizeof(type) * 2, a, pos->actual.num);\
+		PCU_PRINTF3("        " expected_str " : 0x%0*" len_str "x (%d)\n", sizeof(type) * 2, e, pos->expected.num);\
+		PCU_PRINTF3("        " actual_str   " : 0x%0*" len_str "x (%d)\n", sizeof(type) * 2, a, pos->actual.num);\
 	} while (0)
 
 static void print_failure(PCU_Test *test)
@@ -152,10 +152,11 @@ static void print_failure(PCU_Test *test)
 		unsigned long type;
 		type = PCU_GET_ASSERT_TYPE(pos->type);
 		if (type == PCU_TYPE_SETUP) {
-			PCU_PRINTF2("    %d) %s\n", n++, test->name);
+			PCU_PRINTF2("    %d. %s\n", n, test->name);
 		} else {
-			PCU_PRINTF3("    %d) %s:%u\n", n++, pos->file, pos->line);
+			PCU_PRINTF3("    %d. %s:%u\n", n, pos->file, pos->line);
 		}
+		n++;
 		PCU_PRINTF1("      %s\n", pos->expr);
 		switch (type) {
 		case PCU_TYPE_NUM_CHAR:
@@ -182,61 +183,61 @@ static void print_failure(PCU_Test *test)
 #endif
 			break;
 		case PCU_TYPE_OP_CHAR:
-			PRINT_EXPECTED_ACTUAL(unsigned char, "lhs", "rhs", "");
+			PRINT_EXPECTED_ACTUAL(unsigned char, "lhs     ", "rhs     ", "");
 			break;
 		case PCU_TYPE_OP_SHORT:
-			PRINT_EXPECTED_ACTUAL(unsigned short, "lhs", "rhs", "");
+			PRINT_EXPECTED_ACTUAL(unsigned short, "lhs     ", "rhs     ", "");
 			break;
 		case PCU_TYPE_OP_INT:
-			PRINT_EXPECTED_ACTUAL(unsigned int, "lhs", "rhs", "");
+			PRINT_EXPECTED_ACTUAL(unsigned int, "lhs     ", "rhs     ", "");
 			break;
 		case PCU_TYPE_OP_LONG:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL_16BIT(unsigned long, "lhs", "rhs", "l");
+			PRINT_EXPECTED_ACTUAL_16BIT(unsigned long, "lhs     ", "rhs     ", "l");
 #else
-			PRINT_EXPECTED_ACTUAL(unsigned long, "lhs", "rhs", "l");
+			PRINT_EXPECTED_ACTUAL(unsigned long, "lhs     ", "rhs     ", "l");
 #endif
 			break;
 		case PCU_TYPE_OP_SIZET:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL_16BIT(size_t, "lhs", "rhs", "");
+			PRINT_EXPECTED_ACTUAL_16BIT(size_t, "lhs     ", "rhs     ", "");
 #else
-			PRINT_EXPECTED_ACTUAL(size_t, "lhs", "rhs", "");
+			PRINT_EXPECTED_ACTUAL(size_t, "lhs     ", "rhs     ", "");
 #endif
 			break;
 		case PCU_TYPE_PTR:
 			if (pos->expected.ptr) {
-				PCU_PRINTF1("        expected <%p>\n", pos->expected.ptr);
+				PCU_PRINTF1("        expected : %p\n", pos->expected.ptr);
 			} else {
-				PCU_PRINTF0("        expected <NULL>\n");
+				PCU_PRINTF0("        expected : NULL\n");
 			}
 			if (pos->actual.ptr) {
-				PCU_PRINTF1("        actual   <%p>\n", pos->actual.ptr);
+				PCU_PRINTF1("        actual   : %p\n", pos->actual.ptr);
 			} else {
-				PCU_PRINTF0("        actual   <NULL>\n");
+				PCU_PRINTF0("        actual   : NULL\n");
 			}
 			break;
 		case PCU_TYPE_STR:
 		case PCU_TYPE_NSTR:
 			if (pos->expected.str) {
-				PCU_PRINTF1("        expected <\"%s\">\n", pos->expected.str);
+				PCU_PRINTF1("        expected : \"%s\"\n", pos->expected.str);
 			} else {
-				PCU_PRINTF0("        expected <NULL>\n");
+				PCU_PRINTF0("        expected : NULL\n");
 			}
 			if (pos->actual.str) {
-				PCU_PRINTF1("        actual   <\"%s\">\n", pos->actual.str);
+				PCU_PRINTF1("        actual   : \"%s\"\n", pos->actual.str);
 			} else {
-				PCU_PRINTF0("        actual   <NULL>\n");
+				PCU_PRINTF0("        actual   : NULL\n");
 			}
 			if (type == PCU_TYPE_NSTR) {
-				PCU_PRINTF1("        length   <%d>\n", PCU_GET_NSTR_LEN(pos->type));
+				PCU_PRINTF1("        length   : %d\n", PCU_GET_NSTR_LEN(pos->type));
 			}
 			break;
 #if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		case PCU_TYPE_DBL:
-			PCU_PRINTF1("        expected <%g>\n", pos->expected.dbl);
-			PCU_PRINTF1("        actual   <%g>\n", pos->actual.dbl);
-			PCU_PRINTF1("        delta    <%g>\n", pos->delta);
+			PCU_PRINTF1("        expected : %g\n", pos->expected.dbl);
+			PCU_PRINTF1("        actual   : %g\n", pos->actual.dbl);
+			PCU_PRINTF1("        delta    : %g\n", pos->delta);
 			break;
 #endif
 		case PCU_TYPE_MSG:
@@ -244,13 +245,13 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("        %s\n", pos->expected.str);
 			break;
 		case PCU_TYPE_SETUP:
-			PCU_PRINTF1("        return   <0x%x>\n", pos->actual.num);
+			PCU_PRINTF1("        return   : 0x%x\n", pos->actual.num);
 			break;
 		default:
 			break;
 		}
 		if (PCU_Test_is_repeated_test(test)) {
-			PCU_PRINTF1("        repeat   <%d>\n", pos->repeat);
+			PCU_PRINTF1("        repeat   : %d\n", pos->repeat);
 		}
 	}
 	if (!LIST_EMPTY(&test->failure_list)) {
