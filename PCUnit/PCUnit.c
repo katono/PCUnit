@@ -162,11 +162,7 @@ static void print_failure(PCU_Test *test)
 	PCU_TestFailure *list = &test->failure_list;
 	int n = 1;
 	if (PCU_Test_is_failed(test)) {
-		set_color(COLOR_RED);
-		PCU_PRINTF0("  !!!! Failure !!!!\n");
-	}
-	if (!LIST_EMPTY(&test->failure_list)) {
-		PCU_PRINTF1("  Test: %s\n", test->name);
+		PCU_PRINTF1("  Test: %s ... FAILED\n", test->name);
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
 		unsigned long type;
@@ -274,12 +270,6 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("        repeat   : %d\n", pos->repeat);
 		}
 	}
-	if (!LIST_EMPTY(&test->failure_list)) {
-		PCU_PRINTF0("\n");
-	}
-	if (PCU_Test_is_failed(test)) {
-		reset_color();
-	}
 }
 
 static void print_result_selected(PCU_Suite *suite, int idx)
@@ -301,15 +291,15 @@ static void print_result(PCU_Suite *suite)
 	PCU_PRINTF1("Suite: %s\n", suite->name);
 	if (suite->initialize_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! INITIALIZE FAILED <0x%x> !!!!\n", suite->initialize_error);
+		PCU_PRINTF1("INITIALIZE FAILED : 0x%x\n", suite->initialize_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 		return;
 	}
-	PCU_PRINTF0("\n");
 	for (i = 0, p = suite->tests; i < suite->ntests; i++, p++) {
 		print_failure(p);
 	}
+	PCU_PRINTF0("\n");
 	if (suite->result.num_tests_failed == 0) {
 		set_color(COLOR_GREEN);
 		PCU_PRINTF2("%d Tests, %d Skipped\n", 
@@ -328,7 +318,7 @@ static void print_result(PCU_Suite *suite)
 	}
 	if (suite->cleanup_error) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("!!!! CLEANUP FAILED <0x%x> !!!!\n", suite->cleanup_error);
+		PCU_PRINTF1("CLEANUP FAILED : 0x%x\n", suite->cleanup_error);
 		reset_color();
 		PCU_PRINTF0("\n");
 	}
