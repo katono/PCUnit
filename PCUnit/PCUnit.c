@@ -11,6 +11,7 @@ static char input_buf[64];
 static int enable_color;
 
 static PCU_Result result;
+static PCU_SuiteResult suite_result;
 
 static void reset(const PCU_SuiteMethod *suite_methods, int num)
 {
@@ -19,7 +20,6 @@ static void reset(const PCU_SuiteMethod *suite_methods, int num)
 	PCU_MEMSET(&result, 0, sizeof(result));
 	for (i = 0; i < num; i++, method++) {
 		PCU_Suite *p = (*method)();
-		PCU_SuiteResult suite_result;
 		PCU_Suite_reset(p);
 		PCU_Suite_get_result(p, &suite_result);
 		result.num_suites++;
@@ -315,19 +315,19 @@ static void print_result(PCU_Suite *suite)
 	}
 }
 
-static void add_result(const PCU_SuiteResult *suite_result)
+static void add_result(void)
 {
-	result.suite_result.num_tests_ran         += suite_result->num_tests_ran;
-	result.suite_result.num_tests_failed      += suite_result->num_tests_failed;
-	result.suite_result.num_errors_initialize += suite_result->num_errors_initialize;
-	result.suite_result.num_errors_cleanup    += suite_result->num_errors_cleanup;
-	result.suite_result.test_result.num_asserts         += suite_result->test_result.num_asserts;
-	result.suite_result.test_result.num_asserts_ran     += suite_result->test_result.num_asserts_ran;
-	result.suite_result.test_result.num_asserts_failed  += suite_result->test_result.num_asserts_failed;
-	result.suite_result.test_result.num_errors_setup    += suite_result->test_result.num_errors_setup;
-	result.suite_result.test_result.num_errors_teardown += suite_result->test_result.num_errors_teardown;
+	result.suite_result.num_tests_ran         += suite_result.num_tests_ran;
+	result.suite_result.num_tests_failed      += suite_result.num_tests_failed;
+	result.suite_result.num_errors_initialize += suite_result.num_errors_initialize;
+	result.suite_result.num_errors_cleanup    += suite_result.num_errors_cleanup;
+	result.suite_result.test_result.num_asserts         += suite_result.test_result.num_asserts;
+	result.suite_result.test_result.num_asserts_ran     += suite_result.test_result.num_asserts_ran;
+	result.suite_result.test_result.num_asserts_failed  += suite_result.test_result.num_asserts_failed;
+	result.suite_result.test_result.num_errors_setup    += suite_result.test_result.num_errors_setup;
+	result.suite_result.test_result.num_errors_teardown += suite_result.test_result.num_errors_teardown;
 	result.num_suites_ran++;
-	if (suite_result->num_tests_failed > 0) {
+	if (suite_result.num_tests_failed > 0) {
 		result.num_suites_failed++;
 	}
 }
@@ -337,11 +337,10 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 	int i;
 	const PCU_SuiteMethod *method = suite_methods;
 	for (i = 0; i < num; i++, method++) {
-		PCU_SuiteResult suite_result;
 		PCU_Suite *p = (*method)();
 		PCU_Suite_run(p);
 		PCU_Suite_get_result(p, &suite_result);
-		add_result(&suite_result);
+		add_result();
 		PCU_PRINTF0("----\n");
 		print_result(p);
 	}
@@ -350,22 +349,20 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 
 static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
 {
-	PCU_SuiteResult suite_result;
 	PCU_Suite *p = (suite_methods[suite_idx])();
 	PCU_Suite_run(p);
 	PCU_Suite_get_result(p, &suite_result);
-	add_result(&suite_result);
+	add_result();
 	print_result(p);
 	reset(suite_methods, num);
 }
 
 static void run_selected_test(const PCU_SuiteMethod *suite_methods, int num, int suite_idx, int test_idx)
 {
-	PCU_SuiteResult suite_result;
 	PCU_Suite *p = (suite_methods[suite_idx])();
 	PCU_Suite_run_selected(p, test_idx);
 	PCU_Suite_get_result(p, &suite_result);
-	add_result(&suite_result);
+	add_result();
 	print_result_selected(p, test_idx);
 	reset(suite_methods, num);
 }

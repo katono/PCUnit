@@ -3,6 +3,7 @@
 #include "PCU_Libc.h"
 
 static PCU_Suite *current_suite;
+static PCU_TestResult test_result;
 
 static void PCU_Suite_clear_result(PCU_Suite *self)
 {
@@ -52,7 +53,6 @@ void PCU_Suite_run(PCU_Suite *self)
 		return;
 	}
 	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
-		PCU_TestResult test_result;
 		PCU_Test_run(p);
 		PCU_Test_get_result(p, &test_result);
 		self->result.test_result.num_asserts         += test_result.num_asserts;
@@ -76,7 +76,6 @@ void PCU_Suite_run(PCU_Suite *self)
 
 void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
-	PCU_TestResult test_result;
 	current_suite = self;
 
 	self->initialize_error = PCU_Suite_initialize(self);
