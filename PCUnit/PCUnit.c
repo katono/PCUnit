@@ -114,6 +114,18 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 	}
 }
 
+#define IS_ASCII(c)		(' ' == 0x20 && 0x20 <= (c) && (c) <= 0x7e)
+
+#define PRINT_EXPECTED_ACTUAL_AUX(type, str, size_t_num, type_num, len_str)	\
+	do {\
+		PCU_PRINTF3("        " str " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, type_num, size_t_num);\
+		if (IS_ASCII(size_t_num)) {\
+			PCU_PRINTF1(" '%c'\n", size_t_num);\
+		} else {\
+			PCU_PRINTF0("\n");\
+		}\
+	} while (0)
+
 #define PRINT_EXPECTED_ACTUAL_16BIT(type, expected_str, actual_str, len_str)	\
 	do {\
 		const type e = (type) pos->expected.num;\
@@ -122,18 +134,8 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 			PCU_PRINTF2("        " expected_str " : 0x%0*" len_str "x\n", sizeof(type) * 2, e);\
 			PCU_PRINTF2("        " actual_str   " : 0x%0*" len_str "x\n", sizeof(type) * 2, a);\
 		} else {\
-			PCU_PRINTF3("        " expected_str " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, e, pos->expected.num);\
-			if (' ' == 0x20 && 0x20 <= pos->expected.num && pos->expected.num <= 0x7e) {\
-				PCU_PRINTF1(" '%c'\n", pos->expected.num);\
-			} else {\
-				PCU_PRINTF0("\n");\
-			}\
-			PCU_PRINTF3("        " actual_str   " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, a, pos->actual.num);\
-			if (' ' == 0x20 && 0x20 <= pos->actual.num && pos->actual.num <= 0x7e) {\
-				PCU_PRINTF1(" '%c'\n", pos->actual.num);\
-			} else {\
-				PCU_PRINTF0("\n");\
-			}\
+			PRINT_EXPECTED_ACTUAL_AUX(type, expected_str, pos->expected.num, e, len_str);\
+			PRINT_EXPECTED_ACTUAL_AUX(type, actual_str  , pos->actual.num  , a, len_str);\
 		}\
 	} while (0)
 
@@ -141,18 +143,8 @@ unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int
 	do {\
 		const type e = (type) pos->expected.num;\
 		const type a = (type) pos->actual.num;\
-		PCU_PRINTF3("        " expected_str " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, e, pos->expected.num);\
-		if (' ' == 0x20 && 0x20 <= pos->expected.num && pos->expected.num <= 0x7e) {\
-			PCU_PRINTF1(" '%c'\n", pos->expected.num);\
-		} else {\
-			PCU_PRINTF0("\n");\
-		}\
-		PCU_PRINTF3("        " actual_str   " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, a, pos->actual.num);\
-		if (' ' == 0x20 && 0x20 <= pos->actual.num && pos->actual.num <= 0x7e) {\
-			PCU_PRINTF1(" '%c'\n", pos->actual.num);\
-		} else {\
-			PCU_PRINTF0("\n");\
-		}\
+		PRINT_EXPECTED_ACTUAL_AUX(type, expected_str, pos->expected.num, e, len_str);\
+		PRINT_EXPECTED_ACTUAL_AUX(type, actual_str  , pos->actual.num  , a, len_str);\
 	} while (0)
 
 static void print_failure(PCU_Test *test)
