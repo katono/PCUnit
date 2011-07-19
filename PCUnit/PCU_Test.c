@@ -16,7 +16,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node);
 static PCU_TestFailure *list_pop(PCU_TestFailure *list);
-#define LIST_EMPTY(list)	((list)->next == list)
+#define LIST_EMPTY(list)	((list)->next == (list))
 
 static void PCU_Test_clear_result(PCU_Test *self)
 {

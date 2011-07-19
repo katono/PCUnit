@@ -5,7 +5,6 @@
 
 #define LIST_BEGIN(list)	(list)->next
 #define LIST_END(list)		(list)
-#define LIST_EMPTY(list)	((list)->next == list)
 
 char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 static char input_buf[64];
