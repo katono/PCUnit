@@ -114,7 +114,7 @@ struct PCU_Test {
 	/* public */
 	const char *name;
 	void (*test)(void);
-	int repeat;
+	int ntimes;
 	/* private */
 	const PCU_Suite *suite;
 	PCU_TestResult result;

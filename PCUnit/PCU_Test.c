@@ -62,7 +62,7 @@ void PCU_Test_run(PCU_Test *self)
 	volatile int repeat;
 	current_test = self;
 
-	repeat = (self->repeat != 0) ? self->repeat : 1;
+	repeat = (self->ntimes != 0) ? self->ntimes : 1;
 	for (repeat_counter = 0; repeat_counter < repeat; repeat_counter++) {
 		int err;
 		err = PCU_Test_setup(self);
@@ -98,26 +98,17 @@ void PCU_Test_get_result(PCU_Test *self, PCU_TestResult *result)
 
 int PCU_Test_is_repeated_test(PCU_Test *self)
 {
-	if (self->repeat > 0) {
-		return 1;
-	}
-	return 0;
+	return (self->ntimes > 1);
 }
 
 int PCU_Test_is_skipped(PCU_Test *self)
 {
-	if (self->repeat < 0) {
-		return 1;
-	}
-	return 0;
+	return (self->ntimes < 0);
 }
 
 int PCU_Test_is_failed(PCU_Test *self)
 {
-	if (self->result.num_asserts_failed > 0 || self->result.num_errors_setup > 0 || self->result.num_errors_teardown > 0) {
-		return 1;
-	}
-	return 0;
+	return (self->result.num_asserts_failed > 0 || self->result.num_errors_setup > 0 || self->result.num_errors_teardown > 0);
 }
 
 int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag)
