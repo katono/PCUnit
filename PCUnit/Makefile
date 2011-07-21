@@ -24,6 +24,17 @@ $(TARGET): $(OBJS)
 	$(AR) rcs $(TARGET) $^
 
 
+install:
+	cp $(TARGET) /usr/local/lib
+	mkdir -p /usr/local/include/PCUnit
+	cp PCUnit.h PCU_Libc.h /usr/local/include/PCUnit
+
+
+uninstall:
+	rm /usr/local/lib/$(TARGET)
+	rm -rf /usr/local/include/PCUnit
+
+
 .PHONY: clean
 clean:
 	rm -f *.o *.a
