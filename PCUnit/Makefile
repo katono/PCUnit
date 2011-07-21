@@ -29,8 +29,6 @@ clean:
 	rm -f *.o *.a
 
 PCUnit.o: PCU_Suite.h PCU_Libc.h PCUnit.h
-PCU_Test.h: PCUnit.h
 PCU_Test.o: PCU_Test.h PCU_Libc.h PCUnit.h
-PCU_Suite.h: PCUnit.h
 PCU_Suite.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h
 PCU_Libc.o: PCU_Libc.h PCUnit.h
