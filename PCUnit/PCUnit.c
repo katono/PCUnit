@@ -267,7 +267,13 @@ static void print_result_selected(PCU_Suite *suite, int idx)
 {
 	PCU_Test *test = &suite->tests[idx];
 	print_failure(test);
-	if (!PCU_Test_is_failed(test)) {
+	PCU_PRINTF0("\n");
+	if (PCU_Test_is_failed(test)) {
+		set_color(COLOR_RED);
+		PCU_PRINTF1("FAILED (%s)\n", test->name);
+		reset_color();
+		PCU_PRINTF0("\n");
+	} else {
 		set_color(COLOR_GREEN);
 		PCU_PRINTF2("%s (%s)\n", PCU_Test_is_skipped(test) ? "Skipped" : "OK", test->name);
 		reset_color();
