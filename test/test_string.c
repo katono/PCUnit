@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 
-#undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
 size_t PCU_strlen(const char *s);
 int PCU_strcmp(const char *s1, const char *s2);

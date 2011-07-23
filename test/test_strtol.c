@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
 long PCU_strtol(const char *s, char **endptr, int base);
 unsigned long PCU_strtoul(const char *s, char **endptr, int base);

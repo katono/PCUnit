@@ -1,8 +1,6 @@
 #include <stdio.h>
-#undef PCU_NO_LIBC
 #include "../PCUnit/PCUnit.h"
 
-#define PCU_snprintf		snprintf
 
 static void test_assert(void)
 {
