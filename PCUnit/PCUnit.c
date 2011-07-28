@@ -225,15 +225,17 @@ static void print_failure(PCU_Test *test)
 			break;
 		case PCU_TYPE_STR:
 		case PCU_TYPE_NSTR:
-			if (pos->expected.str) {
-				PCU_PRINTF1("        expected : \"%s\"\n", pos->expected.str);
-			} else {
-				PCU_PRINTF0("        expected : NULL\n");
-			}
-			if (pos->actual.str) {
-				PCU_PRINTF1("        actual   : \"%s\"\n", pos->actual.str);
-			} else {
-				PCU_PRINTF0("        actual   : NULL\n");
+			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
+				if (pos->expected.str) {
+					PCU_PRINTF1("        expected : \"%s\"\n", pos->expected.str);
+				} else {
+					PCU_PRINTF0("        expected : NULL\n");
+				}
+				if (pos->actual.str) {
+					PCU_PRINTF1("        actual   : \"%s\"\n", pos->actual.str);
+				} else {
+					PCU_PRINTF0("        actual   : NULL\n");
+				}
 			}
 			if (type == PCU_TYPE_NSTR) {
 				PCU_PRINTF1("        length   : %d\n", PCU_GET_NSTR_LEN(pos->type));
@@ -248,7 +250,9 @@ static void print_failure(PCU_Test *test)
 #endif
 		case PCU_TYPE_MSG:
 		case PCU_TYPE_FAIL:
-			PCU_PRINTF1("        %s\n", pos->expected.str);
+			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
+				PCU_PRINTF1("        %s\n", pos->expected.str);
+			}
 			break;
 		case PCU_TYPE_SETUP:
 			PCU_PRINTF1("        return   : 0x%x\n", pos->actual.num);

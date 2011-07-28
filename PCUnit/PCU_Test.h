@@ -9,6 +9,7 @@ void PCU_Test_get_result(PCU_Test *self, PCU_TestResult *result);
 int PCU_Test_is_repeated_test(PCU_Test *self);
 int PCU_Test_is_skipped(PCU_Test *self);
 int PCU_Test_is_failed(PCU_Test *self);
+int PCU_TestFailure_str_malloc_is_failed(PCU_TestFailure *self);
 
 
 #endif /* PCU_TEST_H_INCLUDED */

@@ -280,9 +280,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!copy_string(&self->expected.str, &self->actual.str, (const char *) expected, (const char *) actual, type)) {
-			PCU_PRINTF3("string malloc failed: %s(%u): %s\n", file, line, expr);
-			PCU_FREE(self);
-			return 0;
+			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
 	default:
@@ -342,16 +340,23 @@ static void PCU_TestFailure_delete(PCU_TestFailure *self)
 	case PCU_TYPE_NSTR:
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
-		if (self->expected.str) {
-			PCU_STR_FREE(self->expected.str);
-		} else {
-			PCU_STR_FREE(self->actual.str);
+		if (!PCU_TestFailure_str_malloc_is_failed(self)) {
+			if (self->expected.str) {
+				PCU_STR_FREE(self->expected.str);
+			} else {
+				PCU_STR_FREE(self->actual.str);
+			}
 		}
 		break;
 	default:
 		break;
 	}
 	PCU_FREE(self);
+}
+
+int PCU_TestFailure_str_malloc_is_failed(PCU_TestFailure *self)
+{
+	return self->actual.num == (size_t) -1;
 }
 
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node)
