@@ -74,6 +74,7 @@ void PCU_Suite_run(PCU_Suite *self)
 	}
 }
 
+#ifndef PCU_NO_CONSOLE_RUN
 void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
 	current_suite = self;
@@ -102,6 +103,7 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 		return;
 	}
 }
+#endif
 
 void PCU_Suite_get_result(PCU_Suite *self, PCU_SuiteResult *result)
 {

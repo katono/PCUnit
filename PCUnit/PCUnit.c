@@ -7,7 +7,6 @@
 #define LIST_END(list)		(list)
 
 char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
-static char input_buf[64];
 static int enable_color;
 
 static PCU_Result result;
@@ -263,24 +262,6 @@ static void print_failure(PCU_Test *test)
 	}
 }
 
-static void print_result_selected(PCU_Suite *suite, int idx)
-{
-	PCU_Test *test = &suite->tests[idx];
-	print_failure(test);
-	PCU_PRINTF0("\n");
-	if (PCU_Test_is_failed(test)) {
-		set_color(COLOR_RED);
-		PCU_PRINTF1("FAILED (%s)\n", test->name);
-		reset_color();
-		PCU_PRINTF0("\n");
-	} else {
-		set_color(COLOR_GREEN);
-		PCU_PRINTF2("%s (%s)\n", PCU_Test_is_skipped(test) ? "Skipped" : "OK", test->name);
-		reset_color();
-		PCU_PRINTF0("\n");
-	}
-}
-
 static void print_result(PCU_Suite *suite)
 {
 	int i;
@@ -353,6 +334,33 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 	reset(suite_methods, num);
 }
 
+void PCU_run(const PCU_SuiteMethod *suite_methods, int num)
+{
+	reset(suite_methods, num);
+	run_all(suite_methods, num);
+}
+
+#ifndef PCU_NO_CONSOLE_RUN
+static char input_buf[64];
+
+static void print_result_selected(PCU_Suite *suite, int idx)
+{
+	PCU_Test *test = &suite->tests[idx];
+	print_failure(test);
+	PCU_PRINTF0("\n");
+	if (PCU_Test_is_failed(test)) {
+		set_color(COLOR_RED);
+		PCU_PRINTF1("FAILED (%s)\n", test->name);
+		reset_color();
+		PCU_PRINTF0("\n");
+	} else {
+		set_color(COLOR_GREEN);
+		PCU_PRINTF2("%s (%s)\n", PCU_Test_is_skipped(test) ? "Skipped" : "OK", test->name);
+		reset_color();
+		PCU_PRINTF0("\n");
+	}
+}
+
 static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
 {
 	PCU_Suite *p = (suite_methods[suite_idx])();
@@ -412,7 +420,7 @@ static int find_test_name(const PCU_Test *tests, int num, const char *input_str)
 	return -1;
 }
 
-static int find_test_number(int num, const char *input_str)
+static int find_number(int num, const char *input_str)
 {
 	int n;
 	n = PCU_ATOI(input_str);
@@ -442,7 +450,7 @@ static void select_test(const PCU_SuiteMethod *suite_methods, int num, int suite
 	PCU_PRINTF0("Enter Number or Name of Test: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_test_number(suite->ntests, input_buf);
+	idx = find_number(suite->ntests, input_buf);
 	if (idx == -1) {
 		idx = find_test_name(suite->tests, suite->ntests, input_buf);
 		if (idx == -1) {
@@ -468,16 +476,6 @@ static int find_suite_name(const PCU_SuiteMethod *suite_methods, int num, const 
 	return -1;
 }
 
-static int find_suite_number(int num, const char *input_str)
-{
-	int n;
-	n = PCU_ATOI(input_str);
-	if (n <= 0 || num + 1 <= n) {
-		return -1;
-	}
-	return n - 1;
-}
-
 static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 {
 	int idx;
@@ -485,7 +483,7 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 	PCU_PRINTF0("Enter Number or Name of Suite: ");
 	get_line(input_buf, sizeof input_buf);
 
-	idx = find_suite_number(num, input_buf);
+	idx = find_number(num, input_buf);
 	if (idx == -1) {
 		idx = find_suite_name(suite_methods, num, input_buf);
 		if (idx == -1) {
@@ -573,10 +571,4 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_PRINTF0("\n");
 	}
 }
-
-void PCU_run(const PCU_SuiteMethod *suite_methods, int num)
-{
-	reset(suite_methods, num);
-	run_all(suite_methods, num);
-}
-
+#endif

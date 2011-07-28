@@ -744,6 +744,7 @@ void *PCU_memcpy(void *dst, const void *src, size_t len)
 	return dst;
 }
 
+#ifndef PCU_NO_CONSOLE_RUN
 static int ascii2hex(char c)
 {
 	if ('0' <= c && c <= '9') {
@@ -862,5 +863,6 @@ int PCU_atoi(const char *s)
 {
 	return (int) PCU_strtol(s, 0, 10);
 }
+#endif
 
 #endif
