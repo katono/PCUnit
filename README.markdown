@@ -44,16 +44,18 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 
 ### 条件コンパイル
 
-標準Cライブラリのサポートする関数の有無によって適宜コンパイラオプションでマクロを定義してください。
+開発環境によって適宜コンパイラオプションでマクロを定義してください。
 
-* vsnprintfがサポートされていない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
-* malloc/freeがサポートされていない場合は、`PCU_NO_MALLOC`マクロを定義してください。
-* setjmp/longjmpがサポートされていない場合は、`PCU_NO_SETJMP`マクロを定義してください。
-* strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでもサポートされていない場合は、
+* vsnprintfが使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
+* malloc/freeが使用できない場合は、`PCU_NO_MALLOC`マクロを定義してください。
+* setjmp/longjmpが使用できない場合は、`PCU_NO_SETJMP`マクロを定義してください。
+* strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでも使用できない場合は、
   `PCU_NO_LIBC`マクロを定義してください。
   このマクロを定義した場合は`PCU_NO_VSNPRINTF`、`PCU_NO_MALLOC`、`PCU_NO_SETJMP`を定義する必要はありません。
-* プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリもサポートされていない場合は、
+* プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できない場合は、
   `PCU_NO_FLOATINGPOINT`マクロを定義してください。
+* コンソールモードが不要な場合は、`PCU_NO_CONSOLE_RUN`マクロを定義してください。
+  `PCU_console_run`が使用できなくなりますが、コードサイズが少し小さくなります。
 
 #### `PCU_NO_MALLOC` または `PCU_NO_LIBC` を定義した場合
 
@@ -70,7 +72,9 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 このメモリプールのバイト数を`PCU_STRING_POOL_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
 このメモリプールは、`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`、`PCU_FAIL*`、
 `PCU_MESSAGE*`のマクロで使用されます(`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`は失敗時のみ使用)。
-このメモリプールを使い切ってしまった場合はテスト結果が正しく表示されません。
+このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`の引数や
+`PCU_FAIL*`、`PCU_MESSAGE*`のメッセージが表示されません。
+これらの文字列表示が不要ならば`PCU_STRING_POOL_SIZE`に1を指定してください。
 
 #### `PCU_NO_*` のいずれかを定義した場合
 
@@ -349,7 +353,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
 ### `PCU_ASSERT*`
 
-`PCU_ASSERT*`マクロの引数は複数回展開される可能性があるので、副作用のないように指定してください。
+`PCU_ASSERT*`マクロの引数は複数回展開されるので、副作用のないように指定してください。
 `PCU_ASSERT*`マクロの戻り値は、失敗時に`PCU_MESSAGE*`マクロで追加メッセージを表示させたい場合などに利用できます。
 
 
@@ -557,6 +561,7 @@ arg[1-9]の個数によって使用するマクロを選択してください。
     コンソールモードでテストを実行します。
     実行するテストを対話的に選択したい場合、`PCU_run`の代わりにこちらを使います。
     引数は`PCU_run`と同じです。
+    なお、PCUnitが`PCU_NO_CONSOLE_RUN`マクロが定義済みでビルドされている場合は使用できません。
 
 
 * **`void PCU_set_putchar(PCU_Putchar func)`**
