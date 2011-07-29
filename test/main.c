@@ -4,6 +4,7 @@
 
 
 PCU_Suite *AssertTest_suite(void);
+PCU_Suite *AssertReturnTest_suite(void);
 PCU_Suite *SnprintfTest_suite(void);
 PCU_Suite *StringTest_suite(void);
 PCU_Suite *StrtolTest_suite(void);
@@ -12,6 +13,7 @@ int main(int argc, char **argv)
 {
 	const PCU_SuiteMethod assert_suites[] = {
 		AssertTest_suite,
+		AssertReturnTest_suite,
 	};
 	const PCU_SuiteMethod suites[] = {
 		SnprintfTest_suite,

@@ -187,7 +187,37 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_OPERATOR(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR((" #lhs ") " #op " (" #rhs "))", __FILE__, __LINE__, 0)
 
+
+#define PCU_ASSERT_RETURN(expr)	if (!PCU_assert_impl(((expr) != 0), 0, 0, PCU_TYPE_NONE, "PCU_ASSERT_RETURN(" #expr ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_TRUE_RETURN(expr)	if (!PCU_assert_impl(((expr) != 0), 1, 0, PCU_TYPE_BOOL, "PCU_ASSERT_TRUE_RETURN(" #expr ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_FALSE_RETURN(expr)	if (!PCU_assert_impl(((expr) == 0), 0, 1, PCU_TYPE_BOOL, "PCU_ASSERT_FALSE_RETURN(" #expr ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_EQUAL_RETURN(expected, actual)		if (!PCU_assert_impl(((expected) == (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0), "PCU_ASSERT_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_NOT_EQUAL_RETURN(expected, actual)	if (!PCU_assert_impl(((expected) != (actual)), (size_t)(expected), (size_t)(actual), PCU_get_num_type(sizeof(expected), sizeof(actual), 0) | PCU_TYPE_NOT, "PCU_ASSERT_NOT_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_PTR_EQUAL_RETURN(expected, actual)		if (!PCU_assert_impl(((const void *)(expected) == (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR, "PCU_ASSERT_PTR_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_PTR_NOT_EQUAL_RETURN(expected, actual)	if (!PCU_assert_impl(((const void *)(expected) != (const void *)(actual)), (size_t)(expected), (size_t)(actual), PCU_TYPE_PTR | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_PTR_NULL_RETURN(value)		if (!PCU_assert_impl(((const void *)(value) == 0), 0, (size_t)(value), PCU_TYPE_PTR_NULL, "PCU_ASSERT_PTR_NULL_RETURN(" #value ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_PTR_NOT_NULL_RETURN(value)	if (!PCU_assert_impl(((const void *)(value) != 0), 1, (size_t)(value), PCU_TYPE_PTR_NULL | PCU_TYPE_NOT, "PCU_ASSERT_PTR_NOT_NULL_RETURN(" #value ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_STRING_EQUAL_RETURN(expected, actual)		if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRCMP((expected), (actual)) == 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STR, "PCU_ASSERT_STRING_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_STRING_NOT_EQUAL_RETURN(expected, actual)	if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRCMP((expected), (actual)) != 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STR | PCU_TYPE_NOT, "PCU_ASSERT_STRING_NOT_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_NSTRING_EQUAL_RETURN(expected, actual, n)		if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | (n)), "PCU_ASSERT_NSTRING_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(expected, actual, n)	if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
+
+#ifndef PCU_NO_FLOATINGPOINT
+#define PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)		if (!PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_RETURN(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)	if (!PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)) return
+#endif
+
+#define PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)	if (!PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR_RETURN((" #lhs ") " #op " (" #rhs "))", __FILE__, __LINE__, 0)) return
+
+
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
+#define PCU_FAIL_IMPL_R()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_RETURN", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)
 
 #define PCU_FAIL0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL(); } while (0)
@@ -201,8 +231,20 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_FAIL8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL(); } while (0)
 #define PCU_FAIL9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL(); } while (0)
 
+#define PCU_FAIL0_RETURN(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL1_RETURN(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL2_RETURN(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL3_RETURN(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL4_RETURN(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL5_RETURN(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL6_RETURN(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL7_RETURN(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL8_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL9_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_R(); return; } while (0)
+
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
-#define PCU_FAIL(format, ...)		do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, format, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL(format, ...)			do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, format, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL_RETURN(format, ...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, format, __VA_ARGS__); PCU_FAIL_IMPL_R(); return; } while (0)
 #endif
 
 #define PCU_MSG_IMPL()	PCU_msg_impl(PCU_msg_buf, __FILE__, __LINE__)

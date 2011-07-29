@@ -486,6 +486,31 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 なお、PCUnitが`PCU_NO_SETJMP`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
 
 
+### `PCU_ASSERT*_RETURN`
+
+* **`PCU_ASSERT_RETURN(expr)`**
+* **`PCU_ASSERT_TRUE_RETURN(expr)`**
+* **`PCU_ASSERT_FALSE_RETURN(expr)`**
+* **`PCU_ASSERT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_NOT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_PTR_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_PTR_NOT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_PTR_NULL_RETURN(value)`**
+* **`PCU_ASSERT_PTR_NOT_NULL_RETURN(value)`**
+* **`PCU_ASSERT_STRING_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_STRING_NOT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_NSTRING_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)`**
+* **`PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)`**
+* **`PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)`**
+
+全ての`PCU_ASSERT*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
+`PCU_ASSERT*_RETURN`マクロは失敗時にテスト関数からreturnします。
+returnなのでスタブ等のテスト関数内で呼び出される関数から一気に抜けることはできません。
+これらのマクロは値を返しません。
+
+
 ### `PCU_FAIL*`
 
 * **`PCU_FAIL0(format)`**
@@ -522,9 +547,28 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 * **`PCU_FAIL_FATAL(format, ...)`**
 
 `PCU_FAIL*`マクロにはマクロ名の末尾に`_FATAL`が付いたバージョンがあります。
-`PCU_FAIL*_FATAL`は常にlongjmpによりテスト関数から強制的に抜けます。
+`PCU_FAIL*_FATAL`マクロは常にlongjmpによりテスト関数から強制的に抜けます。
 例えばスタブ内から一気に抜けたい場合などに利用できます。
 なお、PCUnitが`PCU_NO_SETJMP`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+
+
+### `PCU_FAIL*_RETURN`
+
+* **`PCU_FAIL0_RETURN(format)`**
+* **`PCU_FAIL1_RETURN(format, arg1)`**
+* **`PCU_FAIL2_RETURN(format, arg1, arg2)`**
+* **`PCU_FAIL3_RETURN(format, arg1, arg2, arg3)`**
+* **`PCU_FAIL4_RETURN(format, arg1, arg2, arg3, arg4)`**
+* **`PCU_FAIL5_RETURN(format, arg1, arg2, arg3, arg4, arg5)`**
+* **`PCU_FAIL6_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6)`**
+* **`PCU_FAIL7_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)`**
+* **`PCU_FAIL8_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
+* **`PCU_FAIL9_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
+* **`PCU_FAIL_RETURN(format, ...)`**
+
+`PCU_FAIL*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
+`PCU_FAIL*_RETURN`マクロは常にテスト関数からreturnします。
+returnなのでスタブ等のテスト関数内で呼び出される関数から一気に抜けることはできません。
 
 
 ### `PCU_MESSAGE*`

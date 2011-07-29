@@ -342,13 +342,11 @@ static void test_msg9(void)
 
 static void test_msg(void)
 {
-#if __STDC_VERSION__ >= 199901L
 	PCU_MESSAGE("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 1, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_MESSAGE("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 2, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 3, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_FAIL_FATAL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 4, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, '3', 4, "5", 6, 7, 8, -9, 10);
-#endif
 }
 
 static void test_assert_dummy(void)
@@ -421,6 +419,194 @@ static void test_assert_operator(void)
 	PCU_ASSERT_OPERATOR(0, >, 1);
 }
 
+static void test_assert_return(void)
+{
+	PCU_ASSERT_RETURN(0);
+	PCU_ASSERT(0);
+}
+
+static void test_assert_true_return(void)
+{
+	PCU_ASSERT_TRUE_RETURN(0);
+	PCU_ASSERT_TRUE(0);
+}
+
+
+static void test_assert_false_return(void)
+{
+	PCU_ASSERT_FALSE_RETURN(1);
+	PCU_ASSERT_FALSE(1);
+}
+
+
+static void test_assert_equal_return(void)
+{
+	PCU_ASSERT_EQUAL_RETURN(0, 1);
+	PCU_ASSERT_EQUAL(0, 1);
+}
+
+
+static void test_assert_not_equal_return(void)
+{
+	PCU_ASSERT_NOT_EQUAL_RETURN(0, 0);
+	PCU_ASSERT_NOT_EQUAL(0, 0);
+}
+
+
+static void test_assert_ptr_equal_return(void)
+{
+	PCU_ASSERT_PTR_EQUAL_RETURN(0, __FILE__);
+	PCU_ASSERT_PTR_EQUAL(0, __FILE__);
+}
+
+
+static void test_assert_ptr_not_equal_return(void)
+{
+	PCU_ASSERT_PTR_NOT_EQUAL_RETURN(0, 0);
+	PCU_ASSERT_PTR_NOT_EQUAL(0, 0);
+}
+
+
+static void test_assert_ptr_null_return(void)
+{
+	PCU_ASSERT_PTR_NULL_RETURN(__FILE__);
+	PCU_ASSERT_PTR_NULL(__FILE__);
+}
+
+
+static void test_assert_ptr_not_null_return(void)
+{
+	PCU_ASSERT_PTR_NOT_NULL_RETURN(0);
+	PCU_ASSERT_PTR_NOT_NULL(0);
+}
+
+
+static void test_assert_str_equal_return(void)
+{
+	PCU_ASSERT_STRING_EQUAL_RETURN(__FILE__, __FILE__+1);
+	PCU_ASSERT_STRING_EQUAL(__FILE__, __FILE__+1);
+}
+
+
+static void test_assert_str_not_equal_return(void)
+{
+	PCU_ASSERT_STRING_NOT_EQUAL_RETURN(__FILE__, __FILE__);
+	PCU_ASSERT_STRING_NOT_EQUAL(__FILE__, __FILE__);
+}
+
+
+static void test_assert_nstr_equal_return(void)
+{
+	PCU_ASSERT_NSTRING_EQUAL_RETURN(__FILE__, __FILE__+1, 5);
+	PCU_ASSERT_NSTRING_EQUAL(__FILE__, __FILE__+1, 5);
+}
+
+
+static void test_assert_nstr_not_equal_return(void)
+{
+	PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(__FILE__, __FILE__, 5);
+	PCU_ASSERT_NSTRING_NOT_EQUAL(__FILE__, __FILE__, 5);
+}
+
+
+static void test_assert_dbl_equal_return(void)
+{
+	PCU_ASSERT_DOUBLE_EQUAL_RETURN(0.0, 1.5, 0.0);
+	PCU_ASSERT_DOUBLE_EQUAL(0.0, 1.5, 0.0);
+}
+
+
+static void test_assert_dbl_not_equal_return(void)
+{
+	PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(1.0, 1.0, 0.0);
+	PCU_ASSERT_DOUBLE_NOT_EQUAL(1.0, 1.0, 0.0);
+}
+
+
+static void test_fail0_return(void)
+{
+	PCU_FAIL0_RETURN("test_msg0: 4");
+	PCU_FAIL0("test_msg0: 4");
+}
+
+
+static void test_fail1_return(void)
+{
+	PCU_FAIL1_RETURN("test_msg1: %d", 4);
+	PCU_FAIL1("test_msg1: %d", 5);
+}
+
+
+static void test_fail2_return(void)
+{
+	PCU_FAIL2_RETURN("test_msg2: %d,%#x", 4, 2);
+	PCU_FAIL2("test_msg2: %d,%#x", 5, 2);
+}
+
+
+static void test_fail3_return(void)
+{
+	PCU_FAIL3_RETURN("test_msg3: %d,%#x, %c", 4, 2, '3');
+	PCU_FAIL3("test_msg3: %d,%#x, %c", 5, 2, '3');
+}
+
+
+static void test_fail4_return(void)
+{
+	PCU_FAIL4_RETURN("test_msg4: %d,%#x, %c, %04d", 4, 2, '3', 4);
+	PCU_FAIL4("test_msg4: %d,%#x, %c, %04d", 5, 2, '3', 4);
+}
+
+
+static void test_fail5_return(void)
+{
+	PCU_FAIL5_RETURN("test_msg5: %d,%#x, %c, %04d, %s", 4, 2, '3', 4, "5");
+	PCU_FAIL5("test_msg5: %d,%#x, %c, %04d, %s", 5, 2, '3', 4, "5");
+}
+
+
+static void test_fail6_return(void)
+{
+	PCU_FAIL6_RETURN("test_msg6: %d,%#x, %c, %04d, %s, 0x%08X", 4, 2, '3', 4, "5", 6);
+	PCU_FAIL6("test_msg6: %d,%#x, %c, %04d, %s, 0x%08X", 5, 2, '3', 4, "5", 6);
+}
+
+
+static void test_fail7_return(void)
+{
+	PCU_FAIL7_RETURN("test_msg7: %d,%#x, %c, %04d, %s, 0x%08X, %+d", 4, 2, '3', 4, "5", 6, 7);
+	PCU_FAIL7("test_msg7: %d,%#x, %c, %04d, %s, 0x%08X, %+d", 5, 2, '3', 4, "5", 6, 7);
+}
+
+
+static void test_fail8_return(void)
+{
+	PCU_FAIL8_RETURN("test_msg8: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,", 4, 2, '3', 4, "5", 6, 7, 8);
+	PCU_FAIL8("test_msg8: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,", 5, 2, '3', 4, "5", 6, 7, 8);
+}
+
+
+static void test_fail9_return(void)
+{
+	PCU_FAIL9_RETURN("test_msg9: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d", 4, 2, '3', 4, "5", 6, 7, 8, -9);
+	PCU_FAIL9("test_msg9: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d", 5, 2, '3', 4, "5", 6, 7, 8, -9);
+}
+
+
+static void test_fail_return(void)
+{
+	PCU_FAIL_RETURN("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 4, 2, '3', 4, "5", 6, 7, 8, -9, 10);
+	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, '3', 4, "5", 6, 7, 8, -9, 10);
+}
+
+
+static void test_assert_operator_return(void)
+{
+	PCU_ASSERT_OPERATOR_RETURN(0, ==, 1);
+	PCU_ASSERT_OPERATOR(0, ==, 1);
+}
+
+
 
 PCU_Suite *AssertTest_suite(void)
 {
@@ -458,5 +644,40 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_assert_operator"       , test_assert_operator       } ,
 	};
 	static PCU_Suite suite = { "AssertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
+	return &suite;
+}
+
+PCU_Suite *AssertReturnTest_suite(void)
+{
+	static PCU_Test tests[] = {
+		{ "test_assert_return"                , test_assert_return                } , 
+		{ "test_assert_true_return"           , test_assert_true_return           } , 
+		{ "test_assert_false_return"          , test_assert_false_return          } , 
+		{ "test_assert_equal_return"          , test_assert_equal_return          } , 
+		{ "test_assert_not_equal_return"      , test_assert_not_equal_return      } , 
+		{ "test_assert_ptr_equal_return"      , test_assert_ptr_equal_return      } , 
+		{ "test_assert_ptr_not_equal_return"  , test_assert_ptr_not_equal_return  } , 
+		{ "test_assert_ptr_null_return"       , test_assert_ptr_null_return       } , 
+		{ "test_assert_ptr_not_null_return"   , test_assert_ptr_not_null_return   } , 
+		{ "test_assert_str_equal_return"      , test_assert_str_equal_return      } , 
+		{ "test_assert_str_not_equal_return"  , test_assert_str_not_equal_return  } , 
+		{ "test_assert_nstr_equal_return"     , test_assert_nstr_equal_return     } , 
+		{ "test_assert_nstr_not_equal_return" , test_assert_nstr_not_equal_return } , 
+		{ "test_assert_dbl_equal_return"      , test_assert_dbl_equal_return      } , 
+		{ "test_assert_dbl_not_equal_return"  , test_assert_dbl_not_equal_return  } , 
+		{ "test_fail0_return"                 , test_fail0_return                 } , 
+		{ "test_fail1_return"                 , test_fail1_return                 } , 
+		{ "test_fail2_return"                 , test_fail2_return                 } , 
+		{ "test_fail3_return"                 , test_fail3_return                 } , 
+		{ "test_fail4_return"                 , test_fail4_return                 } , 
+		{ "test_fail5_return"                 , test_fail5_return                 } , 
+		{ "test_fail6_return"                 , test_fail6_return                 } , 
+		{ "test_fail7_return"                 , test_fail7_return                 } , 
+		{ "test_fail8_return"                 , test_fail8_return                 } , 
+		{ "test_fail9_return"                 , test_fail9_return                 } , 
+		{ "test_fail_return"                  , test_fail_return                  } , 
+		{ "test_assert_operator_return"       , test_assert_operator_return       } , 
+	};
+	static PCU_Suite suite = { "AssertReturnTest", tests, sizeof tests / sizeof *tests };
 	return &suite;
 }
