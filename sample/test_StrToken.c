@@ -48,8 +48,8 @@ static void test_StrToken(void)
 {
 	size_t i;
 
-	/* _FATALの付いたASSERTが失敗すると強制的に関数から戻る */
-	PCU_ASSERT_EQUAL_FATAL(data->expected_count, StrToken_count(tok));
+	/* _RETURNまたは_FATALの付いたASSERTが失敗すると強制的に関数から戻る */
+	PCU_ASSERT_EQUAL_RETURN(data->expected_count, StrToken_count(tok));
 	for (i = 0; i < data->expected_count; i++) {
 		if (!PCU_ASSERT_STRING_EQUAL(data->expected_token[i], StrToken_get(tok, i))) {
 			/* 失敗したら追加メッセージを表示する */
