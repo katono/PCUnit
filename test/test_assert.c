@@ -342,9 +342,12 @@ static void test_msg9(void)
 
 static void test_msg(void)
 {
+	PCU_MESSAGE("hoge");
+	PCU_FAIL("piyo");
 	PCU_MESSAGE("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 1, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_MESSAGE("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 2, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 3, 2, '3', 4, "5", 6, 7, 8, -9, 10);
+	PCU_FAIL_FATAL("foo");
 	PCU_FAIL_FATAL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 4, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 }

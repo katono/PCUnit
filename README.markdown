@@ -523,7 +523,7 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 * **`PCU_FAIL7(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)`**
 * **`PCU_FAIL8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
-* **`PCU_FAIL(format, ...)`**
+* **`PCU_FAIL(...)`**
 
 `PCU_FAIL*`マクロは無条件に失敗を登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
@@ -544,7 +544,7 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 * **`PCU_FAIL7_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)`**
 * **`PCU_FAIL8_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
-* **`PCU_FAIL_FATAL(format, ...)`**
+* **`PCU_FAIL_FATAL(...)`**
 
 `PCU_FAIL*`マクロにはマクロ名の末尾に`_FATAL`が付いたバージョンがあります。
 `PCU_FAIL*_FATAL`マクロは常にlongjmpによりテスト関数から強制的に抜けます。
@@ -564,7 +564,7 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 * **`PCU_FAIL7_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)`**
 * **`PCU_FAIL8_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
-* **`PCU_FAIL_RETURN(format, ...)`**
+* **`PCU_FAIL_RETURN(...)`**
 
 `PCU_FAIL*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
 `PCU_FAIL*_RETURN`マクロは常にテスト関数からreturnします。
@@ -583,7 +583,7 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 * **`PCU_MESSAGE7(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)`**
 * **`PCU_MESSAGE8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_MESSAGE9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
-* **`PCU_MESSAGE(format, ...)`**
+* **`PCU_MESSAGE(...)`**
 
 `PCU_MESSAGE*`マクロは合否チェックを行わず、表示メッセージのみを登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
