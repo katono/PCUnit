@@ -242,7 +242,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_FAIL8_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_R(); return; } while (0)
 #define PCU_FAIL9_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_R(); return; } while (0)
 
-#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_FAIL(...)			do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
 #define PCU_FAIL_RETURN(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL_R(); return; } while (0)
 #endif
@@ -260,7 +260,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_MESSAGE8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
 #define PCU_MESSAGE9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
 
-#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_MESSAGE(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
 #endif
 
@@ -304,7 +304,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_FAIL8_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_F(); } while (0)
 #define PCU_FAIL9_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_F(); } while (0)
 
-#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC) && __STDC_VERSION__ >= 199901L
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_FAIL_FATAL(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL_F(); } while (0)
 #endif
 #endif
