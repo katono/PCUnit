@@ -655,6 +655,25 @@ arg[1-9]の個数によって使用するマクロを選択してください。
     `PCU_Test`のntimesにはテストデータの要素数を指定してください。
 
 
+## ヘルパーマクロ
+
+`PCU_Test`の配列初期化の際に、テストケース名とテスト関数を同じ名前にする場合、ヘルパーマクロが利用できます。
+ヘルパーマクロは次のように定義されています。
+
+    #define PCU_TEST(func)                  { #func, func }
+    #define PCU_TEST_REPEATED(func, ntimes) { #func, func, ntimes }
+    #define PCU_TEST_SKIPPED(func)          { #func, func, -1 }
+
+### 例
+
+    static PCU_Test tests[] = {
+        PCU_TEST(test_hoge),            /* test_hoge関数を登録 */
+        PCU_TEST(test_piyo),            /* test_piyo関数を登録 */
+        PCU_TEST_REPEATED(test_foo, 5), /* test_foo関数を登録(5回実行) */
+        PCU_TEST_SKIPPED(test_bar),     /* test_bar関数を登録(スキップ) */
+    };
+
+
 ## ライセンス
 
 PCUnitはzlibライセンスに従って配布されます。

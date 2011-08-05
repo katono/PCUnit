@@ -309,6 +309,12 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #endif
 #endif
 
+/* 
+ * Helper Macros
+ */
+#define PCU_TEST(func)                  { #func, func }
+#define PCU_TEST_REPEATED(func, ntimes) { #func, func, ntimes }
+#define PCU_TEST_SKIPPED(func)          { #func, func, -1 }
 
 #ifdef __cplusplus
 }
