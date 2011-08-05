@@ -336,7 +336,7 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
 
     Suite: AddSubTest
     
-    2 Tests, 0 Skipped
+    2 Tests, 0 Failures, 0 Skipped
     OK
 
 全てのテストにパスすると、OKのメッセージが表示されます。

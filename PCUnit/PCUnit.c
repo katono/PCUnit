@@ -284,20 +284,17 @@ static void print_result(PCU_Suite *suite)
 	PCU_PRINTF0("\n");
 	if (suite->result.num_tests_failed == 0) {
 		set_color(COLOR_GREEN);
-		PCU_PRINTF2("%d Tests, %d Skipped\n", 
-				suite->result.num_tests,
-				suite->result.num_tests - suite->result.num_tests_ran);
-		PCU_PRINTF0("OK\n");
-		reset_color();
-		PCU_PRINTF0("\n");
 	} else {
 		set_color(COLOR_RED);
-		PCU_PRINTF3("%d Tests, %d Failures, %d Skipped\n", 
-				suite->result.num_tests, suite->result.num_tests_failed,
-				suite->result.num_tests - suite->result.num_tests_ran);
-		reset_color();
-		PCU_PRINTF0("\n");
 	}
+	PCU_PRINTF3("%d Tests, %d Failures, %d Skipped\n", 
+			suite->result.num_tests, suite->result.num_tests_failed,
+			suite->result.num_tests - suite->result.num_tests_ran);
+	if (suite->result.num_tests_failed == 0) {
+		PCU_PRINTF0("OK\n");
+	}
+	reset_color();
+	PCU_PRINTF0("\n");
 	if (suite->cleanup_error) {
 		set_color(COLOR_RED);
 		PCU_PRINTF1("CLEANUP FAILED : 0x%x\n", suite->cleanup_error);
