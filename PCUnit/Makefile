@@ -16,7 +16,7 @@ all: $(TARGET)
 
 .SUFFIXES: .c .o
 
-.c .o:
+.c.o:
 	$(CC) $(CFLAGS) -c $<
 
 

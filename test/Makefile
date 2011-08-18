@@ -31,7 +31,7 @@ PCU_Test.o: ../PCUnit/PCU_Test.c
 
 .SUFFIXES: .c .o
 
-.c .o:
+.c.o:
 	$(CC) $(CFLAGS) -c $<
 
 
