@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g
-CFLAGS += -I../PCUnit
+CFLAGS += -I..
 # CFLAGS += -DPCU_NO_LIBC
 LFLAGS = -L../PCUnit -lpcunit
 TARGET = sample

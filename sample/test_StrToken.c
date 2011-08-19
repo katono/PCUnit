@@ -1,7 +1,7 @@
 /* 
  * Data Driven Test
  */
-#include "PCUnit.h"
+#include "PCUnit/PCUnit.h"
 #include "StrToken.h"
 
 typedef struct {
