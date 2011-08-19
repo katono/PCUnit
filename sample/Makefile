@@ -1,4 +1,5 @@
-CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -std=c99 -pedantic-errors -g
+CC = gcc
+CFLAGS = -Wall -g
 CFLAGS += -I../PCUnit
 # CFLAGS += -DPCU_NO_LIBC
 LFLAGS = -L../PCUnit -lpcunit
