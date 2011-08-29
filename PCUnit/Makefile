@@ -12,6 +12,8 @@ OBJS += PCU_Test.o
 OBJS += PCU_Suite.o
 OBJS += PCU_Libc.o
 
+.PHONY: all clean install uninstall
+
 all: $(TARGET)
 
 .SUFFIXES: .c .o
@@ -19,23 +21,22 @@ all: $(TARGET)
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-
 $(TARGET): $(OBJS)
 	$(AR) rcs $(TARGET) $^
 
+INSTALLDIR = /usr/local
 
 install:
-	cp $(TARGET) /usr/local/lib
-	mkdir -p /usr/local/include/PCUnit
-	cp PCUnit.h PCU_Libc.h /usr/local/include/PCUnit
-
+	install -d $(INSTALLDIR)/include/PCUnit
+	install -m 644 $(TARGET) $(INSTALLDIR)/lib
+	install -m 644 PCUnit.h PCU_Libc.h $(INSTALLDIR)/include/PCUnit
+	install -m 755 ../util/pcunit_*.rb $(INSTALLDIR)/bin
 
 uninstall:
-	rm /usr/local/lib/$(TARGET)
-	rm -rf /usr/local/include/PCUnit
+	rm $(INSTALLDIR)/lib/$(TARGET)
+	rm -rf $(INSTALLDIR)/include/PCUnit
+	rm $(INSTALLDIR)/bin/pcunit_*.rb
 
-
-.PHONY: clean
 clean:
 	rm -f *.o *.a
 
