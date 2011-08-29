@@ -2,37 +2,43 @@ CC = gcc
 CFLAGS = -Wall -g
 CFLAGS += -I..
 # CFLAGS += -DPCU_NO_LIBC
-LFLAGS = -L../PCUnit -lpcunit
 TARGET = sample
+PCUNITDIR = ../PCUnit
+LIBPCUNIT = $(PCUNITDIR)/libpcunit.a
+LFLAGS = -L$(PCUNITDIR) -lpcunit
 OBJS = main.o
 OBJS += RingBuf.o test_RingBuf.o
 OBJS += StrToken.o test_StrToken.o
-OBJS += ../PCUnit/libpcunit.a
+OBJS += $(LIBPCUNIT)
 
-all: $(TARGET)
+.PHONY: all clean pcunit_register test
+
+all: pcunit_register $(TARGET) test
+
+pcunit_register:
+	ruby ../util/pcunit_register.rb
 
 .SUFFIXES: .c .o
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-
-../PCUnit/libpcunit.a:
-	cd ../PCUnit && $(MAKE)
+$(LIBPCUNIT):
+	cd $(PCUNITDIR) && $(MAKE)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
+
+test:
 	./$(TARGET)
 
-
-.PHONY: clean
 clean:
-	rm -f *.o $(TARGET) ../PCUnit/*.o ../PCUnit/*.a
+	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)
 
-main.o:  ../PCUnit/PCU_Libc.h ../PCUnit/PCUnit.h
+main.o:  $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
 StrToken.o: StrToken.h
-test_StrToken.o: StrToken.h ../PCUnit/PCU_Libc.h ../PCUnit/PCUnit.h
+test_StrToken.o: StrToken.h $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
 RingBuf.o: RingBuf.h
-test_RingBuf.o: RingBuf.h ../PCUnit/PCU_Libc.h ../PCUnit/PCUnit.h
+test_RingBuf.o: RingBuf.h $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
 
-../PCUnit/libpcunit.a: ../PCUnit/PCU_Test.h ../PCUnit/PCU_Suite.h ../PCUnit/PCU_Libc.h ../PCUnit/PCUnit.h ../PCUnit/PCU_Test.c ../PCUnit/PCU_Suite.c ../PCUnit/PCU_Libc.c ../PCUnit/PCUnit.c
+$(LIBPCUNIT): $(PCUNITDIR)/*.h $(PCUNITDIR)/*.c
