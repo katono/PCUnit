@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#define PCU_VERSION "1.2.0"
+
 /* 
  * private
  */
