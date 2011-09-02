@@ -33,7 +33,7 @@ def register_tests(file_name)
 	mark = false
 	while line = file.gets
 		lines.push(line)
-		if line =~ /void\s+(test[^\s]*)\s*\((void|)\)/
+		if line =~ /void\s+(test[^\s]*)\s*\(\s*(void|)\s*\)/
 			testfuncs.push($1)
 		end
 		if mark && line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
@@ -47,10 +47,10 @@ def register_tests(file_name)
 			insert_idx = idx
 			mark = false
 		end
-		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\((|void)\)/
+		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\(\s*(void|)\s*\)\s*[^;]*\s*$/
 			$suite_methods.push($1)
 		end
-		if !$main_file && line =~ /PCU_SuiteMethod\s+.*\[\]/
+		if !$main_file && line =~ /PCU_SuiteMethod\s+.*\[\s*\]/
 			$main_file = file_name
 		end
 		idx += 1
@@ -89,7 +89,7 @@ def register_suite_methods(file_name)
 	mark = false
 	insert_idx_decl = nil
 	while line = file.gets
-		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\((|void)\);/
+		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\(\s*(void|)\s*\)\s*;\s*$/
 			registered_suite_methods1.push($1)
 			next
 		end
@@ -98,15 +98,15 @@ def register_suite_methods(file_name)
 			next
 		end
 		lines.push(line)
-		if line =~ /PCU_SuiteMethod\s+.*\[\]/
+		if line =~ /PCU_SuiteMethod\s+.*\[\s*\]/
 			mark = true
 			indent = line.slice(/^\s*/) * 2
 		end
-		if mark && line =~ /\};/
+		if mark && line =~ /\}\s*;/
 			insert_idx_init = idx
 			mark = false
 		end
-		if !insert_idx_decl && line =~ /^\{/
+		if !insert_idx_decl && line =~ /^\s*\{/
 			insert_idx_decl = idx - 2
 		elsif !insert_idx_decl && line =~ /\)\s*\{/
 			insert_idx_decl = idx - 1
