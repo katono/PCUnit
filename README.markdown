@@ -35,12 +35,15 @@ PCUnitは以下のような特長があります。
 
 ## ビルド方法
 
-GNU開発環境の場合は、PCUnitディレクトリでmakeしてください。makeするとlibpcunit.aが生成されるので
-これをテストプロジェクトに静的リンクしてください。デフォルトのコンパイラはgccですが、
+GNU開発環境の場合は、PCUnitディレクトリでmakeを実行してください。makeを実行するとlibpcunit.aが生成されるので
+それをテストプロジェクトに静的リンクしてください。デフォルトのコンパイラはgccですが、
 適宜Makefileを修正してターゲット用のクロスコンパイラやコンパイラオプションを指定してください。
-make installすると/usr/local/libにlibpcunit.aを、/usr/local/includeにヘッダファイルを、
+ホスト環境にインストールしたい場合は、make installを実行してください。
+make installを実行すると/usr/local/libにlibpcunit.aを、/usr/local/include/PCUnitにヘッダファイルを、
 /usr/local/binにユーティリティをインストールします。
-make uninstallするとアンインストールします。
+make uninstallを実行するとアンインストールします。
+インストール先ディレクトリを/usr/localから変更したい場合は、
+make install INSTALLDIR=dirのように、dirに任意のインストール先ディレクトリを指定してください。
 
 GNU開発環境でない場合は、PCUnitディレクトリ以下のソースファイルとヘッダファイルをテストプロジェクトに追加して
 テストコードと共にビルドしてください。あるいはPCUnitの静的ライブラリをビルドするプロジェクトを作成し、
