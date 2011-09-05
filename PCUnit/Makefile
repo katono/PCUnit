@@ -27,10 +27,19 @@ $(TARGET): $(OBJS)
 INSTALLDIR = /usr/local
 
 install:
+	install -d $(INSTALLDIR)/lib
 	install -d $(INSTALLDIR)/include/PCUnit
+	install -d $(INSTALLDIR)/bin
 	install -m 644 $(TARGET) $(INSTALLDIR)/lib
 	install -m 644 PCUnit.h PCU_Libc.h $(INSTALLDIR)/include/PCUnit
-	install -m 755 ../util/pcunit_*.rb $(INSTALLDIR)/bin
+	if [ -d ../util ]; then\
+		if [ -e ../util/pcunit_template.rb ]; then\
+			install -m 755 ../util/pcunit_template.rb $(INSTALLDIR)/bin;\
+		fi;\
+		if [ -e ../util/pcunit_register.rb ]; then\
+			install -m 755 ../util/pcunit_register.rb $(INSTALLDIR)/bin;\
+		fi;\
+	fi
 
 uninstall:
 	rm $(INSTALLDIR)/lib/$(TARGET)
