@@ -306,20 +306,20 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
 
     Suite: AddSubTest
       Test: test_add ... FAILED
-        1. addsub.c:7
+        1. AddSubTest.c:6
           PCU_ASSERT_EQUAL(3, add(2, 1))
             expected : 0x00000003 (3)
             actual   : 0x00000000 (0)
-        2. addsub.c:9
+        2. AddSubTest.c:8
           PCU_ASSERT_EQUAL(1, add(-1, 2))
             expected : 0x00000001 (1)
             actual   : 0x00000000 (0)
       Test: test_sub ... FAILED
-        1. addsub.c:14
+        1. AddSubTest.c:13
           PCU_ASSERT_EQUAL(1, sub(2, 1))
             expected : 0x00000001 (1)
             actual   : 0x00000000 (0)
-        2. addsub.c:16
+        2. AddSubTest.c:15
           PCU_ASSERT_EQUAL(-3, sub(-1, 2))
             expected : 0xfffffffd (-3)
             actual   : 0x00000000 (0)
@@ -700,7 +700,7 @@ setup関数・テスト関数等の雛形が定義されています。
 * `-d DIR`
 
     `DIR`にファイルを生成するディレクトリを指定してください。
-    このオプションを省略した場合、カレントディレクトリを指定したとみなします。
+    このオプションを省略した場合、カレントディレクトリを指定したと見なします。
 
 * `-p [EXT]`
 
@@ -747,7 +747,7 @@ setup関数・テスト関数等の雛形が定義されています。
 * `-d DIR`
 
     `DIR`にテストプロジェクトのソースファイルのディレクトリを指定してください。
-    このオプションを省略した場合、カレントディレクトリを指定したとみなします。
+    このオプションを省略した場合、カレントディレクトリを指定したと見なします。
 
 * `-n`
 
