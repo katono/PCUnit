@@ -142,7 +142,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 	current_test->result.num_asserts++;
 	current_test->result.num_asserts_ran++;
 
-	not_flag = PCU_GET_NOT_FLAG(type);
+	not_flag = PCU_get_not_flag(type);
 	if (dlt < 0) {
 		dlt = -dlt;
 	}
@@ -205,9 +205,9 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 		*dst2 = 0;
 		return 1;
 	}
-	t = PCU_GET_ASSERT_TYPE(type);
+	t = PCU_get_assert_type(type);
 	if (t == PCU_TYPE_NSTR) {
-		len = PCU_GET_NSTR_LEN(type);
+		len = PCU_get_nstr_len(type);
 		src1_len = src1 ? len + 1 : 0;
 		src2_len = src2 ? len + 1 : 0;
 	} else {
@@ -250,7 +250,7 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	}
 
 	self->type = type;
-	switch (PCU_GET_ASSERT_TYPE(type)) {
+	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_NONE:
 		break;
 	case PCU_TYPE_BOOL:
@@ -306,7 +306,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 	}
 
 	self->type = type;
-	switch (PCU_GET_ASSERT_TYPE(type)) {
+	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_DBL:
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		self->expected.dbl = expected;
@@ -335,7 +335,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 static void PCU_TestFailure_delete(PCU_TestFailure *self)
 {
 	if (!self) return;
-	switch (PCU_GET_ASSERT_TYPE(self->type)) {
+	switch (PCU_get_assert_type(self->type)) {
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
 	case PCU_TYPE_MSG:

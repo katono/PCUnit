@@ -41,10 +41,9 @@ extern char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 #define PCU_TYPE_NSTR      0x40000000
 #define PCU_TYPE_NOT       0x80000000
 
-#define PCU_GET_ASSERT_TYPE(type)		(((type) & PCU_TYPE_NSTR) ? PCU_TYPE_NSTR : ((type) & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT)))
-#define PCU_GET_NSTR_LEN(type)			(size_t)((type) & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT))
-#define PCU_GET_NOT_FLAG(type)			((type) & PCU_TYPE_NOT)
-
+unsigned long PCU_get_assert_type(unsigned long type);
+size_t PCU_get_nstr_len(unsigned long type);
+int PCU_get_not_flag(unsigned long type);
 unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int is_operator);
 int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag);
 #ifndef PCU_NO_FLOATINGPOINT

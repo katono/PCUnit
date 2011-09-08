@@ -96,6 +96,25 @@ static void reset_color(void)
 #endif
 }
 
+unsigned long PCU_get_assert_type(unsigned long type)
+{
+	if (type & PCU_TYPE_NSTR) {
+		return PCU_TYPE_NSTR;
+	} else {
+		return (type & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT));
+	}
+}
+
+size_t PCU_get_nstr_len(unsigned long type)
+{
+	return (size_t) (type & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT));
+}
+
+int PCU_get_not_flag(unsigned long type)
+{
+	return (type & PCU_TYPE_NOT);
+}
+
 unsigned long PCU_get_num_type(size_t sizeof_expected, size_t sizeof_actual, int is_operator)
 {
 	if (sizeof_expected <= sizeof(char) && sizeof_actual <= sizeof(char)) {
@@ -156,7 +175,7 @@ static void print_failure(PCU_Test *test)
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
 		unsigned long type;
-		type = PCU_GET_ASSERT_TYPE(pos->type);
+		type = PCU_get_assert_type(pos->type);
 		if (type == PCU_TYPE_SETUP) {
 			PCU_PRINTF2("    %d. %s\n", n, test->name);
 		} else {
@@ -238,7 +257,7 @@ static void print_failure(PCU_Test *test)
 				}
 			}
 			if (type == PCU_TYPE_NSTR) {
-				PCU_PRINTF1("        length   : %d\n", PCU_GET_NSTR_LEN(pos->type));
+				PCU_PRINTF1("        length   : %d\n", PCU_get_nstr_len(pos->type));
 			}
 			break;
 #if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
