@@ -140,6 +140,9 @@ int PCU_atoi(const char *s);
 # define PCU_ATOI		atoi
 #endif
 
+#ifndef PCU_NO_WCHAR
+#include <wchar.h>
+#endif
 
 #ifdef __cplusplus
 }

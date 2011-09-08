@@ -96,18 +96,22 @@ static void reset_color(void)
 #endif
 }
 
+#define PCU_TYPE_NOT_NSTR	(~(PCU_TYPE_NSTR | PCU_TYPE_NSTRW | PCU_TYPE_NOT))
+
 unsigned long PCU_get_assert_type(unsigned long type)
 {
 	if (type & PCU_TYPE_NSTR) {
 		return PCU_TYPE_NSTR;
+	} else if (type & PCU_TYPE_NSTRW) {
+		return PCU_TYPE_NSTRW;
 	} else {
-		return (type & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT));
+		return (type & PCU_TYPE_NOT_NSTR);
 	}
 }
 
 size_t PCU_get_nstr_len(unsigned long type)
 {
-	return (size_t) (type & ~(PCU_TYPE_NSTR | PCU_TYPE_NOT));
+	return (size_t) (type & PCU_TYPE_NOT_NSTR);
 }
 
 int PCU_get_not_flag(unsigned long type)
@@ -244,6 +248,8 @@ static void print_failure(PCU_Test *test)
 			break;
 		case PCU_TYPE_STR:
 		case PCU_TYPE_NSTR:
+		case PCU_TYPE_STRW:
+		case PCU_TYPE_NSTRW:
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
 				if (pos->expected.str) {
 					PCU_PRINTF1("        expected : \"%s\"\n", pos->expected.str);

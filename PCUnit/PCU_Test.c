@@ -277,6 +277,8 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 		break;
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
+	case PCU_TYPE_STRW:
+	case PCU_TYPE_NSTRW:
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!copy_string(&self->expected.str, &self->actual.str, (const char *) expected, (const char *) actual, type)) {

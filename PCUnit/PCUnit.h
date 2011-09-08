@@ -34,11 +34,13 @@ extern char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 #define PCU_TYPE_PTR       0x0000000e
 #define PCU_TYPE_PTR_NULL  0x0000000f
 #define PCU_TYPE_STR       0x00000010
-#define PCU_TYPE_DBL       0x00000011
-#define PCU_TYPE_MSG       0x00000012
-#define PCU_TYPE_FAIL      0x00000013
-#define PCU_TYPE_SETUP     0x00000014
-#define PCU_TYPE_NSTR      0x40000000
+#define PCU_TYPE_STRW      0x00000011
+#define PCU_TYPE_DBL       0x00000012
+#define PCU_TYPE_MSG       0x00000013
+#define PCU_TYPE_FAIL      0x00000014
+#define PCU_TYPE_SETUP     0x00000015
+#define PCU_TYPE_NSTR      0x20000000
+#define PCU_TYPE_NSTRW     0x40000000
 #define PCU_TYPE_NOT       0x80000000
 
 unsigned long PCU_get_assert_type(unsigned long type);
@@ -181,6 +183,12 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | (n)), "PCU_ASSERT_NSTRING_EQUAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRING_NOT_EQUAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)
 
+#define PCU_ASSERT_STRINGW_EQUAL(expected, actual)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) == 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW, "PCU_ASSERT_STRINGW_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) != 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW | PCU_TYPE_NOT, "PCU_ASSERT_STRINGW_NOT_EQUAL(" #expected ", " #actual ")", __FILE__, __LINE__, 0)
+
+#define PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | (n)), "PCU_ASSERT_NSTRINGW_EQUAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)
+#define PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRINGW_NOT_EQUAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)
+
 #ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)		PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)	PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL | PCU_TYPE_NOT, "PCU_ASSERT_DOUBLE_NOT_EQUAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)
@@ -208,6 +216,12 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_NSTRING_EQUAL_RETURN(expected, actual, n)		if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | (n)), "PCU_ASSERT_NSTRING_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
 #define PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(expected, actual, n)	if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_STRINGW_EQUAL_RETURN(expected, actual)		if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) == 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW, "PCU_ASSERT_STRINGW_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_STRINGW_NOT_EQUAL_RETURN(expected, actual)	if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) != 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW | PCU_TYPE_NOT, "PCU_ASSERT_STRINGW_NOT_EQUAL_RETURN(" #expected ", " #actual ")", __FILE__, __LINE__, 0)) return
+
+#define PCU_ASSERT_NSTRINGW_EQUAL_RETURN(expected, actual, n)		if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | (n)), "PCU_ASSERT_NSTRINGW_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
+#define PCU_ASSERT_NSTRINGW_NOT_EQUAL_RETURN(expected, actual, n)	if (!PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRINGW_NOT_EQUAL_RETURN(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 0)) return
 
 #ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)		if (!PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_RETURN(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 0)) return
@@ -286,6 +300,12 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_NSTRING_EQUAL_FATAL(expected, actual, n)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | (n)), "PCU_ASSERT_NSTRING_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
 #define PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(expected, actual, n)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (PCU_STRNCMP((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTR | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
+
+#define PCU_ASSERT_STRINGW_EQUAL_FATAL(expected, actual)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) == 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW, "PCU_ASSERT_STRINGW_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(expected, actual)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcscmp((expected), (actual)) != 0) : 0), (size_t)(expected), (size_t)(actual), PCU_TYPE_STRW | PCU_TYPE_NOT, "PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(" #expected ", " #actual ")", __FILE__, __LINE__, 1)
+
+#define PCU_ASSERT_NSTRINGW_EQUAL_FATAL(expected, actual, n)		PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) == 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | (n)), "PCU_ASSERT_NSTRINGW_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
+#define PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(expected, actual, n)	PCU_assert_impl((((size_t)(expected) != 0 && (size_t)(actual) != 0) ? (wcsncmp((expected), (actual), (n)) != 0) : 0), (size_t)(expected), (size_t)(actual), (PCU_TYPE_NSTRW | PCU_TYPE_NOT | (n)), "PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #n ")", __FILE__, __LINE__, 1)
 
 #ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)		PCU_assert_double_impl((expected), (actual), (delta), PCU_TYPE_DBL, "PCU_ASSERT_DOUBLE_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")", __FILE__, __LINE__, 1)
