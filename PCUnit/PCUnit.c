@@ -252,12 +252,14 @@ static void print_failure(PCU_Test *test)
 		case PCU_TYPE_NSTRW:
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
 				if (pos->expected.str) {
-					PCU_PRINTF1("        expected : \"%s\"\n", pos->expected.str);
+					PCU_PRINTF2("        expected : %s\"%s\"\n",
+							(type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "", pos->expected.str);
 				} else {
 					PCU_PRINTF0("        expected : NULL\n");
 				}
 				if (pos->actual.str) {
-					PCU_PRINTF1("        actual   : \"%s\"\n", pos->actual.str);
+					PCU_PRINTF2("        actual   : %s\"%s\"\n",
+							(type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "", pos->actual.str);
 				} else {
 					PCU_PRINTF0("        actual   : NULL\n");
 				}

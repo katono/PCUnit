@@ -241,6 +241,73 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 	return 1;
 }
 
+static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wchar_t *src2, unsigned long type)
+{
+	char *p1;
+	char *p2;
+	size_t src1_len;
+	size_t src2_len;
+	size_t len = 0;
+	unsigned long t;
+	if (!src1 && !src2) {
+		*dst1 = 0;
+		*dst2 = 0;
+		return 1;
+	}
+	t = PCU_get_assert_type(type);
+	if (t == PCU_TYPE_NSTRW) {
+		len = PCU_get_nstr_len(type);
+		src1_len = src1 ? len + 1 : 0;
+		src2_len = src2 ? len + 1 : 0;
+	} else {
+		if (src1) {
+			src1_len = wcstombs(0, src1, 0);
+			if (src1_len == (size_t) -1) {
+				src1_len = wcslen(src1);
+			}
+			src1_len++;
+		} else {
+			src1_len = 0;
+		}
+		if (src2) {
+			src2_len = wcstombs(0, src2, 0);
+			if (src2_len == (size_t) -1) {
+				src2_len = wcslen(src2);
+			}
+			src2_len++;
+		} else {
+			src2_len = 0;
+		}
+	}
+	p1 = (char *) PCU_STR_MALLOC(sizeof(char) * (src1_len + src2_len));
+	if (!p1) {
+		return 0;
+	}
+	p2 = p1 + src1_len;
+	if (t == PCU_TYPE_NSTRW) {
+		if (src1) {
+			wcstombs(p1, src1, len);
+			p1[len] = '\0';
+		}
+		if (src2) {
+			wcstombs(p2, src2, len);
+			p2[len] = '\0';
+		}
+	} else {
+		if (src1) {
+			wcstombs(p1, src1, src1_len);
+			p1[src1_len - 1] = '\0';
+		}
+		if (src2) {
+			wcstombs(p2, src2, src2_len);
+			p2[src2_len - 1] = '\0';
+		}
+	}
+	*dst1 = src1 ? p1 : 0;
+	*dst2 = src2 ? p2 : 0;
+	return 1;
+}
+
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
@@ -277,11 +344,15 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 		break;
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
-	case PCU_TYPE_STRW:
-	case PCU_TYPE_NSTRW:
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!copy_string(&self->expected.str, &self->actual.str, (const char *) expected, (const char *) actual, type)) {
+			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
+		}
+		break;
+	case PCU_TYPE_STRW:
+	case PCU_TYPE_NSTRW:
+		if (!copy_stringw(&self->expected.str, &self->actual.str, (const wchar_t *) expected, (const wchar_t *) actual, type)) {
 			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
