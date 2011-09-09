@@ -142,6 +142,7 @@ int PCU_atoi(const char *s);
 
 #ifndef PCU_NO_WCHAR
 #include <wchar.h>
+#include <limits.h>
 #endif
 
 #ifdef __cplusplus
