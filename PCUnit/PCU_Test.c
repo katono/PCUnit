@@ -289,11 +289,10 @@ static size_t get_mblen_strw(const wchar_t *wstr)
 static void to_mbs(char *cstr, const wchar_t *wstr, size_t cstr_len)
 {
 	if (wstr) {
-		size_t s;
 		const wchar_t *p = wstr;
 		mbstate_t ps;
 		PCU_MEMSET(&ps, 0, sizeof ps);
-		s = wcsrtombs(cstr, &p, cstr_len, &ps);
+		wcsrtombs(cstr, &p, cstr_len, &ps);
 		cstr[cstr_len - 1] = '\0';
 	}
 }
