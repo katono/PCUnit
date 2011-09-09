@@ -264,7 +264,7 @@ static void print_failure(PCU_Test *test)
 					PCU_PRINTF0("        actual   : NULL\n");
 				}
 			}
-			if (type == PCU_TYPE_NSTR) {
+			if (type == PCU_TYPE_NSTR || type == PCU_TYPE_NSTRW) {
 				PCU_PRINTF1("        length   : %d\n", PCU_get_nstr_len(pos->type));
 			}
 			break;
