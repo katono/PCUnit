@@ -260,8 +260,36 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 	t = PCU_get_assert_type(type);
 	if (t == PCU_TYPE_NSTRW) {
 		len = PCU_get_nstr_len(type);
-		src1_len = src1 ? len + 1 : 0;
-		src2_len = src2 ? len + 1 : 0;
+		if (src1) {
+			size_t i;
+			char buf[sizeof(wchar_t)];
+			src1_len = 0;
+			for (i = 0; i < len; i++) {
+				size_t s = wcrtomb(buf, src1[i], &ps);
+				if (s == (size_t) -1 || (s == 1 && buf[0] == '\0')) {
+					break;
+				}
+				src1_len += s;
+			}
+			src1_len++;
+		} else {
+			src1_len = 0;
+		}
+		if (src2) {
+			size_t i;
+			char buf[sizeof(wchar_t)];
+			src2_len = 0;
+			for (i = 0; i < len; i++) {
+				size_t s = wcrtomb(buf, src2[i], &ps);
+				if (s == (size_t) -1 || (s == 1 && buf[0] == '\0')) {
+					break;
+				}
+				src2_len += s;
+			}
+			src2_len++;
+		} else {
+			src2_len = 0;
+		}
 	} else {
 		if (src1) {
 			wp = src1;
@@ -289,27 +317,24 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 		return 0;
 	}
 	p2 = p1 + src1_len;
-	if (t == PCU_TYPE_NSTRW) {
-		if (src1) {
-			wp = src1;
-			wcsrtombs(p1, &wp, len, &ps);
-			p1[len] = '\0';
-		}
-		if (src2) {
-			wp = src2;
-			wcsrtombs(p2, &wp, len, &ps);
-			p2[len] = '\0';
-		}
-	} else {
-		if (src1) {
-			wp = src1;
-			wcsrtombs(p1, &wp, src1_len, &ps);
+	if (src1) {
+		size_t s;
+		wp = src1;
+		s = wcsrtombs(p1, &wp, src1_len, &ps);
+		if (s != (size_t) -1) {
 			p1[src1_len - 1] = '\0';
+		} else {
+			p1[0] = '\0';
 		}
-		if (src2) {
-			wp = src2;
-			wcsrtombs(p2, &wp, src2_len, &ps);
+	}
+	if (src2) {
+		size_t s;
+		wp = src2;
+		s = wcsrtombs(p2, &wp, src2_len, &ps);
+		if (s != (size_t) -1) {
 			p2[src2_len - 1] = '\0';
+		} else {
+			p2[0] = '\0';
 		}
 	}
 	*dst1 = src1 ? p1 : 0;
