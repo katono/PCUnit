@@ -241,6 +241,63 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 	return 1;
 }
 
+static size_t get_mblen_nstrw(const wchar_t *wstr, size_t wstr_len)
+{
+	size_t ret;
+	if (wstr) {
+		size_t i;
+		char buf[sizeof(wchar_t)];
+		mbstate_t ps;
+		PCU_MEMSET(&ps, 0, sizeof ps);
+		ret = 0;
+		for (i = 0; i < wstr_len; i++) {
+			size_t s = wcrtomb(buf, wstr[i], &ps);
+			if (s == (size_t) -1) {
+				ret = sizeof(wchar_t) * wcslen(wstr);
+				break;
+			} else if (s == 1 && buf[0] == '\0') {
+				break;
+			}
+			ret += s;
+		}
+		ret++;
+	} else {
+		ret = 0;
+	}
+	return ret;
+}
+
+static size_t get_mblen_strw(const wchar_t *wstr)
+{
+	size_t ret;
+	if (wstr) {
+		const wchar_t *p = wstr;
+		mbstate_t ps;
+		PCU_MEMSET(&ps, 0, sizeof ps);
+		ret = wcsrtombs(0, &p, 0, &ps);
+		if (ret == (size_t) -1) {
+			ret = sizeof(wchar_t) * wcslen(wstr);
+		}
+		ret++;
+	} else {
+		ret = 0;
+	}
+	return ret;
+}
+
+static void to_mbs(char *cstr, const wchar_t *wstr, size_t cstr_len)
+{
+	if (wstr) {
+		size_t s;
+		const wchar_t *p = wstr;
+		mbstate_t ps;
+		PCU_MEMSET(&ps, 0, sizeof ps);
+		p = wstr;
+		s = wcsrtombs(cstr, &p, cstr_len, &ps);
+		cstr[cstr_len - 1] = '\0';
+	}
+}
+
 static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wchar_t *src2, unsigned long type)
 {
 	char *p1;
@@ -249,9 +306,6 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 	size_t src2_len;
 	size_t len = 0;
 	unsigned long t;
-	mbstate_t ps;
-	const wchar_t *wp;
-	PCU_MEMSET(&ps, 0, sizeof ps);
 	if (!src1 && !src2) {
 		*dst1 = 0;
 		*dst2 = 0;
@@ -260,83 +314,19 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 	t = PCU_get_assert_type(type);
 	if (t == PCU_TYPE_NSTRW) {
 		len = PCU_get_nstr_len(type);
-		if (src1) {
-			size_t i;
-			char buf[sizeof(wchar_t)];
-			src1_len = 0;
-			for (i = 0; i < len; i++) {
-				size_t s = wcrtomb(buf, src1[i], &ps);
-				if (s == (size_t) -1 || (s == 1 && buf[0] == '\0')) {
-					break;
-				}
-				src1_len += s;
-			}
-			src1_len++;
-		} else {
-			src1_len = 0;
-		}
-		if (src2) {
-			size_t i;
-			char buf[sizeof(wchar_t)];
-			src2_len = 0;
-			for (i = 0; i < len; i++) {
-				size_t s = wcrtomb(buf, src2[i], &ps);
-				if (s == (size_t) -1 || (s == 1 && buf[0] == '\0')) {
-					break;
-				}
-				src2_len += s;
-			}
-			src2_len++;
-		} else {
-			src2_len = 0;
-		}
+		src1_len = get_mblen_nstrw(src1, len);
+		src2_len = get_mblen_nstrw(src2, len);
 	} else {
-		if (src1) {
-			wp = src1;
-			src1_len = wcsrtombs(0, &wp, 0, &ps);
-			if (src1_len == (size_t) -1) {
-				src1_len = wcslen(src1);
-			}
-			src1_len++;
-		} else {
-			src1_len = 0;
-		}
-		if (src2) {
-			wp = src2;
-			src2_len = wcsrtombs(0, &wp, 0, &ps);
-			if (src2_len == (size_t) -1) {
-				src2_len = wcslen(src2);
-			}
-			src2_len++;
-		} else {
-			src2_len = 0;
-		}
+		src1_len = get_mblen_strw(src1);
+		src2_len = get_mblen_strw(src2);
 	}
 	p1 = (char *) PCU_STR_MALLOC(sizeof(char) * (src1_len + src2_len));
 	if (!p1) {
 		return 0;
 	}
 	p2 = p1 + src1_len;
-	if (src1) {
-		size_t s;
-		wp = src1;
-		s = wcsrtombs(p1, &wp, src1_len, &ps);
-		if (s != (size_t) -1) {
-			p1[src1_len - 1] = '\0';
-		} else {
-			p1[0] = '\0';
-		}
-	}
-	if (src2) {
-		size_t s;
-		wp = src2;
-		s = wcsrtombs(p2, &wp, src2_len, &ps);
-		if (s != (size_t) -1) {
-			p2[src2_len - 1] = '\0';
-		} else {
-			p2[0] = '\0';
-		}
-	}
+	to_mbs(p1, src1, src1_len);
+	to_mbs(p2, src2, src2_len);
 	*dst1 = src1 ? p1 : 0;
 	*dst2 = src2 ? p2 : 0;
 	return 1;
