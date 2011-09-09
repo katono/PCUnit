@@ -111,6 +111,11 @@ int PCU_Test_is_failed(PCU_Test *self)
 	return (self->result.num_asserts_failed > 0 || self->result.num_errors_setup > 0 || self->result.num_errors_teardown > 0);
 }
 
+int PCU_Test_contains_msg(PCU_Test *self)
+{
+	return (self->result.num_msgs > 0);
+}
+
 int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag)
 {
 	PCU_TestFailure *node;
@@ -176,6 +181,7 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 void PCU_msg_impl(const char *msg, const char *file, unsigned int line)
 {
 	PCU_TestFailure *node;
+	current_test->result.num_msgs++;
 	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MESSAGE", file, line, repeat_counter);
 	if (node) {
 		list_push(&current_test->failure_list, node);

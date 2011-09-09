@@ -60,6 +60,7 @@ typedef struct {
 	int num_asserts_failed;
 	int num_errors_setup;
 	int num_errors_teardown;
+	int num_msgs;
 } PCU_TestResult;
 
 typedef struct {

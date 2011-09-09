@@ -176,6 +176,8 @@ static void print_failure(PCU_Test *test)
 	int n = 1;
 	if (PCU_Test_is_failed(test)) {
 		PCU_PRINTF1("  Test: %s ... FAILED\n", test->name);
+	} else if (PCU_Test_contains_msg(test)) {
+		PCU_PRINTF1("  Test: %s\n", test->name);
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
 		unsigned long type;
