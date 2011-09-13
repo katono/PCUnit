@@ -434,6 +434,8 @@ static void PCU_TestFailure_delete(PCU_TestFailure *self)
 	switch (PCU_get_assert_type(self->type)) {
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
+	case PCU_TYPE_STRW:
+	case PCU_TYPE_NSTRW:
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!PCU_TestFailure_str_malloc_is_failed(self)) {
