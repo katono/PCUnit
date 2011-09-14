@@ -141,8 +141,9 @@ int PCU_atoi(const char *s);
 #endif
 
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
-# include <wchar.h>
-# include <limits.h>
+# include <wchar.h> /* wchar_t, mbstate_t */
+# include <limits.h> /* MB_LEN_MAX */
+# include <stdlib.h> /* MB_CUR_MAX */
 # define PCU_WCSCMP		wcscmp
 # define PCU_WCSNCMP	wcsncmp
 # define PCU_WCSLEN		wcslen
