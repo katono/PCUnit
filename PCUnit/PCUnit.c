@@ -250,8 +250,10 @@ static void print_failure(PCU_Test *test)
 			break;
 		case PCU_TYPE_STR:
 		case PCU_TYPE_NSTR:
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 		case PCU_TYPE_STRW:
 		case PCU_TYPE_NSTRW:
+#endif
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
 				if (pos->expected.str) {
 					PCU_PRINTF2("        expected : %s\"%s\"\n",

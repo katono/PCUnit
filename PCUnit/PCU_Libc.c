@@ -5,7 +5,7 @@
 #include "PCU_Libc.h"
 #include "PCUnit.h"
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_SETJMP) || defined(PCU_NO_LIBC) || defined(PCU_NO_FLOATINGPOINT)
+#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_MALLOC) || defined(PCU_NO_SETJMP) || defined(PCU_NO_WCHAR) || defined(PCU_NO_LIBC) || defined(PCU_NO_FLOATINGPOINT)
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
 #else

@@ -140,9 +140,14 @@ int PCU_atoi(const char *s);
 # define PCU_ATOI		atoi
 #endif
 
-#ifndef PCU_NO_WCHAR
-#include <wchar.h>
-#include <limits.h>
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+# include <wchar.h>
+# include <limits.h>
+# define PCU_WCSCMP		wcscmp
+# define PCU_WCSNCMP	wcsncmp
+# define PCU_WCSLEN		wcslen
+# define PCU_WCRTOMB	wcrtomb
+# define PCU_WCSRTOMBS	wcsrtombs
 #endif
 
 #ifdef __cplusplus

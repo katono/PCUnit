@@ -247,6 +247,7 @@ static int copy_string(char **dst1, char **dst2, const char *src1, const char *s
 	return 1;
 }
 
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 static size_t get_mblen_nstrw(const wchar_t *wstr, size_t wstr_len)
 {
 	size_t ret = 0;
@@ -256,9 +257,9 @@ static size_t get_mblen_nstrw(const wchar_t *wstr, size_t wstr_len)
 		mbstate_t ps;
 		PCU_MEMSET(&ps, 0, sizeof ps);
 		for (i = 0; i < wstr_len; i++) {
-			size_t s = wcrtomb(tmp, wstr[i], &ps);
+			size_t s = PCU_WCRTOMB(tmp, wstr[i], &ps);
 			if (s == (size_t) -1) {
-				ret = MB_CUR_MAX * wcslen(wstr);
+				ret = MB_CUR_MAX * PCU_WCSLEN(wstr);
 				break;
 			} else if (s == 1 && tmp[0] == '\0') {
 				break;
@@ -277,9 +278,9 @@ static size_t get_mblen_strw(const wchar_t *wstr)
 		const wchar_t *p = wstr;
 		mbstate_t ps;
 		PCU_MEMSET(&ps, 0, sizeof ps);
-		ret = wcsrtombs(0, &p, 0, &ps);
+		ret = PCU_WCSRTOMBS(0, &p, 0, &ps);
 		if (ret == (size_t) -1) {
-			ret = MB_CUR_MAX * wcslen(wstr);
+			ret = MB_CUR_MAX * PCU_WCSLEN(wstr);
 		}
 		ret++;
 	}
@@ -292,7 +293,7 @@ static void to_mbs(char *cstr, const wchar_t *wstr, size_t cstr_len)
 		const wchar_t *p = wstr;
 		mbstate_t ps;
 		PCU_MEMSET(&ps, 0, sizeof ps);
-		wcsrtombs(cstr, &p, cstr_len, &ps);
+		PCU_WCSRTOMBS(cstr, &p, cstr_len, &ps);
 		cstr[cstr_len - 1] = '\0';
 	}
 }
@@ -330,6 +331,7 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 	*dst2 = src2 ? p2 : 0;
 	return 1;
 }
+#endif
 
 static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *expr, const char *file, unsigned int line, int repeat)
 {
@@ -373,12 +375,14 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 	case PCU_TYPE_STRW:
 	case PCU_TYPE_NSTRW:
 		if (!copy_stringw(&self->expected.str, &self->actual.str, (const wchar_t *) expected, (const wchar_t *) actual, type)) {
 			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
+#endif
 	default:
 		self->type = PCU_TYPE_NONE;
 		break;
@@ -434,8 +438,10 @@ static void PCU_TestFailure_delete(PCU_TestFailure *self)
 	switch (PCU_get_assert_type(self->type)) {
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 	case PCU_TYPE_STRW:
 	case PCU_TYPE_NSTRW:
+#endif
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
 		if (!PCU_TestFailure_str_malloc_is_failed(self)) {
