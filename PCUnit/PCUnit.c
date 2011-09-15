@@ -6,7 +6,13 @@
 #define LIST_BEGIN(list)	(list)->next
 #define LIST_END(list)		(list)
 
-char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
+#ifndef PCU_MESSAGE_BUF_SIZE
+#define PCU_MESSAGE_BUF_SIZE	256
+#endif
+static size_t PCU_msg_buf_real[PCU_MESSAGE_BUF_SIZE / sizeof(size_t)];
+char * const PCU_msg_buf = (char *) PCU_msg_buf_real;
+const size_t PCU_msg_buf_size = sizeof PCU_msg_buf_real;
+
 static int enable_color;
 
 static PCU_Result result;
@@ -281,6 +287,10 @@ static void print_failure(PCU_Test *test)
 #endif
 		case PCU_TYPE_MSG:
 		case PCU_TYPE_FAIL:
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+		case PCU_TYPE_MSGW:
+		case PCU_TYPE_FAILW:
+#endif
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
 				PCU_PRINTF1("        %s\n", pos->expected.str);
 			}

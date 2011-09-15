@@ -12,10 +12,8 @@ extern "C" {
 /* 
  * private
  */
-#ifndef PCU_MESSAGE_BUF_SIZE
-#define PCU_MESSAGE_BUF_SIZE	256
-#endif
-extern char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
+extern char * const PCU_msg_buf;
+extern const size_t PCU_msg_buf_size;
 
 #define PCU_TYPE_NONE      0x00000000
 #define PCU_TYPE_BOOL      0x00000001
@@ -38,7 +36,9 @@ extern char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
 #define PCU_TYPE_DBL       0x00000012
 #define PCU_TYPE_MSG       0x00000013
 #define PCU_TYPE_FAIL      0x00000014
-#define PCU_TYPE_SETUP     0x00000015
+#define PCU_TYPE_MSGW      0x00000015
+#define PCU_TYPE_FAILW     0x00000016
+#define PCU_TYPE_SETUP     0x00000017
 #define PCU_TYPE_NSTR      0x20000000
 #define PCU_TYPE_NSTRW     0x40000000
 #define PCU_TYPE_NOT       0x80000000
@@ -51,7 +51,7 @@ int PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned lo
 #ifndef PCU_NO_FLOATINGPOINT
 int PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *expr, const char *file, unsigned int line, int fatal_flag);
 #endif
-void PCU_msg_impl(const char *msg, const char *file, unsigned int line);
+void PCU_msg_impl(const char *msg, unsigned long type, const char *expr, const char *file, unsigned int line);
 
 
 typedef struct {
@@ -239,49 +239,60 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_FAIL_IMPL()		PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_R()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_RETURN", __FILE__, __LINE__, 0)
 #define PCU_FAIL_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL, "PCU_FAIL_FATAL", __FILE__, __LINE__, 1)
+#define PCU_FAILW_IMPL()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW", __FILE__, __LINE__, 0)
+#define PCU_FAILW_IMPL_R()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_RETURN", __FILE__, __LINE__, 0)
+#define PCU_FAILW_IMPL_F()	PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_FATAL", __FILE__, __LINE__, 1)
 
-#define PCU_FAIL0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, PCU_msg_buf_size, format)                                    ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, PCU_msg_buf_size, format, a1)                                ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2)                            ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3)                        ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL(); } while (0)
 
-#define PCU_FAIL0_RETURN(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL1_RETURN(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL2_RETURN(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL3_RETURN(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL4_RETURN(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL5_RETURN(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL6_RETURN(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL7_RETURN(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL8_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_R(); return; } while (0)
-#define PCU_FAIL9_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL0_RETURN(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, PCU_msg_buf_size, format)                                    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL1_RETURN(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, PCU_msg_buf_size, format, a1)                                ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL2_RETURN(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2)                            ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL3_RETURN(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3)                        ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL4_RETURN(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL5_RETURN(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL6_RETURN(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL7_RETURN(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL8_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL9_RETURN(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_R(); return; } while (0)
 
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
-#define PCU_FAIL(...)			do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
-#define PCU_FAIL_RETURN(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL_R(); return; } while (0)
+#define PCU_FAIL(...)			do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
+#define PCU_FAIL_RETURN(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL_R(); return; } while (0)
+#if !defined(PCU_NO_WCHAR)
+#define PCU_FAILW(...)			do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL(); } while (0)
+#define PCU_FAILW_RETURN(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_R(); return; } while (0)
+#endif
 #endif
 
-#define PCU_MSG_IMPL()	PCU_msg_impl(PCU_msg_buf, __FILE__, __LINE__)
+#define PCU_MSG_IMPL()	PCU_msg_impl(PCU_msg_buf, PCU_TYPE_MSG, "PCU_MESSAGE", __FILE__, __LINE__)
+#define PCU_MSGW_IMPL()	PCU_msg_impl(PCU_msg_buf, PCU_TYPE_MSGW, "PCU_MESSAGEW", __FILE__, __LINE__)
 
-#define PCU_MESSAGE0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
-#define PCU_MESSAGE9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE0(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, PCU_msg_buf_size, format)                                    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE1(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, PCU_msg_buf_size, format, a1)                                ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE2(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2)                            ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE3(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3)                        ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE4(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4)                    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE5(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5)                ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE6(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6)            ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE7(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE8(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE9(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_MSG_IMPL(); } while (0)
 
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
-#define PCU_MESSAGE(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
+#define PCU_MESSAGE(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
+#if !defined(PCU_NO_WCHAR)
+#define PCU_MESSAGEW(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_MSGW_IMPL(); } while (0)
+#endif
 #endif
 
 
@@ -321,19 +332,22 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)	PCU_assert_impl(((lhs) op (rhs)), (size_t)(lhs), (size_t)(rhs), PCU_get_num_type(sizeof(lhs), sizeof(rhs), 1), "PCU_ASSERT_OPERATOR_FATAL((" #lhs ") " #op " (" #rhs "))", __FILE__, __LINE__, 1)
 
-#define PCU_FAIL0_FATAL(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, sizeof PCU_msg_buf, format)                                    ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL1_FATAL(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, sizeof PCU_msg_buf, format, a1)                                ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL2_FATAL(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2)                            ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL3_FATAL(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3)                        ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL4_FATAL(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL5_FATAL(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL6_FATAL(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL7_FATAL(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL8_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_F(); } while (0)
-#define PCU_FAIL9_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, sizeof PCU_msg_buf, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL0_FATAL(format)                                     do { PCU_SNPRINTF0(PCU_msg_buf, PCU_msg_buf_size, format)                                    ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL1_FATAL(format, a1)                                 do { PCU_SNPRINTF1(PCU_msg_buf, PCU_msg_buf_size, format, a1)                                ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL2_FATAL(format, a1, a2)                             do { PCU_SNPRINTF2(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2)                            ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL3_FATAL(format, a1, a2, a3)                         do { PCU_SNPRINTF3(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3)                        ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL4_FATAL(format, a1, a2, a3, a4)                     do { PCU_SNPRINTF4(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4)                    ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL5_FATAL(format, a1, a2, a3, a4, a5)                 do { PCU_SNPRINTF5(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5)                ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL6_FATAL(format, a1, a2, a3, a4, a5, a6)             do { PCU_SNPRINTF6(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6)            ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL7_FATAL(format, a1, a2, a3, a4, a5, a6, a7)         do { PCU_SNPRINTF7(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7)        ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL8_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8)     do { PCU_SNPRINTF8(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8)    ; PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL9_FATAL(format, a1, a2, a3, a4, a5, a6, a7, a8, a9) do { PCU_SNPRINTF9(PCU_msg_buf, PCU_msg_buf_size, format, a1, a2, a3, a4, a5, a6, a7, a8, a9); PCU_FAIL_IMPL_F(); } while (0)
 
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
-#define PCU_FAIL_FATAL(...)	do { PCU_snprintf(PCU_msg_buf, sizeof PCU_msg_buf, __VA_ARGS__); PCU_FAIL_IMPL_F(); } while (0)
+#define PCU_FAIL_FATAL(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL_F(); } while (0)
+#if !defined(PCU_NO_WCHAR)
+#define PCU_FAILW_FATAL(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_F(); } while (0)
+#endif
 #endif
 #endif
 

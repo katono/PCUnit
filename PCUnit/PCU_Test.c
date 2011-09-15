@@ -178,11 +178,11 @@ int PCU_assert_double_impl(double expected, double actual, double delta, unsigne
 }
 #endif
 
-void PCU_msg_impl(const char *msg, const char *file, unsigned int line)
+void PCU_msg_impl(const char *msg, unsigned long type, const char *expr, const char *file, unsigned int line)
 {
 	PCU_TestFailure *node;
 	current_test->result.num_msgs++;
-	node = PCU_TestFailure_new((size_t) msg, 0, PCU_TYPE_MSG, "PCU_MESSAGE", file, line, repeat_counter);
+	node = PCU_TestFailure_new((size_t) msg, 0, type, expr, file, line, repeat_counter);
 	if (node) {
 		list_push(&current_test->failure_list, node);
 	}
@@ -378,6 +378,8 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 	case PCU_TYPE_STRW:
 	case PCU_TYPE_NSTRW:
+	case PCU_TYPE_MSGW:
+	case PCU_TYPE_FAILW:
 		if (!copy_stringw(&self->expected.str, &self->actual.str, (const wchar_t *) expected, (const wchar_t *) actual, type)) {
 			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
@@ -438,12 +440,14 @@ static void PCU_TestFailure_delete(PCU_TestFailure *self)
 	switch (PCU_get_assert_type(self->type)) {
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
+	case PCU_TYPE_MSG:
+	case PCU_TYPE_FAIL:
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
 	case PCU_TYPE_STRW:
 	case PCU_TYPE_NSTRW:
+	case PCU_TYPE_MSGW:
+	case PCU_TYPE_FAILW:
 #endif
-	case PCU_TYPE_MSG:
-	case PCU_TYPE_FAIL:
 		if (!PCU_TestFailure_str_malloc_is_failed(self)) {
 			if (self->expected.str) {
 				PCU_STR_FREE(self->expected.str);

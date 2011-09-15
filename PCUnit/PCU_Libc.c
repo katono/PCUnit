@@ -460,7 +460,7 @@ static int PCU_printf_aux(const char *format, size_t *arg_list)
 	if (!putchar_func) {
 		return -1;
 	}
-	ret = PCU_snprintf_aux(p, sizeof PCU_msg_buf, format, arg_list);
+	ret = PCU_snprintf_aux(p, PCU_msg_buf_size, format, arg_list);
 	while (*p) {
 		putchar_func((int) *(p++));
 	}
@@ -599,7 +599,7 @@ int PCU_printf(const char *format, ...)
 		return -1;
 	}
 	va_start(ap, format);
-	ret = vsnprintf(p, sizeof PCU_msg_buf, format, ap);
+	ret = vsnprintf(p, PCU_msg_buf_size, format, ap);
 	va_end(ap);
 	while (*p) {
 		putchar_func((int) *(p++));
