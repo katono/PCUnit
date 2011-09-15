@@ -608,11 +608,17 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 * **`PCU_FAIL8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
 * **`PCU_FAIL(...)`**
+* **`PCU_FAILW(...)`**
+* **`PCU_FAILT(...)`**
 
 `PCU_FAIL*`マクロは無条件に失敗を登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
 arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
 `PCU_FAIL`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のvsnprintfが使用可能な場合に使用できます。
+`PCU_FAILW`は`PCU_FAIL`のワイド文字版です。
+`PCU_FAILW`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のswprintfが使用可能な場合に使用できます。
+`PCU_FAILT`は`_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_FAILW`に展開され、
+そうでない場合は`PCU_FAIL`に展開されます。
 
 
 ### `PCU_FAIL*_FATAL`
@@ -628,6 +634,8 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 * **`PCU_FAIL8_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
 * **`PCU_FAIL_FATAL(...)`**
+* **`PCU_FAILW_FATAL(...)`**
+* **`PCU_FAILT_FATAL(...)`**
 
 `PCU_FAIL*`マクロにはマクロ名の末尾に`_FATAL`が付いたバージョンがあります。
 `PCU_FAIL*_FATAL`マクロは常にlongjmpによりテスト関数から強制的に抜けます。
@@ -648,6 +656,8 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 * **`PCU_FAIL8_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_FAIL9_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
 * **`PCU_FAIL_RETURN(...)`**
+* **`PCU_FAILW_RETURN(...)`**
+* **`PCU_FAILT_RETURN(...)`**
 
 `PCU_FAIL*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
 `PCU_FAIL*_RETURN`マクロは常にテスト関数からreturnします。
@@ -667,11 +677,17 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 * **`PCU_MESSAGE8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)`**
 * **`PCU_MESSAGE9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)`**
 * **`PCU_MESSAGE(...)`**
+* **`PCU_MESSAGEW(...)`**
+* **`PCU_MESSAGET(...)`**
 
 `PCU_MESSAGE*`マクロは合否チェックを行わず、表示メッセージのみを登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
 arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
 `PCU_MESSAGE`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のvsnprintfが使用可能な場合に使用できます。
+`PCU_MESSAGEW`は`PCU_MESSAGE`のワイド文字版です。
+`PCU_MESSAGEW`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のswprintfが使用可能な場合に使用できます。
+`PCU_MESSAGET`は`_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_MESSAGEW`に展開され、
+そうでない場合は`PCU_MESSAGE`に展開されます。
 
 
 ## API
