@@ -269,8 +269,8 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_FAIL(...)			do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL(); } while (0)
 #define PCU_FAIL_RETURN(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL_R(); return; } while (0)
 #if !defined(PCU_NO_WCHAR)
-#define PCU_FAILW(...)			do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL(); } while (0)
-#define PCU_FAILW_RETURN(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_R(); return; } while (0)
+#define PCU_FAILW(...)			do { PCU_SWPRINTF((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL(); } while (0)
+#define PCU_FAILW_RETURN(...)	do { PCU_SWPRINTF((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_R(); return; } while (0)
 #endif
 #endif
 
@@ -291,7 +291,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_MESSAGE(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_MSG_IMPL(); } while (0)
 #if !defined(PCU_NO_WCHAR)
-#define PCU_MESSAGEW(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_MSGW_IMPL(); } while (0)
+#define PCU_MESSAGEW(...)	do { PCU_SWPRINTF((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_MSGW_IMPL(); } while (0)
 #endif
 #endif
 
@@ -346,7 +346,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_FAIL_FATAL(...)	do { PCU_snprintf(PCU_msg_buf, PCU_msg_buf_size, __VA_ARGS__); PCU_FAIL_IMPL_F(); } while (0)
 #if !defined(PCU_NO_WCHAR)
-#define PCU_FAILW_FATAL(...)	do { swprintf((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_F(); } while (0)
+#define PCU_FAILW_FATAL(...)	do { PCU_SWPRINTF((wchar_t *) PCU_msg_buf, PCU_msg_buf_size / sizeof(wchar_t), __VA_ARGS__); PCU_FAILW_IMPL_F(); } while (0)
 #endif
 #endif
 #endif

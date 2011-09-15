@@ -149,6 +149,7 @@ int PCU_atoi(const char *s);
 # define PCU_WCSLEN		wcslen
 # define PCU_WCRTOMB	wcrtomb
 # define PCU_WCSRTOMBS	wcsrtombs
+# define PCU_SWPRINTF	swprintf
 #endif
 
 #ifdef __cplusplus
