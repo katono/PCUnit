@@ -431,6 +431,18 @@ static void test_msg(void)
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 }
 
+static void test_msgw(void)
+{
+	PCU_MESSAGEW(L"hoge");
+	PCU_FAILW(L"piyo");
+	PCU_MESSAGEW(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 1, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+	PCU_MESSAGEW(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 2, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+	PCU_FAILW(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 3, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+	PCU_FAILW_FATAL(L"foo");
+	PCU_FAILW_FATAL(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 4, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+	PCU_FAILW(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+}
+
 static void test_assert_dummy(void)
 {
 	PCU_ASSERT(0);
@@ -711,6 +723,12 @@ static void test_fail_return(void)
 	PCU_FAIL("test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, '3', 4, "5", 6, 7, 8, -9, 10);
 }
 
+static void test_failw_return(void)
+{
+	PCU_FAILW_RETURN(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 4, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+	PCU_FAILW(L"test_msg: %d,%#x, %c, %04d, %s, 0x%08X, %+d, %-8x,% d, %10d", 5, 2, L'3', 4, L"5", 6, 7, 8, -9, 10);
+}
+
 
 static void test_assert_operator_return(void)
 {
@@ -753,6 +771,7 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_msg8"                  , test_msg8                  } ,
 		{ "test_msg9"                  , test_msg9                  } ,
 		{ "test_msg"                   , test_msg                   } ,
+		{ "test_msgw"                  , test_msgw                  } ,
 		{ "test_assert_setup_err"      , test_assert_dummy          } ,
 		{ "test_assert_teardown_err"   , test_assert_dummy          } ,
 		{ "test_long_long"             , test_long_long             } ,
@@ -796,6 +815,7 @@ PCU_Suite *AssertReturnTest_suite(void)
 		{ "test_fail8_return"                 , test_fail8_return                 } , 
 		{ "test_fail9_return"                 , test_fail9_return                 } , 
 		{ "test_fail_return"                  , test_fail_return                  } , 
+		{ "test_failw_return"                 , test_failw_return                 } , 
 		{ "test_assert_operator_return"       , test_assert_operator_return       } , 
 	};
 	static PCU_Suite suite = { "AssertReturnTest", tests, sizeof tests / sizeof *tests };
