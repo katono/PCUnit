@@ -614,9 +614,9 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 `PCU_FAIL*`マクロは無条件に失敗を登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
 arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
-`PCU_FAIL`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のvsnprintfが使用可能な場合に使用できます。
+`PCU_FAIL`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_FAILW`は`PCU_FAIL`のワイド文字版です。
-`PCU_FAILW`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のswprintfが使用可能な場合に使用できます。
+`PCU_FAILW`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_WCHAR`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_FAILT`は`_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_FAILW`に展開され、
 そうでない場合は`PCU_FAIL`に展開されます。
 
@@ -683,9 +683,9 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 `PCU_MESSAGE*`マクロは合否チェックを行わず、表示メッセージのみを登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
 arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
-`PCU_MESSAGE`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のvsnprintfが使用可能な場合に使用できます。
+`PCU_MESSAGE`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_MESSAGEW`は`PCU_MESSAGE`のワイド文字版です。
-`PCU_MESSAGEW`はマクロの可変長引数(`__VA_ARGS__`)と標準C関数のswprintfが使用可能な場合に使用できます。
+`PCU_MESSAGEW`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_WCHAR`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_MESSAGET`は`_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_MESSAGEW`に展開され、
 そうでない場合は`PCU_MESSAGE`に展開されます。
 
