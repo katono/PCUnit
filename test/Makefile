@@ -39,6 +39,9 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	./$(TARGET)
 
+test:
+	./$(TARGET) assert
+
 
 .PHONY: clean
 clean:

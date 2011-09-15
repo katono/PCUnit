@@ -197,6 +197,85 @@ static void test_assert_nstr_not_equal(void)
 	PCU_ASSERT_NSTRING_NOT_EQUAL(a, b, 4);
 }
 
+static void test_assert_strw_equal(void)
+{
+	const wchar_t *a, *b;
+	a = b = L"hoge";
+	PCU_ASSERT_STRINGW_EQUAL(L"hoge", a);
+	PCU_ASSERT_STRINGW_EQUAL(a, b);
+	PCU_ASSERT_STRINGW_EQUAL_FATAL(a, b);
+
+	a = L"piyo";
+	PCU_ASSERT_STRINGW_EQUAL(L"hoge", a);
+	PCU_ASSERT_STRINGW_EQUAL(a, b);
+	PCU_ASSERT_STRINGW_EQUAL(NULL, b);
+	PCU_ASSERT_STRINGW_EQUAL(a, NULL);
+	PCU_ASSERT_STRINGW_EQUAL(NULL, NULL);
+	PCU_ASSERT_STRINGW_EQUAL_FATAL(a, b);
+	PCU_ASSERT_STRINGW_EQUAL(a, b);
+}
+
+static void test_assert_strw_not_equal(void)
+{
+	const wchar_t *a, *b;
+	a = L"piyo";
+	b = L"hoge";
+	PCU_ASSERT_STRINGW_NOT_EQUAL(L"hoge", a);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
+	PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(a, b);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
+
+	a = b = L"hoge";
+	PCU_ASSERT_STRINGW_NOT_EQUAL(L"hoge", a);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(NULL, b);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(a, NULL);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(NULL, NULL);
+	PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(a, b);
+	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
+}
+
+static void test_assert_nstrw_equal(void)
+{
+	const wchar_t *a, *b;
+	a = L"hoge";
+	b = L"hogehoge";
+	PCU_ASSERT_NSTRINGW_EQUAL(L"hoge", a, 4);
+	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 4);
+	PCU_ASSERT_NSTRINGW_EQUAL_FATAL(a, b, 3);
+	PCU_ASSERT_NSTRINGW_EQUAL_FATAL(a, b, 0);
+
+	a = L"hogu";
+	PCU_ASSERT_NSTRINGW_EQUAL(L"hoge", a, 4);
+	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 4);
+	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 5);
+	PCU_ASSERT_NSTRINGW_EQUAL(NULL, b, 1);
+	PCU_ASSERT_NSTRINGW_EQUAL(a, NULL, 2);
+	PCU_ASSERT_NSTRINGW_EQUAL(NULL, NULL, 0);
+	PCU_ASSERT_NSTRINGW_EQUAL_FATAL(a, b, 4);
+	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 4);
+}
+
+static void test_assert_nstrw_not_equal(void)
+{
+	const wchar_t *a, *b;
+	a = L"hogu";
+	b = L"hogehoge";
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(L"hoge", a, 4);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 4);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 5);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(a, b, 4);
+
+	a = L"hoge";
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(L"hoge", a, 4);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 4);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(NULL, b, 1);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, NULL, 2);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(NULL, NULL, 0);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(a, b, 3);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 4);
+}
+
 static void test_assert_dbl_equal(void)
 {
 	double a, b, delta;
@@ -512,6 +591,36 @@ static void test_assert_nstr_not_equal_return(void)
 }
 
 
+#define WIDEN2(x) L ## x
+#define WIDEN(x) WIDEN2(x)
+static void test_assert_strw_equal_return(void)
+{
+	PCU_ASSERT_STRINGW_EQUAL_RETURN(WIDEN(__FILE__), WIDEN(__FILE__)+1);
+	PCU_ASSERT_STRINGW_EQUAL(WIDEN(__FILE__), WIDEN(__FILE__)+1);
+}
+
+
+static void test_assert_strw_not_equal_return(void)
+{
+	PCU_ASSERT_STRINGW_NOT_EQUAL_RETURN(WIDEN(__FILE__), WIDEN(__FILE__));
+	PCU_ASSERT_STRINGW_NOT_EQUAL(WIDEN(__FILE__), WIDEN(__FILE__));
+}
+
+
+static void test_assert_nstrw_equal_return(void)
+{
+	PCU_ASSERT_NSTRINGW_EQUAL_RETURN(WIDEN(__FILE__), WIDEN(__FILE__)+1, 5);
+	PCU_ASSERT_NSTRINGW_EQUAL(WIDEN(__FILE__), WIDEN(__FILE__)+1, 5);
+}
+
+
+static void test_assert_nstrw_not_equal_return(void)
+{
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL_RETURN(WIDEN(__FILE__), WIDEN(__FILE__), 5);
+	PCU_ASSERT_NSTRINGW_NOT_EQUAL(WIDEN(__FILE__), WIDEN(__FILE__), 5);
+}
+
+
 static void test_assert_dbl_equal_return(void)
 {
 	PCU_ASSERT_DOUBLE_EQUAL_RETURN(0.0, 1.5, 0.0);
@@ -627,6 +736,10 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_assert_str_not_equal"  , test_assert_str_not_equal  } ,
 		{ "test_assert_nstr_equal"     , test_assert_nstr_equal     } ,
 		{ "test_assert_nstr_not_equal" , test_assert_nstr_not_equal } ,
+		{ "test_assert_strw_equal"     , test_assert_strw_equal     } ,
+		{ "test_assert_strw_not_equal" , test_assert_strw_not_equal } ,
+		{ "test_assert_nstrw_equal"    , test_assert_nstrw_equal    } ,
+		{ "test_assert_nstrw_not_equal", test_assert_nstrw_not_equal} ,
 		{ "test_assert_dbl_equal"      , test_assert_dbl_equal      } ,
 		{ "test_assert_dbl_not_equal"  , test_assert_dbl_not_equal  } ,
 		{ "test_msg0"                  , test_msg0                  } ,
@@ -666,6 +779,10 @@ PCU_Suite *AssertReturnTest_suite(void)
 		{ "test_assert_str_not_equal_return"  , test_assert_str_not_equal_return  } , 
 		{ "test_assert_nstr_equal_return"     , test_assert_nstr_equal_return     } , 
 		{ "test_assert_nstr_not_equal_return" , test_assert_nstr_not_equal_return } , 
+		{ "test_assert_strw_equal_return"     , test_assert_strw_equal_return     } , 
+		{ "test_assert_strw_not_equal_return" , test_assert_strw_not_equal_return } , 
+		{ "test_assert_nstrw_equal_return"    , test_assert_nstrw_equal_return    } , 
+		{ "test_assert_nstrw_not_equal_return", test_assert_nstrw_not_equal_return} , 
 		{ "test_assert_dbl_equal_return"      , test_assert_dbl_equal_return      } , 
 		{ "test_assert_dbl_not_equal_return"  , test_assert_dbl_not_equal_return  } , 
 		{ "test_fail0_return"                 , test_fail0_return                 } , 
