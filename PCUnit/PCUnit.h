@@ -380,6 +380,18 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_ASSERT_NSTRINGT_NOT_EQUAL_FATAL   PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL
 #endif
 
+#if (defined(_UNICODE) || defined(UNICODE)) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#define PCU_MESSAGET      PCU_MESSAGEW
+#define PCU_FAILT         PCU_FAILW
+#define PCU_FAILT_FATAL   PCU_FAILW_FATAL
+#define PCU_FAILT_RETURN  PCU_FAILW_RETURN
+#else
+#define PCU_MESSAGET      PCU_MESSAGE
+#define PCU_FAILT         PCU_FAIL
+#define PCU_FAILT_FATAL   PCU_FAIL_FATAL
+#define PCU_FAILT_RETURN  PCU_FAIL_RETURN
+#endif
+
 
 /* 
  * Helper Macros
