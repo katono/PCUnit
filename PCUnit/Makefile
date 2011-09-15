@@ -43,9 +43,9 @@ install:
 	fi
 
 uninstall:
-	rm $(INSTALLDIR)/lib/$(TARGET)
+	rm -f $(INSTALLDIR)/lib/$(TARGET)
 	rm -rf $(INSTALLDIR)/include/PCUnit
-	rm $(INSTALLDIR)/bin/pcunit_*.rb
+	rm -f $(INSTALLDIR)/bin/pcunit_*.rb
 
 clean:
 	rm -f *.o *.a
