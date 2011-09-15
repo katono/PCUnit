@@ -56,9 +56,10 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 * vsnprintfが使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
 * malloc/freeが使用できない場合は、`PCU_NO_MALLOC`マクロを定義してください。
 * setjmp/longjmpが使用できない場合は、`PCU_NO_SETJMP`マクロを定義してください。
+* wchar.hの関数が使用できない場合は、`PCU_NO_WCHAR`マクロを定義してください。
 * strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでも使用できない場合は、
   `PCU_NO_LIBC`マクロを定義してください。
-  このマクロを定義した場合は`PCU_NO_VSNPRINTF`、`PCU_NO_MALLOC`、`PCU_NO_SETJMP`を定義する必要はありません。
+  このマクロを定義した場合は`PCU_NO_VSNPRINTF`、`PCU_NO_MALLOC`、`PCU_NO_SETJMP`、`PCU_NO_WCHAR`を定義する必要はありません。
 * プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できない場合は、
   `PCU_NO_FLOATINGPOINT`マクロを定義してください。
 * コンソールモードが不要な場合は、`PCU_NO_CONSOLE_RUN`マクロを定義してください。
@@ -420,26 +421,86 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
 * **`PCU_ASSERT_STRING_EQUAL(expected, actual)`**
 
-    expectedとactualが文字列である前提で、expectedとactualの文字列が等しいかどうかチェックします。
+    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
     等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
 
 
 * **`PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)`**
 
-    expectedとactualが文字列である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
+    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
     等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
 
 
 * **`PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)`**
 
-    expectedとactualが文字列である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
+    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
     等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
 
 
 * **`PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)`**
 
-    expectedとactualが文字列である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
+    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+
+
+* **`PCU_ASSERT_STRINGW_EQUAL(expected, actual)`**
+
+    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
+    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
+    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+
+
+* **`PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)`**
+
+    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
+    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
+    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+
+
+* **`PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)`**
+
+    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
+    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
+    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+
+
+* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)`**
+
+    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
+    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
+    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+
+
+* **`PCU_ASSERT_STRINGT_EQUAL(expected, actual)`**
+
+    `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_EQUAL`に展開され、
+    そうでない場合は`PCU_ASSERT_STRING_EQUAL`に展開されます。
+    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_STRING_EQUAL`に展開されます。
+
+
+* **`PCU_ASSERT_STRINGT_NOT_EQUAL(expected, actual)`**
+
+    `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_NOT_EQUAL`に展開され、
+    そうでない場合は`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
+    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
+
+
+* **`PCU_ASSERT_NSTRINGT_EQUAL(expected, actual, n)`**
+
+    `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_EQUAL`に展開され、
+    そうでない場合は`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
+    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
+
+
+* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(expected, actual, n)`**
+
+    `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_NOT_EQUAL`に展開され、
+    そうでない場合は`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
+    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
 
 
 * **`PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)`**
@@ -483,6 +544,14 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_STRING_NOT_EQUAL_FATAL(expected, actual)`**
 * **`PCU_ASSERT_NSTRING_EQUAL_FATAL(expected, actual, n)`**
 * **`PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(expected, actual, n)`**
+* **`PCU_ASSERT_STRINGW_EQUAL_FATAL(expected, actual)`**
+* **`PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(expected, actual)`**
+* **`PCU_ASSERT_NSTRINGW_EQUAL_FATAL(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(expected, actual, n)`**
+* **`PCU_ASSERT_STRINGT_EQUAL_FATAL(expected, actual)`**
+* **`PCU_ASSERT_STRINGT_NOT_EQUAL_FATAL(expected, actual)`**
+* **`PCU_ASSERT_NSTRINGT_EQUAL_FATAL(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL_FATAL(expected, actual, n)`**
 * **`PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)`**
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)`**
@@ -508,6 +577,14 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_STRING_NOT_EQUAL_RETURN(expected, actual)`**
 * **`PCU_ASSERT_NSTRING_EQUAL_RETURN(expected, actual, n)`**
 * **`PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_STRINGW_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_STRINGW_NOT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_NSTRINGW_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_STRINGT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_STRINGT_NOT_EQUAL_RETURN(expected, actual)`**
+* **`PCU_ASSERT_NSTRINGT_EQUAL_RETURN(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL_RETURN(expected, actual, n)`**
 * **`PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)`**
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)`**
