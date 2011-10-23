@@ -464,21 +464,6 @@ static int teardown(void)
 	return 0;
 }
 
-static void test_long_long(void)
-{
-	long long a = 0x100000000;
-	long long b = 0x100000000;
-
-	PCU_ASSERT_EQUAL(a, b);
-	b++;
-	PCU_ASSERT_EQUAL(a, b);
-	b -= 2;
-	PCU_ASSERT_EQUAL(a, b);
-	a--;
-	PCU_ASSERT_EQUAL(a, b);
-	a--;
-	PCU_ASSERT_EQUAL(a, b);
-}
 
 static void test_skip(void)
 {
@@ -488,13 +473,17 @@ static void test_skip(void)
 
 static void test_assert_operator(void)
 {
-	int a, b;
+	unsigned int a, b;
 	a = 0x100;
 	b = 0x100;
 	PCU_ASSERT_OPERATOR(0, <, 1);
 	PCU_ASSERT_OPERATOR(0, <=, 1);
 	PCU_ASSERT_OPERATOR(0, >, 1);
 	PCU_ASSERT_OPERATOR(0, >=, 1);
+	PCU_ASSERT_OPERATOR(-1, <, 1);
+	PCU_ASSERT_OPERATOR(-1, <=, 1);
+	PCU_ASSERT_OPERATOR(-1, >, 1);
+	PCU_ASSERT_OPERATOR(-1, >=, 1);
 	PCU_ASSERT_OPERATOR(a, ==, b);
 	PCU_ASSERT_OPERATOR(a, ^, b);
 	PCU_ASSERT_OPERATOR(a, ^, b+1);
@@ -511,6 +500,37 @@ static void test_assert_operator(void)
 	PCU_ASSERT_OPERATOR_FATAL(0, <, 1);
 	PCU_ASSERT_OPERATOR_FATAL(0, ==, 1);
 	PCU_ASSERT_OPERATOR(0, >, 1);
+}
+
+static void test_assert_operator_int(void)
+{
+	int a, b;
+	a = 0x100;
+	b = 0x100;
+	PCU_ASSERT_OPERATOR_INT(0, <, 1);
+	PCU_ASSERT_OPERATOR_INT(0, <=, 1);
+	PCU_ASSERT_OPERATOR_INT(0, >, 1);
+	PCU_ASSERT_OPERATOR_INT(0, >=, 1);
+	PCU_ASSERT_OPERATOR_INT(-1, <, 1);
+	PCU_ASSERT_OPERATOR_INT(-1, <=, 1);
+	PCU_ASSERT_OPERATOR_INT(-1, >, 1);
+	PCU_ASSERT_OPERATOR_INT(-1, >=, 1);
+	PCU_ASSERT_OPERATOR_INT(a, ==, b);
+	PCU_ASSERT_OPERATOR_INT(a, ^, b);
+	PCU_ASSERT_OPERATOR_INT(a, ^, b+1);
+	PCU_ASSERT_OPERATOR_INT(a, &, b);
+	PCU_ASSERT_OPERATOR_INT(a, &, ~b);
+	PCU_ASSERT_OPERATOR_INT(a, |, b);
+	b++;
+	PCU_ASSERT_OPERATOR_INT(a, ==, b);
+	b = 0;
+	PCU_ASSERT_OPERATOR_INT(a, &, b);
+	PCU_ASSERT_OPERATOR_INT(0, |, b);
+	PCU_ASSERT_OPERATOR_INT(0x10 <= a, &&, a < 0x100);
+	PCU_ASSERT_OPERATOR_INT(a < 0x10, ||, 0x100 < a);
+	PCU_ASSERT_OPERATOR_INT_FATAL(0, <, 1);
+	PCU_ASSERT_OPERATOR_INT_FATAL(0, ==, 1);
+	PCU_ASSERT_OPERATOR_INT(0, >, 1);
 }
 
 static void test_assert_return(void)
@@ -732,8 +752,14 @@ static void test_failw_return(void)
 
 static void test_assert_operator_return(void)
 {
-	PCU_ASSERT_OPERATOR_RETURN(0, ==, 1);
+	PCU_ASSERT_OPERATOR_RETURN(-1, <, 1);
 	PCU_ASSERT_OPERATOR(0, ==, 1);
+}
+
+static void test_assert_operator_int_return(void)
+{
+	PCU_ASSERT_OPERATOR_INT_RETURN(-1, >, 1);
+	PCU_ASSERT_OPERATOR_INT(0, ==, 1);
 }
 
 
@@ -774,9 +800,9 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_msgw"                  , test_msgw                  } ,
 		{ "test_assert_setup_err"      , test_assert_dummy          } ,
 		{ "test_assert_teardown_err"   , test_assert_dummy          } ,
-		{ "test_long_long"             , test_long_long             } ,
 		{ "test_skip"                  , test_skip, -1              } ,
 		{ "test_assert_operator"       , test_assert_operator       } ,
+		{ "test_assert_operator_int"   , test_assert_operator_int   } ,
 	};
 	static PCU_Suite suite = { "AssertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
 	return &suite;
@@ -817,6 +843,7 @@ PCU_Suite *AssertReturnTest_suite(void)
 		{ "test_fail_return"                  , test_fail_return                  } , 
 		{ "test_failw_return"                 , test_failw_return                 } , 
 		{ "test_assert_operator_return"       , test_assert_operator_return       } , 
+		{ "test_assert_operator_int_return"   , test_assert_operator_int_return   } , 
 	};
 	static PCU_Suite suite = { "AssertReturnTest", tests, sizeof tests / sizeof *tests };
 	return &suite;

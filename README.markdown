@@ -4,7 +4,7 @@
 
 ## 概要
 
-PCUnitは組み込み開発でテスト駆動開発(Test-Driven Development; TDD)を実践するための
+PCUnitは組み込み開発でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
 ポータブルなC言語/C++言語用ユニットテストフレームワークです。
 
 PCUnitは以下のような特長があります。
@@ -42,8 +42,9 @@ GNU開発環境の場合は、PCUnitディレクトリでmakeを実行してく�
 make installを実行すると/usr/local/libにlibpcunit.aを、/usr/local/include/PCUnitにヘッダファイルを、
 /usr/local/binにユーティリティをインストールします。
 make uninstallを実行するとアンインストールします。
-インストール先ディレクトリを/usr/localから変更したい場合は、
-make install INSTALLDIR=dirのように、dirに任意のインストール先ディレクトリを指定してください。
+インストール先ディレクトリを/usr/localから変更してインストールする場合は、
+make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインストール先ディレクトリを指定してください。
+同様にアンインストールする場合は、make uninstall INSTALLDIR=/foo/barを実行してください。
 
 GNU開発環境でない場合は、PCUnitディレクトリ以下のソースファイルとヘッダファイルをテストプロジェクトに追加して
 テストコードと共にビルドしてください。あるいはPCUnitの静的ライブラリをビルドするプロジェクトを作成し、
@@ -51,7 +52,8 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 
 ### 条件コンパイル
 
-開発環境によって適宜コンパイラオプションでマクロを定義してください。
+C99の標準関数がすべて使用できる場合は条件コンパイルをする必要はありません。
+使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。
 
 * vsnprintfが使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
 * malloc/freeが使用できない場合は、`PCU_NO_MALLOC`マクロを定義してください。
@@ -78,9 +80,9 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 
 2つ目のメモリプールは文字列表示用のメモリプールです。
 このメモリプールのバイト数を`PCU_STRING_POOL_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
-このメモリプールは、`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`、`PCU_FAIL*`、
-`PCU_MESSAGE*`のマクロで使用されます(`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`は失敗時のみ使用)。
-このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING_*`、`PCU_ASSERT_NSTRING_*`の引数や
+このメモリプールは、`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`、`PCU_FAIL*`、
+`PCU_MESSAGE*`のマクロで使用されます(`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`は失敗時のみ使用)。
+このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`の引数や
 `PCU_FAIL*`、`PCU_MESSAGE*`のメッセージが表示されません。
 これらの文字列表示が不要ならば`PCU_STRING_POOL_SIZE`に1を指定してください。
 
@@ -359,94 +361,92 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
 全てのアサートマクロはテスト関数、またはテスト関数内で呼び出される関数で使用可能です。
 
+全てのアサートマクロの引数は2回以上評価されないので、マクロ展開による副作用を気にする必要はありません。
+
 ### `PCU_ASSERT*`
-
-`PCU_ASSERT*`マクロの引数は複数回展開されるので、副作用のないように指定してください。
-`PCU_ASSERT*`マクロの戻り値は、失敗時に`PCU_MESSAGE*`マクロで追加メッセージを表示させたい場合などに利用できます。
-
 
 * **`PCU_ASSERT(expr)`**
 
     任意の式exprが真かどうかチェックします。
-    偽ならば失敗を登録し、偽を返します。真ならば真を返します。
+    偽ならば失敗を登録します。
 
 
 * **`PCU_ASSERT_TRUE(expr)`**
 
     任意の式exprが真かどうかチェックします。
-    偽ならば失敗を登録し、偽を返します。真ならば真を返します。
+    偽ならば失敗を登録します。
 
 
 * **`PCU_ASSERT_FALSE(expr)`**
 
     任意の式exprが偽かどうかチェックします。
-    真ならば失敗を登録し、偽を返します。偽ならば真を返します。
+    真ならば失敗を登録します。
 
 
 * **`PCU_ASSERT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
 
 
 * **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
 
 
 * **`PCU_ASSERT_PTR_EQUAL(expected, actual)`**
 
     expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
 
 
 * **`PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)`**
 
     expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
 
 
 * **`PCU_ASSERT_PTR_NULL(value)`**
 
     valueがポインタである前提で、valueがNULLかどうかチェックします。
-    NULLでないならば失敗を登録し、偽を返します。NULLならば真を返します。
+    NULLでないならば失敗を登録します。
 
 
 * **`PCU_ASSERT_PTR_NOT_NULL(value)`**
 
     valueがポインタである前提で、valueがNULLでないかどうかチェックします。
-    NULLならば失敗を登録し、偽を返します。NULLでないならば真を返します。
+    NULLならば失敗を登録します。
 
 
 * **`PCU_ASSERT_STRING_EQUAL(expected, actual)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
 
 
 * **`PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
 
 
 * **`PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
 
 
 * **`PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
 
 
 * **`PCU_ASSERT_STRINGW_EQUAL(expected, actual)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -454,7 +454,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -462,7 +462,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、偽を返します。等しいならば真を返します。
+    等しくないならば失敗を登録します。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -470,7 +470,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、偽を返します。等しくないならば真を返します。
+    等しいならば失敗を登録します。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -506,27 +506,36 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)`**
 
     expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が真かどうかチェックします。
-    偽ならば失敗を登録し、偽を返します。真ならば真を返します。
+    偽ならば失敗を登録します。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)`**
 
     expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が偽かどうかチェックします。
-    真ならば失敗を登録し、偽を返します。偽ならば真を返します。
+    真ならば失敗を登録します。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
 * **`PCU_ASSERT_OPERATOR(lhs, op, rhs)`**
 
-    lhsとrhsが任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-    偽ならば失敗を登録し、偽を返します。真ならば真を返します。
+    lhsとrhsが符号なし整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    偽ならば失敗を登録します。
 
     例:
 
-    * `PCU_ASSERT_OPERATOR(x, <, y);` xがyより小さい値かチェック
     * `PCU_ASSERT_OPERATOR(0 <= x, &&, x < 100);` xが0以上かつ100未満かチェック
     * `PCU_ASSERT_OPERATOR(x, &, 0x01);` xの最下位ビットが立っているかチェック
+
+
+* **`PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)`**
+
+    lhsとrhsが符号あり整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    偽ならば失敗を登録します。
+
+    例:
+
+    * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
 
 
 ### `PCU_ASSERT*_FATAL`
@@ -555,6 +564,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)`**
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_INT_FATAL(lhs, op, rhs)`**
 
 全ての`PCU_ASSERT*`マクロにはマクロ名の末尾に`_FATAL`が付いたバージョンがあります。
 `PCU_ASSERT*_FATAL`マクロは失敗時にlongjmpによりテスト関数から強制的に抜けます。
@@ -588,11 +598,11 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)`**
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_INT_RETURN(lhs, op, rhs)`**
 
 全ての`PCU_ASSERT*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
 `PCU_ASSERT*_RETURN`マクロは失敗時にテスト関数からreturnします。
 returnなのでスタブ等のテスト関数内で呼び出される関数から一気に抜けることはできません。
-これらのマクロは値を返しません。
 
 
 ### `PCU_FAIL*`
@@ -613,7 +623,7 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 
 `PCU_FAIL*`マクロは無条件に失敗を登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
-arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
+arg[1-9]の個数によって使用するマクロを選択してください。
 `PCU_FAIL`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_FAILW`は`PCU_FAIL`のワイド文字版です。
 `PCU_FAILW`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_WCHAR`と`PCU_NO_LIBC`が未定義な場合に使用できます。
@@ -682,7 +692,7 @@ returnなのでスタブ等のテスト関数内で呼び出される関数か�
 
 `PCU_MESSAGE*`マクロは合否チェックを行わず、表示メッセージのみを登録します。
 表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
-arg[1-9]の個数によって使用するマクロを選択してください。これらのマクロは値を返しません。
+arg[1-9]の個数によって使用するマクロを選択してください。
 `PCU_MESSAGE`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_LIBC`が未定義な場合に使用できます。
 `PCU_MESSAGEW`は`PCU_MESSAGE`のワイド文字版です。
 `PCU_MESSAGEW`はマクロの可変長引数(`__VA_ARGS__`)が使用可能かつ、`PCU_NO_VSNPRINTF`と`PCU_NO_WCHAR`と`PCU_NO_LIBC`が未定義な場合に使用できます。
@@ -753,6 +763,12 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 
     例えば、データ駆動テストにおけるテストデータのテーブルから要素を取得するためのインデックスに利用できます。
     `PCU_Test`のntimesにはテストデータの要素数を指定してください。
+
+
+* **`int PCU_last_assertion(void)`**
+
+    最後に呼び出したアサートマクロがパスしていれば真を返し、失敗していれば偽を返します。
+    例えば、アサートマクロ失敗時に`PCU_MESSAGE`で追加メッセージを表示したい場合などに利用できます。
 
 
 ## ヘルパーマクロ

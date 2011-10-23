@@ -65,7 +65,6 @@ static void test_rb_pop(void)
 {
 	int i;
 	int ret;
-	unsigned char c;
 	for (i = 0; i < RingBuf_maxsize(rb); i++) {
 		ret = RingBuf_push(rb, (unsigned char)i);
 		PCU_ASSERT_TRUE(ret);
@@ -79,8 +78,7 @@ static void test_rb_pop(void)
 	PCU_ASSERT_FALSE(ret);
 
 	for (i = 0; !RingBuf_empty(rb); i++) {
-		c = RingBuf_pop(rb);
-		PCU_ASSERT_EQUAL(i, c);
+		PCU_ASSERT_EQUAL(i, RingBuf_pop(rb));
 		PCU_ASSERT_EQUAL(RB_BUF_SIZE - 1 - i - 1, RingBuf_size(rb));
 	}
 	PCU_ASSERT_EQUAL(0, RingBuf_size(rb));
@@ -98,8 +96,7 @@ static void test_rb_pop(void)
 	PCU_ASSERT_FALSE(RingBuf_empty(rb));
 
 	for (i = 0; !RingBuf_empty(rb); i++) {
-		c = RingBuf_pop(rb);
-		PCU_ASSERT_EQUAL(i, c);
+		PCU_ASSERT_EQUAL(i, RingBuf_pop(rb));
 		PCU_ASSERT_EQUAL((RB_BUF_SIZE - 1) / 2 - i - 1, RingBuf_size(rb));
 	}
 	PCU_ASSERT_EQUAL(0, RingBuf_size(rb));

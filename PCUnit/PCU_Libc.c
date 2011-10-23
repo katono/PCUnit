@@ -630,8 +630,8 @@ void *PCU_malloc(size_t size)
 	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURES];
 	(void) size;
 	for (; p != end; p++) {
-		/* p->expr is used as used_flag */
-		if (p->expr == 0) {
+		/* p->str_assert is used as used_flag */
+		if (p->str_assert == 0) {
 			return p;
 		}
 	}
@@ -641,7 +641,7 @@ void *PCU_malloc(size_t size)
 void PCU_free(void *ptr)
 {
 	if (!ptr) return;
-	((PCU_TestFailure *) ptr)->expr = 0;
+	((PCU_TestFailure *) ptr)->str_assert = 0;
 }
 
 /* 
