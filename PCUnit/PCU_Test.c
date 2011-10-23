@@ -245,6 +245,29 @@ void PCU_assert_double_impl(double expected, double actual, double delta, unsign
 		PCU_LONGJMP(fatal_jmp, 1);
 	}
 }
+
+void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
+{
+	PCU_TestFailure *node;
+	current_test->result.num_asserts++;
+	current_test->result.num_asserts_ran++;
+
+	if (passed_flag) {
+		last_assertion = 1;
+		return;
+	}
+
+	last_assertion = 0;
+	current_test->result.num_asserts_failed++;
+
+	node = PCU_TestFailure_new_double(expected, actual, 0.0, type, str_assert, file, line, repeat_counter);
+	if (node) {
+		list_push(&current_test->failure_list, node);
+	}
+	if (fatal_flag) {
+		PCU_LONGJMP(fatal_jmp, 1);
+	}
+}
 #endif
 
 void PCU_msg_impl(const char *msg, unsigned long type, const char *str_assert, const char *file, unsigned int line)
@@ -475,6 +498,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 	self->type = type;
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_DBL:
+	case PCU_TYPE_OP_DBL:
 #if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		self->expected.dbl = expected;
 		self->actual.dbl = actual;

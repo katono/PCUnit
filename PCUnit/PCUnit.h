@@ -25,11 +25,12 @@ extern const size_t PCU_msg_buf_size;
 #define PCU_TYPE_DBL       0x00000007
 #define PCU_TYPE_OP        0x00000008
 #define PCU_TYPE_OP_INT    0x00000009
-#define PCU_TYPE_MSG       0x0000000a
-#define PCU_TYPE_FAIL      0x0000000b
-#define PCU_TYPE_MSGW      0x0000000c
-#define PCU_TYPE_FAILW     0x0000000d
-#define PCU_TYPE_SETUP     0x0000000e
+#define PCU_TYPE_OP_DBL    0x0000000a
+#define PCU_TYPE_MSG       0x0000000b
+#define PCU_TYPE_FAIL      0x0000000c
+#define PCU_TYPE_MSGW      0x0000000d
+#define PCU_TYPE_FAILW     0x0000000e
+#define PCU_TYPE_SETUP     0x0000000f
 #define PCU_TYPE_NSTR      0x20000000
 #define PCU_TYPE_NSTRW     0x40000000
 #define PCU_TYPE_NOT       0x80000000
@@ -46,6 +47,7 @@ void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, unsign
 #endif
 #ifndef PCU_NO_FLOATINGPOINT
 void PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
+void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
 #endif
 void PCU_msg_impl(const char *msg, unsigned long type, const char *str_assert, const char *file, unsigned int line);
 
@@ -281,6 +283,17 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 		PCU_TYPE_DBL | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__, fatal_flag)
+
+#define PCU_ASSERT_OPERATOR_DOUBLE_AUX(lhs, op, rhs, str_assert, fatal_flag)\
+	do {\
+		const double pcu_assert_operator_aux_lhs = (double) (lhs);\
+		const double pcu_assert_operator_aux_rhs = (double) (rhs);\
+		PCU_assert_op_double_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
+			pcu_assert_operator_aux_lhs, pcu_assert_operator_aux_rhs,\
+			PCU_TYPE_OP_DBL,\
+			str_assert,\
+			__FILE__, __LINE__, fatal_flag);\
+	} while (0)
 #endif
 
 #define PCU_ASSERT_OPERATOR_AUX(lhs, op, rhs, str_assert, fatal_flag)\
@@ -402,6 +415,11 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)\
 	PCU_ASSERT_DOUBLE_NOT_EQUAL_AUX(expected, actual, delta,\
 		"PCU_ASSERT_DOUBLE_NOT_EQUAL(" #expected ", " #actual ", " #delta ")",\
+		0)
+
+#define PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)\
+	PCU_ASSERT_OPERATOR_DOUBLE_AUX(lhs, op, rhs,\
+		"PCU_ASSERT_OPERATOR_DOUBLE((" #lhs ") " #op " (" #rhs "))",\
 		0)
 #endif
 
@@ -567,6 +585,14 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 	do {\
 		PCU_ASSERT_DOUBLE_NOT_EQUAL_AUX(expected, actual, delta,\
 			"PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(" #expected ", " #actual ", " #delta ")",\
+			0);\
+		if (!PCU_last_assertion()) return;\
+	} while (0)
+
+#define PCU_ASSERT_OPERATOR_DOUBLE_RETURN(lhs, op, rhs)\
+	do {\
+		PCU_ASSERT_OPERATOR_DOUBLE_AUX(lhs, op, rhs,\
+			"PCU_ASSERT_OPERATOR_DOUBLE_RETURN((" #lhs ") " #op " (" #rhs "))",\
 			0);\
 		if (!PCU_last_assertion()) return;\
 	} while (0)
@@ -922,6 +948,11 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #define PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)\
 	PCU_ASSERT_DOUBLE_NOT_EQUAL_AUX(expected, actual, delta,\
 		"PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(" #expected ", " #actual ", " #delta ")",\
+		1)
+
+#define PCU_ASSERT_OPERATOR_DOUBLE_FATAL(lhs, op, rhs)\
+	PCU_ASSERT_OPERATOR_DOUBLE_AUX(lhs, op, rhs,\
+		"PCU_ASSERT_OPERATOR_DOUBLE_FATAL((" #lhs ") " #op " (" #rhs "))",\
 		1)
 #endif
 

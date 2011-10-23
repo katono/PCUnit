@@ -538,6 +538,17 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
 
 
+* **`PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)`**
+
+    lhsとrhsが浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    偽ならば失敗を登録します。
+    なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
+
+    例:
+
+    * `PCU_ASSERT_OPERATOR_DOUBLE(x, >=, 1.0);` xが1.0以上の値かチェック
+
+
 ### `PCU_ASSERT*_FATAL`
 
 * **`PCU_ASSERT_FATAL(expr)`**
@@ -565,6 +576,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)`**
 * **`PCU_ASSERT_OPERATOR_INT_FATAL(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_DOUBLE_FATAL(lhs, op, rhs)`**
 
 全ての`PCU_ASSERT*`マクロにはマクロ名の末尾に`_FATAL`が付いたバージョンがあります。
 `PCU_ASSERT*_FATAL`マクロは失敗時にlongjmpによりテスト関数から強制的に抜けます。
@@ -599,6 +611,7 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)`**
 * **`PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)`**
 * **`PCU_ASSERT_OPERATOR_INT_RETURN(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_DOUBLE_RETURN(lhs, op, rhs)`**
 
 全ての`PCU_ASSERT*`マクロにはマクロ名の末尾に`_RETURN`が付いたバージョンがあります。
 `PCU_ASSERT*_RETURN`マクロは失敗時にテスト関数からreturnします。

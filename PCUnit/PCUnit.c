@@ -243,6 +243,10 @@ static void print_failure(PCU_Test *test)
 			PCU_PRINTF1("        actual   : %g\n", pos->actual.dbl);
 			PCU_PRINTF1("        delta    : %g\n", pos->delta);
 			break;
+		case PCU_TYPE_OP_DBL:
+			PCU_PRINTF1("        lhs      : %g\n", pos->expected.dbl);
+			PCU_PRINTF1("        rhs      : %g\n", pos->actual.dbl);
+			break;
 #endif
 		case PCU_TYPE_MSG:
 		case PCU_TYPE_FAIL:

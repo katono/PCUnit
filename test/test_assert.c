@@ -533,6 +533,31 @@ static void test_assert_operator_int(void)
 	PCU_ASSERT_OPERATOR_INT(0, >, 1);
 }
 
+static void test_assert_operator_dbl(void)
+{
+	double a, b;
+	a = 100.0;
+	b = 100.0;
+	PCU_ASSERT_OPERATOR_DOUBLE(0, <, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(0, <=, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(0, >, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(0, >=, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(-1, <, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(-1, <=, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(-1, >, 1);
+	PCU_ASSERT_OPERATOR_DOUBLE(-1, >=, 1);
+
+	PCU_ASSERT_OPERATOR_DOUBLE(a, ==, b);
+	PCU_ASSERT_OPERATOR_DOUBLE(a, <, b);
+	PCU_ASSERT_OPERATOR_DOUBLE(a, >, b);
+	PCU_ASSERT_OPERATOR_DOUBLE(a, <, b + 0.01);
+	PCU_ASSERT_OPERATOR_DOUBLE(a, >, b + 0.01);
+
+	PCU_ASSERT_OPERATOR_DOUBLE_FATAL(a, ==, b);
+	PCU_ASSERT_OPERATOR_DOUBLE_FATAL(a, <, b);
+	PCU_ASSERT_OPERATOR_DOUBLE(a, <, b);
+}
+
 static void test_assert_return(void)
 {
 	PCU_ASSERT_RETURN(0);
@@ -762,6 +787,12 @@ static void test_assert_operator_int_return(void)
 	PCU_ASSERT_OPERATOR_INT(0, ==, 1);
 }
 
+static void test_assert_operator_dbl_return(void)
+{
+	PCU_ASSERT_OPERATOR_DOUBLE_RETURN(-1.1, >, 1.1);
+	PCU_ASSERT_OPERATOR_DOUBLE(0, ==, 1);
+}
+
 
 
 PCU_Suite *AssertTest_suite(void)
@@ -803,6 +834,7 @@ PCU_Suite *AssertTest_suite(void)
 		{ "test_skip"                  , test_skip, -1              } ,
 		{ "test_assert_operator"       , test_assert_operator       } ,
 		{ "test_assert_operator_int"   , test_assert_operator_int   } ,
+		{ "test_assert_operator_dbl"   , test_assert_operator_dbl   } ,
 	};
 	static PCU_Suite suite = { "AssertTest", tests, sizeof tests / sizeof *tests, setup, teardown };
 	return &suite;
@@ -844,6 +876,7 @@ PCU_Suite *AssertReturnTest_suite(void)
 		{ "test_failw_return"                 , test_failw_return                 } , 
 		{ "test_assert_operator_return"       , test_assert_operator_return       } , 
 		{ "test_assert_operator_int_return"   , test_assert_operator_int_return   } , 
+		{ "test_assert_operator_dbl_return"   , test_assert_operator_dbl_return   } , 
 	};
 	static PCU_Suite suite = { "AssertReturnTest", tests, sizeof tests / sizeof *tests };
 	return &suite;
