@@ -122,7 +122,7 @@ size_t PCU_get_nstr_len(unsigned long type)
 
 int PCU_get_not_flag(unsigned long type)
 {
-	return (type & PCU_TYPE_NOT);
+	return (int) (type & PCU_TYPE_NOT);
 }
 
 #define IS_ASCII(c)		(' ' == 0x20 && 0x20 <= (c) && (c) <= 0x7e)
