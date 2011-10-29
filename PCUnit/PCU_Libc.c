@@ -290,8 +290,13 @@ static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *
 			SET_WIDTH(flags, width);
 			p++;
 		}
-		if (*p == 'h' || *p == 'l') {
+		if (*p == 'h') {
 			p++;
+		} else if (*p == 'l') {
+			p++;
+			if (*p == 'l') {
+				p++;
+			}
 		}
 		switch (*p) {
 		case 'c':

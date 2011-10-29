@@ -88,7 +88,7 @@ C99の標準関数がすべて使用できる場合は条件コンパイルを�
 
 #### `PCU_NO_*` のいずれかを定義した場合
 
-* `size_t`型をtypedefした`stddef.h`が必要です。
+* `size_t`型と`ptrdiff_t`型をtypedefした`stddef.h`が必要です。
   もし`stddef.h`がなければ作成してインクルードパスの通ったディレクトリに置いてください。
 * テストプロジェクトのコンパイラオプションで、必ずPCUnitビルド時と同じ`PCU_NO_*`マクロを定義してください。
 
@@ -324,8 +324,8 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
             actual   : 0x00000000 (0)
         2. AddSubTest.c:15
           PCU_ASSERT_EQUAL(-3, sub(-1, 2))
-            expected : 0xfffffffd (-3)
-            actual   : 0x00000000 (0)
+            expected : 0xfffffffffffffffd (-3)
+            actual   : 0x0000000000000000 (0)
     
     2 Tests, 2 Failures, 0 Skipped
 
@@ -387,12 +387,16 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
     expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
     等しくないならば失敗を登録します。
+    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
+    引数に`size_t`型の最大値より大きい値を指定できません。
 
 
 * **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
     等しいならば失敗を登録します。
+    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
+    引数に`size_t`型の最大値より大きい値を指定できません。
 
 
 * **`PCU_ASSERT_PTR_EQUAL(expected, actual)`**
@@ -519,8 +523,10 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
 * **`PCU_ASSERT_OPERATOR(lhs, op, rhs)`**
 
-    lhsとrhsが符号なし整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録します。
+    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
+    引数に`size_t`型の最大値より大きい値を指定できません。
 
     例:
 
@@ -530,8 +536,10 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
 * **`PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)`**
 
-    lhsとrhsが符号あり整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録します。
+    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
+    引数に`size_t`型の最大値より大きい値を指定できません。
 
     例:
 

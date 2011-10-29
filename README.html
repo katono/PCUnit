@@ -96,7 +96,7 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 <h4><code>PCU_NO_*</code> のいずれかを定義した場合</h4>
 
 <ul>
-<li><code>size_t</code>型をtypedefした<code>stddef.h</code>が必要です。
+<li><code>size_t</code>型と<code>ptrdiff_t</code>型をtypedefした<code>stddef.h</code>が必要です。
 もし<code>stddef.h</code>がなければ作成してインクルードパスの通ったディレクトリに置いてください。</li>
 <li>テストプロジェクトのコンパイラオプションで、必ずPCUnitビルド時と同じ<code>PCU_NO_*</code>マクロを定義してください。</li>
 </ul>
@@ -351,8 +351,8 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
         actual   : 0x00000000 (0)
     2. AddSubTest.c:15
       PCU_ASSERT_EQUAL(-3, sub(-1, 2))
-        expected : 0xfffffffd (-3)
-        actual   : 0x00000000 (0)
+        expected : 0xfffffffffffffffd (-3)
+        actual   : 0x0000000000000000 (0)
 
 2 Tests, 2 Failures, 0 Skipped
 </code></pre>
@@ -410,11 +410,15 @@ OK
 <li><p><strong><code>PCU_ASSERT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
-等しくないならば失敗を登録します。</p></li>
+等しくないならば失敗を登録します。
+なお、PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は
+引数に<code>size_t</code>型の最大値より大きい値を指定できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
-等しいならば失敗を登録します。</p></li>
+等しいならば失敗を登録します。
+なお、PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は
+引数に<code>size_t</code>型の最大値より大きい値を指定できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
@@ -503,8 +507,10 @@ NULLならば失敗を登録します。</p></li>
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_OPERATOR(lhs, op, rhs)</code></strong></p>
 
-<p>lhsとrhsが符号なし整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-偽ならば失敗を登録します。</p>
+<p>lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+偽ならば失敗を登録します。
+なお、PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は
+引数に<code>size_t</code>型の最大値より大きい値を指定できません。</p>
 
 <p>例:</p>
 
@@ -514,8 +520,10 @@ NULLならば失敗を登録します。</p></li>
 </ul></li>
 <li><p><strong><code>PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)</code></strong></p>
 
-<p>lhsとrhsが符号あり整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-偽ならば失敗を登録します。</p>
+<p>lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+偽ならば失敗を登録します。
+なお、PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は
+引数に<code>size_t</code>型の最大値より大きい値を指定できません。</p>
 
 <p>例:</p>
 

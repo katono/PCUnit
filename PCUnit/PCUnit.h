@@ -15,6 +15,14 @@ extern "C" {
 extern char * const PCU_msg_buf;
 extern const size_t PCU_msg_buf_size;
 
+#if !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
+typedef unsigned long long PCU_size_t;
+typedef long long PCU_ssize_t;
+#else
+typedef size_t PCU_size_t;
+typedef ptrdiff_t PCU_ssize_t;
+#endif
+
 #define PCU_TYPE_NONE      0x00000000
 #define PCU_TYPE_BOOL      0x00000001
 #define PCU_TYPE_NUM       0x00000002
@@ -38,8 +46,8 @@ extern const size_t PCU_msg_buf_size;
 unsigned long PCU_get_assert_type(unsigned long type);
 size_t PCU_get_nstr_len(unsigned long type);
 int PCU_get_not_flag(unsigned long type);
-void PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
-void PCU_assert_num_impl(size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
+void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
+void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
 void PCU_assert_ptr_impl(const void *expected, const void *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
 void PCU_assert_str_impl(const char *expected, const char *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag);
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
@@ -79,7 +87,7 @@ typedef struct {
 
 typedef struct PCU_TestFailure {
 	union {
-		size_t num;
+		PCU_size_t num;
 		char *str;
 		const void *ptr;
 #if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
@@ -87,7 +95,7 @@ typedef struct PCU_TestFailure {
 #endif
 	} expected;
 	union {
-		size_t num;
+		PCU_size_t num;
 		char *str;
 		const void *ptr;
 #if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
@@ -186,13 +194,13 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 		__FILE__, __LINE__, fatal_flag)
 
 #define PCU_ASSERT_EQUAL_AUX(expected, actual, str_assert, fatal_flag)\
-	PCU_assert_num_impl((size_t) (expected), (size_t) (actual),\
+	PCU_assert_num_impl((PCU_size_t) (expected), (PCU_size_t) (actual),\
 		PCU_TYPE_NUM,\
 		str_assert,\
 		__FILE__, __LINE__, fatal_flag)
 
 #define PCU_ASSERT_NOT_EQUAL_AUX(expected, actual, str_assert, fatal_flag)\
-	PCU_assert_num_impl((size_t) (expected), (size_t) (actual),\
+	PCU_assert_num_impl((PCU_size_t) (expected), (PCU_size_t) (actual),\
 		PCU_TYPE_NUM | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__, fatal_flag)
@@ -298,8 +306,8 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_OPERATOR_AUX(lhs, op, rhs, str_assert, fatal_flag)\
 	do {\
-		const size_t pcu_assert_operator_aux_lhs = (size_t) (lhs);\
-		const size_t pcu_assert_operator_aux_rhs = (size_t) (rhs);\
+		const PCU_size_t pcu_assert_operator_aux_lhs = (PCU_size_t) (lhs);\
+		const PCU_size_t pcu_assert_operator_aux_rhs = (PCU_size_t) (rhs);\
 		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
 			pcu_assert_operator_aux_lhs, pcu_assert_operator_aux_rhs,\
 			PCU_TYPE_OP,\
@@ -309,10 +317,10 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 
 #define PCU_ASSERT_OPERATOR_INT_AUX(lhs, op, rhs, str_assert, fatal_flag)\
 	do {\
-		const long pcu_assert_operator_aux_lhs = (long) (lhs);\
-		const long pcu_assert_operator_aux_rhs = (long) (rhs);\
+		const PCU_ssize_t pcu_assert_operator_aux_lhs = (PCU_ssize_t) (lhs);\
+		const PCU_ssize_t pcu_assert_operator_aux_rhs = (PCU_ssize_t) (rhs);\
 		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
-			(size_t) pcu_assert_operator_aux_lhs, (size_t) pcu_assert_operator_aux_rhs,\
+			(PCU_size_t) pcu_assert_operator_aux_lhs, (PCU_size_t) pcu_assert_operator_aux_rhs,\
 			PCU_TYPE_OP_INT,\
 			str_assert,\
 			__FILE__, __LINE__, fatal_flag);\
@@ -615,12 +623,12 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 	} while (0)
 
 
-#define PCU_FAIL_IMPL()    PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL"        , __FILE__, __LINE__, 0)
-#define PCU_FAIL_IMPL_R()  PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL_RETURN" , __FILE__, __LINE__, 0)
-#define PCU_FAIL_IMPL_F()  PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL_FATAL"  , __FILE__, __LINE__, 1)
-#define PCU_FAILW_IMPL()   PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW"       , __FILE__, __LINE__, 0)
-#define PCU_FAILW_IMPL_R() PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_RETURN", __FILE__, __LINE__, 0)
-#define PCU_FAILW_IMPL_F() PCU_assert_impl(0, (size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_FATAL" , __FILE__, __LINE__, 1)
+#define PCU_FAIL_IMPL()    PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL"        , __FILE__, __LINE__, 0)
+#define PCU_FAIL_IMPL_R()  PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL_RETURN" , __FILE__, __LINE__, 0)
+#define PCU_FAIL_IMPL_F()  PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAIL , "PCU_FAIL_FATAL"  , __FILE__, __LINE__, 1)
+#define PCU_FAILW_IMPL()   PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW"       , __FILE__, __LINE__, 0)
+#define PCU_FAILW_IMPL_R() PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_RETURN", __FILE__, __LINE__, 0)
+#define PCU_FAILW_IMPL_F() PCU_assert_impl(0, (PCU_size_t)(size_t)(PCU_msg_buf), 0, PCU_TYPE_FAILW, "PCU_FAILW_FATAL" , __FILE__, __LINE__, 1)
 
 #define PCU_FAIL0(format)\
 	do {\

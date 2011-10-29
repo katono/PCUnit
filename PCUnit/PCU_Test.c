@@ -10,7 +10,7 @@ static int repeat_counter;
 static PCU_jmp_buf fatal_jmp;
 static int last_assertion;
 
-static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat);
+static PCU_TestFailure *PCU_TestFailure_new(PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat);
 #ifndef PCU_NO_FLOATINGPOINT
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat);
 #endif
@@ -70,7 +70,7 @@ void PCU_Test_run(PCU_Test *self)
 		if (err) {
 			PCU_TestFailure *node;
 			self->result.num_errors_setup++;
-			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1, repeat_counter);
+			node = PCU_TestFailure_new(0, (PCU_size_t) err, PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
 				list_push(&self->failure_list, node);
 			}
@@ -83,7 +83,7 @@ void PCU_Test_run(PCU_Test *self)
 		if (err) {
 			PCU_TestFailure *node;
 			self->result.num_errors_teardown++;
-			node = PCU_TestFailure_new(0, (size_t) err, PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1, repeat_counter);
+			node = PCU_TestFailure_new(0, (PCU_size_t) err, PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1, repeat_counter);
 			if (node) {
 				list_push(&self->failure_list, node);
 			}
@@ -117,7 +117,7 @@ int PCU_Test_contains_msg(PCU_Test *self)
 	return (self->result.num_msgs > 0);
 }
 
-void PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
+void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
 {
 	PCU_TestFailure *node;
 	current_test->result.num_asserts++;
@@ -140,7 +140,7 @@ void PCU_assert_impl(int passed_flag, size_t expected, size_t actual, unsigned l
 	}
 }
 
-void PCU_assert_num_impl(size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
+void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
 {
 	if (PCU_get_not_flag(type)) {
 		PCU_assert_impl((expected != actual), expected, actual, type, str_assert, file, line, fatal_flag);
@@ -152,30 +152,30 @@ void PCU_assert_num_impl(size_t expected, size_t actual, unsigned long type, con
 void PCU_assert_ptr_impl(const void *expected, const void *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
 {
 	if (PCU_get_not_flag(type)) {
-		PCU_assert_impl((expected != actual), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+		PCU_assert_impl((expected != actual), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 	} else {
-		PCU_assert_impl((expected == actual), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+		PCU_assert_impl((expected == actual), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 	}
 }
 
 void PCU_assert_str_impl(const char *expected, const char *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
 {
 	if (expected == 0 || actual == 0) {
-		PCU_assert_impl(0, (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+		PCU_assert_impl(0, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		return;
 	}
 	if (PCU_get_assert_type(type) == PCU_TYPE_NSTR) {
 		size_t len = PCU_get_nstr_len(type);
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) != 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) != 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		} else {
-			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) == 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) == 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		}
 	} else {
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_STRCMP(expected, actual) != 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_STRCMP(expected, actual) != 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		} else {
-			PCU_assert_impl((PCU_STRCMP(expected, actual) == 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_STRCMP(expected, actual) == 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		}
 	}
 }
@@ -184,21 +184,21 @@ void PCU_assert_str_impl(const char *expected, const char *actual, unsigned long
 void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int fatal_flag)
 {
 	if (expected == 0 || actual == 0) {
-		PCU_assert_impl(0, (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+		PCU_assert_impl(0, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		return;
 	}
 	if (PCU_get_assert_type(type) == PCU_TYPE_NSTRW) {
 		size_t len = PCU_get_nstr_len(type);
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) != 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) != 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		} else {
-			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) == 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) == 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		}
 	} else {
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSCMP(expected, actual) != 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_WCSCMP(expected, actual) != 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		} else {
-			PCU_assert_impl((PCU_WCSCMP(expected, actual) == 0), (size_t) expected, (size_t) actual, type, str_assert, file, line, fatal_flag);
+			PCU_assert_impl((PCU_WCSCMP(expected, actual) == 0), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line, fatal_flag);
 		}
 	}
 }
@@ -274,7 +274,7 @@ void PCU_msg_impl(const char *msg, unsigned long type, const char *str_assert, c
 {
 	PCU_TestFailure *node;
 	current_test->result.num_msgs++;
-	node = PCU_TestFailure_new((size_t) msg, 0, type, str_assert, file, line, repeat_counter);
+	node = PCU_TestFailure_new((PCU_size_t)(size_t) msg, 0, type, str_assert, file, line, repeat_counter);
 	if (node) {
 		list_push(&current_test->failure_list, node);
 	}
@@ -430,7 +430,7 @@ static int copy_stringw(char **dst1, char **dst2, const wchar_t *src1, const wch
 }
 #endif
 
-static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat)
+static PCU_TestFailure *PCU_TestFailure_new(PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat)
 {
 	PCU_TestFailure *self = (PCU_TestFailure *) PCU_MALLOC(sizeof(PCU_TestFailure));
 	if (!self) {
@@ -452,15 +452,15 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 		break;
 	case PCU_TYPE_PTR:
 	case PCU_TYPE_PTR_NULL:
-		self->expected.ptr = (const void *) expected;
-		self->actual.ptr = (const void *) actual;
+		self->expected.ptr = (const void *)(size_t) expected;
+		self->actual.ptr = (const void *)(size_t) actual;
 		break;
 	case PCU_TYPE_STR:
 	case PCU_TYPE_NSTR:
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_FAIL:
-		if (!copy_string(&self->expected.str, &self->actual.str, (const char *) expected, (const char *) actual, type)) {
-			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
+		if (!copy_string(&self->expected.str, &self->actual.str, (const char *)(size_t) expected, (const char *)(size_t) actual, type)) {
+			self->actual.num = (PCU_size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
@@ -468,8 +468,8 @@ static PCU_TestFailure *PCU_TestFailure_new(size_t expected, size_t actual, unsi
 	case PCU_TYPE_NSTRW:
 	case PCU_TYPE_MSGW:
 	case PCU_TYPE_FAILW:
-		if (!copy_stringw(&self->expected.str, &self->actual.str, (const wchar_t *) expected, (const wchar_t *) actual, type)) {
-			self->actual.num = (size_t) -1; /* actual.num is used as str_malloc_failed_flag */
+		if (!copy_stringw(&self->expected.str, &self->actual.str, (const wchar_t *)(size_t) expected, (const wchar_t *)(size_t) actual, type)) {
+			self->actual.num = (PCU_size_t) -1; /* actual.num is used as str_malloc_failed_flag */
 		}
 		break;
 #endif
@@ -553,7 +553,7 @@ static void PCU_TestFailure_delete(PCU_TestFailure *self)
 
 int PCU_TestFailure_str_malloc_is_failed(PCU_TestFailure *self)
 {
-	return self->actual.num == (size_t) -1;
+	return self->actual.num == (PCU_size_t) -1;
 }
 
 static void list_push(PCU_TestFailure *list, PCU_TestFailure *node)

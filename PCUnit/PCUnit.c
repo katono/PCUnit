@@ -127,35 +127,34 @@ int PCU_get_not_flag(unsigned long type)
 
 #define IS_ASCII(c)		(' ' == 0x20 && 0x20 <= (c) && (c) <= 0x7e)
 
-#define PRINT_EXPECTED_ACTUAL_AUX(type, str, size_t_num, type_num, len_str)	\
+#define PRINT_EXPECTED_ACTUAL_AUX(str, num, is_64bit_width)	\
 	do {\
-		PCU_PRINTF3("        " str " : 0x%0*" len_str "x (%d)", sizeof(type) * 2, type_num, size_t_num);\
-		if (IS_ASCII(size_t_num)) {\
-			PCU_PRINTF1(" '%c'\n", size_t_num);\
+		PCU_PRINTF3("        " str " : 0x%0*llx (%lld)", \
+				(is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2, num, num);\
+		if (IS_ASCII(num)) {\
+			PCU_PRINTF1(" '%c'\n", (int) num);\
 		} else {\
 			PCU_PRINTF0("\n");\
 		}\
 	} while (0)
 
-#define PRINT_EXPECTED_ACTUAL_16BIT(type, expected_str, actual_str, len_str)	\
+#define PRINT_EXPECTED_ACTUAL_16BIT(expected_str, actual_str)	\
 	do {\
-		const type e = (type) pos->expected.num;\
-		const type a = (type) pos->actual.num;\
-		if (sizeof(int) == 2 && (e > 0xFFFF || a > 0xFFFF)) {\
-			PCU_PRINTF2("        " expected_str " : 0x%0*" len_str "x\n", sizeof(type) * 2, e);\
-			PCU_PRINTF2("        " actual_str   " : 0x%0*" len_str "x\n", sizeof(type) * 2, a);\
+		if (sizeof(int) == 2 && (pos->expected.num > 0xFFFF || pos->actual.num > 0xFFFF)) {\
+			PCU_PRINTF2("        " expected_str " : 0x%0*x\n", sizeof(size_t) * 2, pos->expected.num);\
+			PCU_PRINTF2("        " actual_str   " : 0x%0*x\n", sizeof(size_t) * 2, pos->actual.num);\
 		} else {\
-			PRINT_EXPECTED_ACTUAL_AUX(type, expected_str, pos->expected.num, e, len_str);\
-			PRINT_EXPECTED_ACTUAL_AUX(type, actual_str  , pos->actual.num  , a, len_str);\
+			PRINT_EXPECTED_ACTUAL_AUX(expected_str, pos->expected.num, 0);\
+			PRINT_EXPECTED_ACTUAL_AUX(actual_str  , pos->actual.num  , 0);\
 		}\
 	} while (0)
 
-#define PRINT_EXPECTED_ACTUAL(type, expected_str, actual_str, len_str)	\
+#define PRINT_EXPECTED_ACTUAL(expected_str, actual_str)	\
 	do {\
-		const type e = (type) pos->expected.num;\
-		const type a = (type) pos->actual.num;\
-		PRINT_EXPECTED_ACTUAL_AUX(type, expected_str, pos->expected.num, e, len_str);\
-		PRINT_EXPECTED_ACTUAL_AUX(type, actual_str  , pos->actual.num  , a, len_str);\
+		int is_64bit_width = (pos->expected.num > (PCU_size_t) 0xFFFFFFFF ||\
+								pos->actual.num > (PCU_size_t) 0xFFFFFFFF);\
+		PRINT_EXPECTED_ACTUAL_AUX(expected_str, pos->expected.num, is_64bit_width);\
+		PRINT_EXPECTED_ACTUAL_AUX(actual_str  , pos->actual.num  , is_64bit_width);\
 	} while (0)
 
 static void print_failure(PCU_Test *test)
@@ -181,17 +180,17 @@ static void print_failure(PCU_Test *test)
 		switch (type) {
 		case PCU_TYPE_NUM:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL_16BIT(size_t, "expected", "actual  ", "");
+			PRINT_EXPECTED_ACTUAL_16BIT("expected", "actual  ");
 #else
-			PRINT_EXPECTED_ACTUAL(size_t, "expected", "actual  ", "");
+			PRINT_EXPECTED_ACTUAL("expected", "actual  ");
 #endif
 			break;
 		case PCU_TYPE_OP:
 		case PCU_TYPE_OP_INT:
 #if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
-			PRINT_EXPECTED_ACTUAL_16BIT(size_t, "lhs     ", "rhs     ", "");
+			PRINT_EXPECTED_ACTUAL_16BIT("lhs     ", "rhs     ");
 #else
-			PRINT_EXPECTED_ACTUAL(size_t, "lhs     ", "rhs     ", "");
+			PRINT_EXPECTED_ACTUAL("lhs     ", "rhs     ");
 #endif
 			break;
 		case PCU_TYPE_PTR:
@@ -259,7 +258,7 @@ static void print_failure(PCU_Test *test)
 			}
 			break;
 		case PCU_TYPE_SETUP:
-			PCU_PRINTF1("        return   : 0x%x\n", pos->actual.num);
+			PCU_PRINTF1("        return   : 0x%x\n", (int) pos->actual.num);
 			break;
 		default:
 			break;

@@ -38,6 +38,12 @@ static void test_assert_equal(void)
 	int a, b;
 	a = 100;
 	b = 100;
+	PCU_ASSERT_EQUAL(-1, 1);
+	PCU_ASSERT_EQUAL((long long)-1, 1);
+	PCU_ASSERT_EQUAL((unsigned long long)-1, 1);
+	PCU_ASSERT_EQUAL((size_t)-1, 1);
+	PCU_ASSERT_EQUAL((unsigned short)-1, 1);
+	PCU_ASSERT_EQUAL((unsigned char)-1, 1);
 	PCU_ASSERT_EQUAL(a, b);
 	PCU_ASSERT_EQUAL_FATAL(a, b);
 	b++;
@@ -476,6 +482,7 @@ static void test_assert_operator(void)
 	unsigned int a, b;
 	a = 0x100;
 	b = 0x100;
+	PCU_ASSERT_OPERATOR(-1, ==, 0x1FFFFFFFFULL);
 	PCU_ASSERT_OPERATOR(0, <, 1);
 	PCU_ASSERT_OPERATOR(0, <=, 1);
 	PCU_ASSERT_OPERATOR(0, >, 1);
@@ -507,6 +514,7 @@ static void test_assert_operator_int(void)
 	int a, b;
 	a = 0x100;
 	b = 0x100;
+	PCU_ASSERT_OPERATOR_INT(-1, ==, 0x1FFFFFFFFULL);
 	PCU_ASSERT_OPERATOR_INT(0, <, 1);
 	PCU_ASSERT_OPERATOR_INT(0, <=, 1);
 	PCU_ASSERT_OPERATOR_INT(0, >, 1);
