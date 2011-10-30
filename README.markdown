@@ -84,7 +84,7 @@ C99の標準関数がすべて使用できる場合は条件コンパイルを�
 `PCU_MESSAGE*`のマクロで使用されます(`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`は失敗時のみ使用)。
 このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`の引数や
 `PCU_FAIL*`、`PCU_MESSAGE*`のメッセージが表示されません。
-これらの文字列表示が不要で、メモリを節約したいならば`PCU_STRING_POOL_SIZE`に1を指定してください。
+これらの文字列表示が不要で、メモリを節約したいならば`PCU_STRING_POOL_SIZE`に0を指定してください。
 
 #### `PCU_NO_VSNPRINTF` または `PCU_NO_LIBC` を定義した場合
 

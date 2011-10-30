@@ -660,13 +660,13 @@ void PCU_free(void *ptr)
 /* 
  * malloc for string
  */
-static char str_pool[PCU_STRING_POOL_SIZE];
+static char str_pool[(PCU_STRING_POOL_SIZE > 0) ? PCU_STRING_POOL_SIZE : 1];
 static char *str_pool_next_ptr = str_pool;
 
 char *PCU_str_malloc(size_t size)
 {
 	char *p = str_pool_next_ptr;
-	const char * const end = &str_pool[PCU_STRING_POOL_SIZE];
+	const char * const end = &str_pool[(PCU_STRING_POOL_SIZE > 0) ? PCU_STRING_POOL_SIZE : 0];
 	if (str_pool_next_ptr + size > end) {
 		return 0;
 	}

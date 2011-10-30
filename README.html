@@ -91,7 +91,7 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 <code>PCU_MESSAGE*</code>のマクロで使用されます(<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>は失敗時のみ使用)。
 このメモリプールを使い切ってしまった場合は<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>の引数や
 <code>PCU_FAIL*</code>、<code>PCU_MESSAGE*</code>のメッセージが表示されません。
-これらの文字列表示が不要で、メモリを節約したいならば<code>PCU_STRING_POOL_SIZE</code>に1を指定してください。</p>
+これらの文字列表示が不要で、メモリを節約したいならば<code>PCU_STRING_POOL_SIZE</code>に0を指定してください。</p>
 
 <h4><code>PCU_NO_VSNPRINTF</code> または <code>PCU_NO_LIBC</code> を定義した場合</h4>
 
