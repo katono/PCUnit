@@ -166,12 +166,20 @@ end:
 }
 
 #define TMP_SIZE	32
-static int dec2ascii(char *ascii, int ascii_size, unsigned int dec, unsigned long flags)
+
+#ifdef PCU_NO_DIV32
+typedef unsigned int PCU_udec_t;
+typedef int PCU_dec_t;
+#else
+typedef size_t PCU_udec_t;
+typedef ptrdiff_t PCU_dec_t;
+#endif
+static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
 	const char * const num_str = "0123456789";
-	int signed_dec = (int) dec;
+	PCU_dec_t signed_dec = (PCU_dec_t) dec;
 	if (dec == 0) {
 		tmp[0] = '0';
 		i = 1;
@@ -311,7 +319,7 @@ static int PCU_snprintf_aux(char *buf, size_t size, const char *format, size_t *
 			if (*p != 'u') {
 				SET_SIGNED_FLAG(flags);
 			}
-			inc = dec2ascii(&buf[i], buf_size - 1 - i, (unsigned int) tmp_val, flags);
+			inc = dec2ascii(&buf[i], buf_size - 1 - i, (PCU_udec_t) tmp_val, flags);
 			i += inc;
 			if (i >= buf_size - 1) goto end;
 			p++;

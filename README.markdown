@@ -84,7 +84,15 @@ C99の標準関数がすべて使用できる場合は条件コンパイルを�
 `PCU_MESSAGE*`のマクロで使用されます(`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`は失敗時のみ使用)。
 このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`の引数や
 `PCU_FAIL*`、`PCU_MESSAGE*`のメッセージが表示されません。
-これらの文字列表示が不要ならば`PCU_STRING_POOL_SIZE`に1を指定してください。
+これらの文字列表示が不要で、メモリを節約したいならば`PCU_STRING_POOL_SIZE`に1を指定してください。
+
+#### `PCU_NO_VSNPRINTF` または `PCU_NO_LIBC` を定義した場合
+
+32ビットの除算ができないためにビルドが失敗する(例えばgccで`___divsi3`などのリンクエラーが発生する)場合は、
+`PCU_NO_DIV32`マクロを定義してください。
+このマクロを定義するとビルドは成功しますが、
+`PCU_ASSERT_EQUAL`の失敗での引数表示にて負の数または65536以上の10進数の値が表示されなくなります。
+(16進数の値は表示されます。)
 
 #### `PCU_NO_*` のいずれかを定義した場合
 
@@ -387,16 +395,20 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
     expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
     等しくないならば失敗を登録します。
-    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
-    引数に`size_t`型の最大値より大きい値を指定できません。
+
+    注意:
+    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
+    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
 
 * **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
     等しいならば失敗を登録します。
-    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
-    引数に`size_t`型の最大値より大きい値を指定できません。
+
+    注意:
+    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
+    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
 
 * **`PCU_ASSERT_PTR_EQUAL(expected, actual)`**
@@ -525,11 +537,12 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
     lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録します。
-    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
-    引数に`size_t`型の最大値より大きい値を指定できません。
+
+    注意:
+    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
+    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
     例:
-
     * `PCU_ASSERT_OPERATOR(0 <= x, &&, x < 100);` xが0以上かつ100未満かチェック
     * `PCU_ASSERT_OPERATOR(x, &, 0x01);` xの最下位ビットが立っているかチェック
 
@@ -538,11 +551,12 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 
     lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録します。
-    なお、PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は
-    引数に`size_t`型の最大値より大きい値を指定できません。
+
+    注意:
+    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
+    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
     例:
-
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
 
 
@@ -553,7 +567,6 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
     例:
-
     * `PCU_ASSERT_OPERATOR_DOUBLE(x, >=, 1.0);` xが1.0以上の値かチェック
 
 
