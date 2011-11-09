@@ -55,7 +55,7 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 C99の標準関数がすべて使用できる場合は条件コンパイルをする必要はありません。
 使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。
 
-* vsnprintfが使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
+* vsnprintfが使用できない、または`long long`型が使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
 * malloc/freeが使用できない場合は、`PCU_NO_MALLOC`マクロを定義してください。
 * setjmp/longjmpが使用できない場合は、`PCU_NO_SETJMP`マクロを定義してください。
 * wchar.hの関数が使用できない場合は、`PCU_NO_WCHAR`マクロを定義してください。
@@ -75,8 +75,8 @@ C99の標準関数がすべて使用できる場合は条件コンパイルを�
 1つ目のメモリプールはアサートマクロ失敗用データのメモリプールです。
 アサートマクロ失敗の最大数を`PCU_MAX_FAILURES`マクロの値で定義できます。定義しない場合のデフォルト値は64です。
 この最大数を超えてアサートマクロが失敗した場合はテスト結果が正しく表示されません。
-なお、アサートマクロ失敗用データの構造体サイズは少なくとも32バイトあります。
-つまりデフォルトで少なくとも32 * 64 = 2048バイトの静的領域を使用します。
+なお、アサートマクロ失敗用データの構造体サイズは`sizeof(PCU_TestFailure)`で確認できます。
+つまりこのメモリプールでは`sizeof(PCU_TestFailure) * PCU_MAX_FAILURES`バイトの静的領域を使用します。
 
 2つ目のメモリプールは文字列表示用のメモリプールです。
 このメモリプールのバイト数を`PCU_STRING_POOL_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
@@ -317,23 +317,19 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
 
     Suite: AddSubTest
       Test: test_add ... FAILED
-        1. AddSubTest.c:6
-          PCU_ASSERT_EQUAL(3, add(2, 1))
-            expected : 0x00000003 (3)
-            actual   : 0x00000000 (0)
-        2. AddSubTest.c:8
-          PCU_ASSERT_EQUAL(1, add(-1, 2))
-            expected : 0x00000001 (1)
-            actual   : 0x00000000 (0)
+        AddSubTest.c:6: PCU_ASSERT_EQUAL(3, add(2, 1))
+          expected : 0x00000003 (3)
+          actual   : 0x00000000 (0)
+        AddSubTest.c:8: PCU_ASSERT_EQUAL(1, add(-1, 2))
+          expected : 0x00000001 (1)
+          actual   : 0x00000000 (0)
       Test: test_sub ... FAILED
-        1. AddSubTest.c:13
-          PCU_ASSERT_EQUAL(1, sub(2, 1))
-            expected : 0x00000001 (1)
-            actual   : 0x00000000 (0)
-        2. AddSubTest.c:15
-          PCU_ASSERT_EQUAL(-3, sub(-1, 2))
-            expected : 0xfffffffffffffffd (-3)
-            actual   : 0x0000000000000000 (0)
+        AddSubTest.c:13: PCU_ASSERT_EQUAL(1, sub(2, 1))
+          expected : 0x00000001 (1)
+          actual   : 0x00000000 (0)
+        AddSubTest.c:15: PCU_ASSERT_EQUAL(-3, sub(-1, 2))
+          expected : 0xfffffffffffffffd (-3)
+          actual   : 0x0000000000000000 (0)
     
     2 Tests, 2 Failures, 0 Skipped
 

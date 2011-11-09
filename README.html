@@ -61,7 +61,7 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。</p>
 
 <ul>
-<li>vsnprintfが使用できない場合は、<code>PCU_NO_VSNPRINTF</code>マクロを定義してください。</li>
+<li>vsnprintfが使用できない、または<code>long long</code>型が使用できない場合は、<code>PCU_NO_VSNPRINTF</code>マクロを定義してください。</li>
 <li>malloc/freeが使用できない場合は、<code>PCU_NO_MALLOC</code>マクロを定義してください。</li>
 <li>setjmp/longjmpが使用できない場合は、<code>PCU_NO_SETJMP</code>マクロを定義してください。</li>
 <li>wchar.hの関数が使用できない場合は、<code>PCU_NO_WCHAR</code>マクロを定義してください。</li>
@@ -82,8 +82,8 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 <p>1つ目のメモリプールはアサートマクロ失敗用データのメモリプールです。
 アサートマクロ失敗の最大数を<code>PCU_MAX_FAILURES</code>マクロの値で定義できます。定義しない場合のデフォルト値は64です。
 この最大数を超えてアサートマクロが失敗した場合はテスト結果が正しく表示されません。
-なお、アサートマクロ失敗用データの構造体サイズは少なくとも32バイトあります。
-つまりデフォルトで少なくとも32 * 64 = 2048バイトの静的領域を使用します。</p>
+なお、アサートマクロ失敗用データの構造体サイズは<code>sizeof(PCU_TestFailure)</code>で確認できます。
+つまりこのメモリプールでは<code>sizeof(PCU_TestFailure) * PCU_MAX_FAILURES</code>バイトの静的領域を使用します。</p>
 
 <p>2つ目のメモリプールは文字列表示用のメモリプールです。
 このメモリプールのバイト数を<code>PCU_STRING_POOL_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
@@ -344,23 +344,19 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
 
 <pre><code>Suite: AddSubTest
   Test: test_add ... FAILED
-    1. AddSubTest.c:6
-      PCU_ASSERT_EQUAL(3, add(2, 1))
-        expected : 0x00000003 (3)
-        actual   : 0x00000000 (0)
-    2. AddSubTest.c:8
-      PCU_ASSERT_EQUAL(1, add(-1, 2))
-        expected : 0x00000001 (1)
-        actual   : 0x00000000 (0)
+    AddSubTest.c:6: PCU_ASSERT_EQUAL(3, add(2, 1))
+      expected : 0x00000003 (3)
+      actual   : 0x00000000 (0)
+    AddSubTest.c:8: PCU_ASSERT_EQUAL(1, add(-1, 2))
+      expected : 0x00000001 (1)
+      actual   : 0x00000000 (0)
   Test: test_sub ... FAILED
-    1. AddSubTest.c:13
-      PCU_ASSERT_EQUAL(1, sub(2, 1))
-        expected : 0x00000001 (1)
-        actual   : 0x00000000 (0)
-    2. AddSubTest.c:15
-      PCU_ASSERT_EQUAL(-3, sub(-1, 2))
-        expected : 0xfffffffffffffffd (-3)
-        actual   : 0x0000000000000000 (0)
+    AddSubTest.c:13: PCU_ASSERT_EQUAL(1, sub(2, 1))
+      expected : 0x00000001 (1)
+      actual   : 0x00000000 (0)
+    AddSubTest.c:15: PCU_ASSERT_EQUAL(-3, sub(-1, 2))
+      expected : 0xfffffffffffffffd (-3)
+      actual   : 0x0000000000000000 (0)
 
 2 Tests, 2 Failures, 0 Skipped
 </code></pre>
