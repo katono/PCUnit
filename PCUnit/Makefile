@@ -8,6 +8,7 @@ CFLAGS = -Wall -Wextra -std=c99 -pedantic-errors -Os
 # CFLAGS += -DPCU_NO_WCHAR
 # CFLAGS += -DPCU_NO_FLOATINGPOINT
 # CFLAGS += -DPCU_NO_DIV32
+# CFLAGS += -DPCU_NO_STDARG
 TARGET = libpcunit.a
 OBJS = PCUnit.o
 OBJS += PCU_Test.o

@@ -39,9 +39,10 @@ def register_tests(file_name)
 		if mark && line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
 			registered_testfuncs.push($2)
 		end
-		if line =~ /static\s+PCU_Test\s+.*\[\]/
+		if line =~ /PCU_Test\s+.*\[\]/
 			mark = true
-			indent = line.slice(/^\s*/) * 2
+			tmp = line.slice(/^\s*/)
+			indent = tmp == "" ? "\t" : tmp * 2
 		end
 		if mark && line =~ /\};/
 			insert_idx = idx

@@ -18,7 +18,7 @@
 <li>テストフィクスチャ(setup, teardown, initialize, cleanup)をサポートします。</li>
 <li>1つのテストを繰り返し行うRepeatedTestをサポートします。これを利用して、データ駆動テストを行うこともできます。</li>
 <li>ディスプレイやキーボードがないターゲット上でテストするために、ユーザー定義の入出力関数を設定できます。</li>
-<li>インタラクティブなコンソールモードをサポートします。これはターゲット上でのシンプルなテストツールとしても使えます。</li>
+<li>実行するテストをインタラクティブに選択できるコンソールモードをサポートします。</li>
 <li>ターミナルが対応していればテスト結果のカラー表示ができます。</li>
 <li>ユーティリティを使用すればテスト関数の雛形生成や自動登録ができます。</li>
 </ul></li>
@@ -57,7 +57,7 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 
 <h3>条件コンパイル</h3>
 
-<p>C99の標準関数がすべて使用できる場合は条件コンパイルをする必要はありません。
+<p>C99の標準関数が全て使用できる場合は条件コンパイルをする必要はありません。
 使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。</p>
 
 <ul>
@@ -68,6 +68,7 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 <li>strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでも使用できない場合は、
 <code>PCU_NO_LIBC</code>マクロを定義してください。
 このマクロを定義した場合は<code>PCU_NO_VSNPRINTF</code>、<code>PCU_NO_MALLOC</code>、<code>PCU_NO_SETJMP</code>、<code>PCU_NO_WCHAR</code>を定義する必要はありません。</li>
+<li>stdarg.hがない場合は、<code>PCU_NO_STDARG</code>マクロを定義してください。</li>
 <li>プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できない場合は、
 <code>PCU_NO_FLOATINGPOINT</code>マクロを定義してください。</li>
 <li>コンソールモードが不要な場合は、<code>PCU_NO_CONSOLE_RUN</code>マクロを定義してください。
@@ -87,10 +88,10 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 
 <p>2つ目のメモリプールは文字列表示用のメモリプールです。
 このメモリプールのバイト数を<code>PCU_STRING_POOL_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
-このメモリプールは、<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>、<code>PCU_FAIL*</code>、
-<code>PCU_MESSAGE*</code>のマクロで使用されます(<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>は失敗時のみ使用)。
+このメモリプールは、<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>、<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、
+<code>PCU_MESSAGE</code>のマクロで使用されます(<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>、<code>PCU_ASSERT*_MESSAGE</code>は失敗時のみ使用)。
 このメモリプールを使い切ってしまった場合は<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>の引数や
-<code>PCU_FAIL*</code>、<code>PCU_MESSAGE*</code>のメッセージが表示されません。
+<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージが表示されません。
 これらの文字列表示が不要で、メモリを節約したいならば<code>PCU_STRING_POOL_SIZE</code>に0を指定してください。</p>
 
 <h4><code>PCU_NO_VSNPRINTF</code> または <code>PCU_NO_LIBC</code> を定義した場合</h4>
@@ -343,20 +344,16 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
 このように出力されます。</p>
 
 <pre><code>Suite: AddSubTest
-  Test: test_add ... FAILED
-    AddSubTest.c:6: PCU_ASSERT_EQUAL(3, add(2, 1))
-      expected : 0x00000003 (3)
-      actual   : 0x00000000 (0)
-    AddSubTest.c:8: PCU_ASSERT_EQUAL(1, add(-1, 2))
-      expected : 0x00000001 (1)
-      actual   : 0x00000000 (0)
-  Test: test_sub ... FAILED
-    AddSubTest.c:13: PCU_ASSERT_EQUAL(1, sub(2, 1))
-      expected : 0x00000001 (1)
-      actual   : 0x00000000 (0)
-    AddSubTest.c:15: PCU_ASSERT_EQUAL(-3, sub(-1, 2))
-      expected : 0xfffffffffffffffd (-3)
-      actual   : 0x0000000000000000 (0)
+
+Test: test_add
+ AddSubTest.c:6: PCU_ASSERT_EQUAL(3, add(2, 1))
+  expected : 0x00000003 (3)
+  actual   : 0x00000000 (0)
+
+Test: test_sub
+ AddSubTest.c:13: PCU_ASSERT_EQUAL(1, sub(2, 1))
+  expected : 0x00000001 (1)
+  actual   : 0x00000000 (0)
 
 2 Tests, 2 Failures, 0 Skipped
 </code></pre>
@@ -388,33 +385,37 @@ OK
 
 <p>OKのメッセージは1つのテストスイートにつき1つ表示されます。
 この例ではテストスイートは1つでしたが、テストスイートが複数の場合、
-すべてのテストスイートにOKが表示されるまで修正を繰り返してください。</p>
+全てのテストスイートにOKが表示されるまで修正を繰り返してください。</p>
 
 <h2>アサートマクロ</h2>
 
-<p>全てのアサートマクロはテスト関数、またはテスト関数内で呼び出される関数で使用可能です。</p>
+<p>アサートマクロはテスト関数内で使用可能です。
+各アサートマクロの引数は2回以上評価されないので、マクロ展開による副作用を気にする必要はありません。</p>
 
-<p>全てのアサートマクロの引数は2回以上評価されないので、マクロ展開による副作用を気にする必要はありません。</p>
+<p>アサーション失敗時はlongjmpによってテスト関数から抜けます。
+ただし、テストプロジェクトのコンパイラオプションで<code>PCU_NO_SETJMP</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みの場合は、
+setjmp/longjmpが使用できないので代わりにreturnによってテスト関数から抜けるようになります。
+この場合、スタブ等のテスト関数内で呼び出される関数から一気に抜けることはできなくなります。</p>
 
-<h3><code>PCU_ASSERT*</code></h3>
+<p>以下にPCUnitが提供するアサートマクロを示します。</p>
 
 <ul>
 <li><p><strong><code>PCU_ASSERT(expr)</code></strong></p>
 
 <p>任意の式exprが真かどうかチェックします。
-偽ならば失敗を登録します。</p></li>
+偽ならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_TRUE(expr)</code></strong></p>
 
 <p>任意の式exprが真かどうかチェックします。
-偽ならば失敗を登録します。</p></li>
+偽ならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_FALSE(expr)</code></strong></p>
 
 <p>任意の式exprが偽かどうかチェックします。
-真ならば失敗を登録します。</p></li>
+真ならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
-等しくないならば失敗を登録します。</p>
+等しくないならば失敗を登録し、テスト関数から抜けます。</p>
 
 <p>注意:
 PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
@@ -422,7 +423,7 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 <li><p><strong><code>PCU_ASSERT_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
-等しいならば失敗を登録します。</p>
+等しいならば失敗を登録し、テスト関数から抜けます。</p>
 
 <p>注意:
 PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
@@ -430,57 +431,57 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 <li><p><strong><code>PCU_ASSERT_PTR_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
-等しくないならば失敗を登録します。</p></li>
+等しくないならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しくないかどうかチェックします。
-等しいならば失敗を登録します。</p></li>
+等しいならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_NULL(value)</code></strong></p>
 
 <p>valueがポインタである前提で、valueがNULLかどうかチェックします。
-NULLでないならば失敗を登録します。</p></li>
+NULLでないならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_NOT_NULL(value)</code></strong></p>
 
 <p>valueがポインタである前提で、valueがNULLでないかどうかチェックします。
-NULLならば失敗を登録します。</p></li>
+NULLならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRING_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
-等しくないならば失敗を登録します。</p></li>
+等しくないならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
-等しいならば失敗を登録します。</p></li>
+等しいならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
-等しくないならば失敗を登録します。</p></li>
+等しくないならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
-等しいならば失敗を登録します。</p></li>
+等しいならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGW_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
-等しくないならば失敗を登録します。
+等しくないならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
-等しいならば失敗を登録します。
+等しいならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
-等しくないならば失敗を登録します。
+等しくないならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
-等しいならば失敗を登録します。
+等しいならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGT_EQUAL(expected, actual)</code></strong></p>
@@ -506,17 +507,17 @@ NULLならば失敗を登録します。</p></li>
 <li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)</code></strong></p>
 
 <p>expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| &lt;= |delta|が真かどうかチェックします。
-偽ならば失敗を登録します。
+偽ならば失敗を登録し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)</code></strong></p>
 
 <p>expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| &lt;= |delta|が偽かどうかチェックします。
-真ならば失敗を登録します。
+真ならば失敗を登録し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>PCU_ASSERT_OPERATOR(lhs, op, rhs)</code></strong></p>
 
 <p>lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-偽ならば失敗を登録します。</p>
+偽ならば失敗を登録し、テスト関数から抜けます。</p>
 
 <p>注意:
 PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
@@ -525,13 +526,13 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 <p>例:</p>
 
 <ul>
-<li><code>PCU_ASSERT_OPERATOR(0 &lt;= x, &amp;&amp;, x &lt; 100);</code> xが0以上かつ100未満かチェック</li>
+<li><code>PCU_ASSERT_OPERATOR(x &lt; 0, ||, 100 &lt;= x);</code> xが0未満または100以上かチェック</li>
 <li><code>PCU_ASSERT_OPERATOR(x, &amp;, 0x01);</code> xの最下位ビットが立っているかチェック</li>
 </ul></li>
 <li><p><strong><code>PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)</code></strong></p>
 
 <p>lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-偽ならば失敗を登録します。</p>
+偽ならば失敗を登録し、テスト関数から抜けます。</p>
 
 <p>注意:
 PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
@@ -545,7 +546,7 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 <li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)</code></strong></p>
 
 <p>lhsとrhsが浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-偽ならば失敗を登録します。
+偽ならば失敗を登録し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p>
 
 <p>例:</p>
@@ -553,177 +554,32 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 <ul>
 <li><code>PCU_ASSERT_OPERATOR_DOUBLE(x, &gt;=, 1.0);</code> xが1.0以上の値かチェック</li>
 </ul></li>
-</ul>
+<li><p><strong><code>PCU_ASSERT*_MESSAGE(*, msg)</code></strong></p>
 
-<h3><code>PCU_ASSERT*_FATAL</code></h3>
+<p>上記の各アサートマクロには、最後の引数にmsgを追加した、マクロ名の末尾に<code>_MESSAGE</code>が付いたバージョンがあります。
+アサーション失敗時にmsgで指定したメッセージを追加表示できること以外は各アサートマクロと同じです。
+msgの型は<code>const char *</code>です。
+なお、<code>PCU_format</code>/<code>PCU_formatW</code>を使用すればprintf/wprintfと同じ形式の文字列を指定することができます。</p>
 
-<ul>
-<li><strong><code>PCU_ASSERT_FATAL(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_TRUE_FATAL(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_FALSE_FATAL(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NOT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NOT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NULL_FATAL(value)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NOT_NULL_FATAL(value)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRING_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRING_NOT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRING_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGW_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGW_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL_FATAL(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGT_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL_FATAL(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_DOUBLE_EQUAL_FATAL(expected, actual, delta)</code></strong></li>
-<li><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL_FATAL(expected, actual, delta)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_FATAL(lhs, op, rhs)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_INT_FATAL(lhs, op, rhs)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_DOUBLE_FATAL(lhs, op, rhs)</code></strong></li>
-</ul>
-
-<p>全ての<code>PCU_ASSERT*</code>マクロにはマクロ名の末尾に<code>_FATAL</code>が付いたバージョンがあります。
-<code>PCU_ASSERT*_FATAL</code>マクロは失敗時にlongjmpによりテスト関数から強制的に抜けます。
-例えばスタブ内から一気に抜けたい場合などに利用できます。
-なお、PCUnitが<code>PCU_NO_SETJMP</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p>
-
-<h3><code>PCU_ASSERT*_RETURN</code></h3>
+<p>例:</p>
 
 <ul>
-<li><strong><code>PCU_ASSERT_RETURN(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_TRUE_RETURN(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_FALSE_RETURN(expr)</code></strong></li>
-<li><strong><code>PCU_ASSERT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NOT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NOT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NULL_RETURN(value)</code></strong></li>
-<li><strong><code>PCU_ASSERT_PTR_NOT_NULL_RETURN(value)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRING_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRING_NOT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRING_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGW_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGW_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL_RETURN(expected, actual)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGT_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL_RETURN(expected, actual, n)</code></strong></li>
-<li><strong><code>PCU_ASSERT_DOUBLE_EQUAL_RETURN(expected, actual, delta)</code></strong></li>
-<li><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL_RETURN(expected, actual, delta)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_RETURN(lhs, op, rhs)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_INT_RETURN(lhs, op, rhs)</code></strong></li>
-<li><strong><code>PCU_ASSERT_OPERATOR_DOUBLE_RETURN(lhs, op, rhs)</code></strong></li>
+<li><code>PCU_ASSERT_MESSAGE(x, "x is false");</code></li>
+<li><code>PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_format("a:%s, b:%x, c:%d", a, b, c));</code></li>
+</ul></li>
+<li><p><strong><code>PCU_FAIL(msg)</code></strong></p>
+
+<p>無条件に失敗を登録し、テスト関数から抜けます。
+失敗表示の際にmsgで指定したメッセージを表示します。
+msgの型は<code>const char *</code>です。
+なお、<code>PCU_format</code>/<code>PCU_formatW</code>を使用すればprintf/wprintfと同じ形式の文字列を指定することができます。</p></li>
+<li><p><strong><code>PCU_MESSAGE(msg)</code></strong></p>
+
+<p>合否チェックを行わず、msgで指定したメッセージを表示します。
+このマクロはテスト関数から抜けません。
+msgの型は<code>const char *</code>です。
+なお、<code>PCU_format</code>/<code>PCU_formatW</code>を使用すればprintf/wprintfと同じ形式の文字列を指定することができます。</p></li>
 </ul>
-
-<p>全ての<code>PCU_ASSERT*</code>マクロにはマクロ名の末尾に<code>_RETURN</code>が付いたバージョンがあります。
-<code>PCU_ASSERT*_RETURN</code>マクロは失敗時にテスト関数からreturnします。
-returnなのでスタブ等のテスト関数内で呼び出される関数から一気に抜けることはできません。</p>
-
-<h3><code>PCU_FAIL*</code></h3>
-
-<ul>
-<li><strong><code>PCU_FAIL0(format)</code></strong></li>
-<li><strong><code>PCU_FAIL1(format, arg1)</code></strong></li>
-<li><strong><code>PCU_FAIL2(format, arg1, arg2)</code></strong></li>
-<li><strong><code>PCU_FAIL3(format, arg1, arg2, arg3)</code></strong></li>
-<li><strong><code>PCU_FAIL4(format, arg1, arg2, arg3, arg4)</code></strong></li>
-<li><strong><code>PCU_FAIL5(format, arg1, arg2, arg3, arg4, arg5)</code></strong></li>
-<li><strong><code>PCU_FAIL6(format, arg1, arg2, arg3, arg4, arg5, arg6)</code></strong></li>
-<li><strong><code>PCU_FAIL7(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)</code></strong></li>
-<li><strong><code>PCU_FAIL8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)</code></strong></li>
-<li><strong><code>PCU_FAIL9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)</code></strong></li>
-<li><strong><code>PCU_FAIL(...)</code></strong></li>
-<li><strong><code>PCU_FAILW(...)</code></strong></li>
-<li><strong><code>PCU_FAILT(...)</code></strong></li>
-</ul>
-
-<p><code>PCU_FAIL*</code>マクロは無条件に失敗を登録します。
-表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
-arg[1-9]の個数によって使用するマクロを選択してください。
-<code>PCU_FAIL</code>はマクロの可変長引数(<code>__VA_ARGS__</code>)が使用可能かつ、<code>PCU_NO_VSNPRINTF</code>と<code>PCU_NO_LIBC</code>が未定義な場合に使用できます。
-<code>PCU_FAILW</code>は<code>PCU_FAIL</code>のワイド文字版です。
-<code>PCU_FAILW</code>はマクロの可変長引数(<code>__VA_ARGS__</code>)が使用可能かつ、<code>PCU_NO_VSNPRINTF</code>と<code>PCU_NO_WCHAR</code>と<code>PCU_NO_LIBC</code>が未定義な場合に使用できます。
-<code>PCU_FAILT</code>は<code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_FAILW</code>に展開され、
-そうでない場合は<code>PCU_FAIL</code>に展開されます。</p>
-
-<h3><code>PCU_FAIL*_FATAL</code></h3>
-
-<ul>
-<li><strong><code>PCU_FAIL0_FATAL(format)</code></strong></li>
-<li><strong><code>PCU_FAIL1_FATAL(format, arg1)</code></strong></li>
-<li><strong><code>PCU_FAIL2_FATAL(format, arg1, arg2)</code></strong></li>
-<li><strong><code>PCU_FAIL3_FATAL(format, arg1, arg2, arg3)</code></strong></li>
-<li><strong><code>PCU_FAIL4_FATAL(format, arg1, arg2, arg3, arg4)</code></strong></li>
-<li><strong><code>PCU_FAIL5_FATAL(format, arg1, arg2, arg3, arg4, arg5)</code></strong></li>
-<li><strong><code>PCU_FAIL6_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6)</code></strong></li>
-<li><strong><code>PCU_FAIL7_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)</code></strong></li>
-<li><strong><code>PCU_FAIL8_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)</code></strong></li>
-<li><strong><code>PCU_FAIL9_FATAL(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)</code></strong></li>
-<li><strong><code>PCU_FAIL_FATAL(...)</code></strong></li>
-<li><strong><code>PCU_FAILW_FATAL(...)</code></strong></li>
-<li><strong><code>PCU_FAILT_FATAL(...)</code></strong></li>
-</ul>
-
-<p><code>PCU_FAIL*</code>マクロにはマクロ名の末尾に<code>_FATAL</code>が付いたバージョンがあります。
-<code>PCU_FAIL*_FATAL</code>マクロは常にlongjmpによりテスト関数から強制的に抜けます。
-例えばスタブ内から一気に抜けたい場合などに利用できます。
-なお、PCUnitが<code>PCU_NO_SETJMP</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p>
-
-<h3><code>PCU_FAIL*_RETURN</code></h3>
-
-<ul>
-<li><strong><code>PCU_FAIL0_RETURN(format)</code></strong></li>
-<li><strong><code>PCU_FAIL1_RETURN(format, arg1)</code></strong></li>
-<li><strong><code>PCU_FAIL2_RETURN(format, arg1, arg2)</code></strong></li>
-<li><strong><code>PCU_FAIL3_RETURN(format, arg1, arg2, arg3)</code></strong></li>
-<li><strong><code>PCU_FAIL4_RETURN(format, arg1, arg2, arg3, arg4)</code></strong></li>
-<li><strong><code>PCU_FAIL5_RETURN(format, arg1, arg2, arg3, arg4, arg5)</code></strong></li>
-<li><strong><code>PCU_FAIL6_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6)</code></strong></li>
-<li><strong><code>PCU_FAIL7_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)</code></strong></li>
-<li><strong><code>PCU_FAIL8_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)</code></strong></li>
-<li><strong><code>PCU_FAIL9_RETURN(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)</code></strong></li>
-<li><strong><code>PCU_FAIL_RETURN(...)</code></strong></li>
-<li><strong><code>PCU_FAILW_RETURN(...)</code></strong></li>
-<li><strong><code>PCU_FAILT_RETURN(...)</code></strong></li>
-</ul>
-
-<p><code>PCU_FAIL*</code>マクロにはマクロ名の末尾に<code>_RETURN</code>が付いたバージョンがあります。
-<code>PCU_FAIL*_RETURN</code>マクロは常にテスト関数からreturnします。
-returnなのでスタブ等のテスト関数内で呼び出される関数から一気に抜けることはできません。</p>
-
-<h3><code>PCU_MESSAGE*</code></h3>
-
-<ul>
-<li><strong><code>PCU_MESSAGE0(format)</code></strong></li>
-<li><strong><code>PCU_MESSAGE1(format, arg1)</code></strong></li>
-<li><strong><code>PCU_MESSAGE2(format, arg1, arg2)</code></strong></li>
-<li><strong><code>PCU_MESSAGE3(format, arg1, arg2, arg3)</code></strong></li>
-<li><strong><code>PCU_MESSAGE4(format, arg1, arg2, arg3, arg4)</code></strong></li>
-<li><strong><code>PCU_MESSAGE5(format, arg1, arg2, arg3, arg4, arg5)</code></strong></li>
-<li><strong><code>PCU_MESSAGE6(format, arg1, arg2, arg3, arg4, arg5, arg6)</code></strong></li>
-<li><strong><code>PCU_MESSAGE7(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7)</code></strong></li>
-<li><strong><code>PCU_MESSAGE8(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)</code></strong></li>
-<li><strong><code>PCU_MESSAGE9(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)</code></strong></li>
-<li><strong><code>PCU_MESSAGE(...)</code></strong></li>
-<li><strong><code>PCU_MESSAGEW(...)</code></strong></li>
-<li><strong><code>PCU_MESSAGET(...)</code></strong></li>
-</ul>
-
-<p><code>PCU_MESSAGE*</code>マクロは合否チェックを行わず、表示メッセージのみを登録します。
-表示メッセージをprintfと同じ形式でformatとarg[1-9]に指定します。
-arg[1-9]の個数によって使用するマクロを選択してください。
-<code>PCU_MESSAGE</code>はマクロの可変長引数(<code>__VA_ARGS__</code>)が使用可能かつ、<code>PCU_NO_VSNPRINTF</code>と<code>PCU_NO_LIBC</code>が未定義な場合に使用できます。
-<code>PCU_MESSAGEW</code>は<code>PCU_MESSAGE</code>のワイド文字版です。
-<code>PCU_MESSAGEW</code>はマクロの可変長引数(<code>__VA_ARGS__</code>)が使用可能かつ、<code>PCU_NO_VSNPRINTF</code>と<code>PCU_NO_WCHAR</code>と<code>PCU_NO_LIBC</code>が未定義な場合に使用できます。
-<code>PCU_MESSAGET</code>は<code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_MESSAGEW</code>に展開され、
-そうでない場合は<code>PCU_MESSAGE</code>に展開されます。</p>
 
 <h2>API</h2>
 
@@ -741,13 +597,13 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 <li><p><strong><code>void PCU_set_putchar(PCU_Putchar func)</code></strong></p>
 
 <p>1文字出力する関数を設定します。
-<code>PCU_Putchar</code>型はputcharと同じ<code>int(*)(int)</code>型のtypedefです。指定したfuncによって、テスト結果が出力されます。
-なお、<code>PCU_NO_*</code>マクロのいずれも定義されていない場合はデフォルトで<code>PCU_set_putchar(putchar)</code>の状態に設定されています。</p></li>
+<code>PCU_Putchar</code>型はputcharと同じ<code>int(*)(int)</code>型のtypedefです。
+<code>PCU_run</code>または<code>PCU_console_run</code>の前に必ず設定してください。</p></li>
 <li><p><strong><code>void PCU_set_getchar(PCU_Getchar func)</code></strong></p>
 
-<p><code>PCU_console_run</code>で使用する、入力した1文字を取得する関数を設定します。
-<code>PCU_Getchar</code>型はgetcharと同じ<code>int(*)(void)</code>型のtypedefです。指定したfuncによって、入力した文字を取得します。
-なお、<code>PCU_NO_*</code>マクロのいずれも定義されていない場合はデフォルトで<code>PCU_set_getchar(getchar)</code>の状態に設定されています。</p></li>
+<p>入力した1文字を取得する関数を設定します。
+<code>PCU_Getchar</code>型はgetcharと同じ<code>int(*)(void)</code>型のtypedefです。
+<code>PCU_console_run</code>の前に必ず設定してください。</p></li>
 <li><p><strong><code>void PCU_enable_color(void)</code></strong></p>
 
 <p>ターミナルがカラー表示に対応していれば、テスト結果のカラー表示を有効にします。</p></li>
@@ -775,11 +631,39 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 
 <p>例えば、データ駆動テストにおけるテストデータのテーブルから要素を取得するためのインデックスに利用できます。
 <code>PCU_Test</code>のntimesにはテストデータの要素数を指定してください。</p></li>
-<li><p><strong><code>int PCU_last_assertion(void)</code></strong></p>
+<li><p><strong><code>const char *PCU_format(const char *format, ...)</code></strong></p>
 
-<p><p>最後に呼び出したアサートマクロがパスしていれば真を返し、失敗していれば偽を返します。
-例えば、アサートマクロ失敗時に<code>PCU_MESSAGE</code>で追加メッセージを表示したい場合などに利用できます。</p></li>
-</ul></p>
+<p>引数に指定したprintf形式の文字列を静的領域に展開し、その領域のポインタを返します。
+<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージをprintf形式にしたい場合に利用できます。
+静的領域のサイズはPCUnitのビルド時に<code>PCU_MESSAGE_BUF_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は256です。</p>
+
+<p>例:</p>
+
+<ul>
+<li><code>PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_format("a:%s, b:%x, c:%d", a, b, c));</code></li>
+</ul>
+
+<p>なお、PCUnitが<code>PCU_NO_STDARG</code>マクロが定義済みでビルドされている場合は使用できません。
+<code>PCU_NO_STDARG</code>マクロが定義済みの場合は、代わりに<code>PCU_format0</code>～<code>PCU_format9</code>(0～9は引数<code>format</code>より後の引数の個数)を使用してください。</p></li>
+<li><p><strong><code>const char *PCU_formatW(const wchar_t *format, ...)</code></strong></p>
+
+<p>引数に指定したwprintf形式のワイド文字列をマルチバイト文字列に変換して静的領域に展開し、その領域のポインタを返します。
+<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージをwprintf形式にしたい場合に利用できます。
+静的領域のサイズはPCUnitのビルド時に<code>PCU_MESSAGE_BUF_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は256です。
+なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p>
+
+<p>例:</p>
+
+<ul>
+<li><code>PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_formatW(L"a:%s, b:%x, c:%d", a, b, c));</code></li>
+</ul></li>
+<li><p><strong><code>const char *PCU_formatT(const TCHAR *format, ...)</code></strong></p>
+
+<p><code>PCU_formatT</code>はマクロです。
+<code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_formatW</code>に展開され、
+そうでない場合は<code>PCU_format</code>に展開されます。
+また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_format</code>に展開されます。</p></li>
+</ul>
 
 <h2>ヘルパーマクロ</h2>
 
@@ -808,13 +692,14 @@ arg[1-9]の個数によって使用するマクロを選択してください。
 <p><code>pcunit_template.rb</code>はPCUnit用のソースファイルの雛形を生成するRubyスクリプトです。
 書式は次の通りです。</p>
 
-<pre><code>pcunit_template.rb suite_name1 [suite_name2 ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-o]
+<pre><code>pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-M [FILE]] [-o]
 </code></pre>
 
-<p>引数<code>suite_name*</code>に1つ以上のテストスイート名を指定すると、<code>テストスイート名.c</code>というファイルを生成します。
+<p><code>suite_name</code>に1つ以上のテストスイート名を指定すると、<code>テストスイート名.c</code>というファイルを生成します。
 生成されたファイルにはあらかじめ<code>テストスイート名_suite()</code>という名前のスイートメソッドや、
 setup関数・テスト関数等の雛形が定義されています。
-適宜このファイルを編集して使用してください。</p>
+適宜このファイルを編集して使用してください。
+また、main関数やMakefileの雛形を生成することもできます。</p>
 
 <h4>オプション</h4>
 
@@ -832,6 +717,11 @@ setup関数・テスト関数等の雛形が定義されています。
 <p><code>PCU_run</code>を呼び出すmain関数を定義したファイルを生成します。
 <code>FILE</code>にファイル名を指定してください。
 <code>FILE</code>を省略した場合、ファイル名は<code>main.c</code>(<code>-p</code>指定の場合は<code>main.cpp</code>)になります。</p></li>
+<li><p><code>-M [FILE]</code></p>
+
+<p>テストプロジェクトのMakefileの雛型を生成します。
+<code>FILE</code>にファイル名を指定してください。
+<code>FILE</code>を省略した場合、ファイル名は<code>Makefile</code>になります。</p></li>
 <li><p><code>-o</code></p>
 
 <p>生成するファイルと同じ名前のファイルが既に存在している場合でも上書きします。</p></li>

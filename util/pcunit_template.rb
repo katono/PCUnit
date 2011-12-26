@@ -15,6 +15,13 @@ opt.on('-m [VAL]') {|v|
 		OPTS[:m] = "main"
 	end
 }
+opt.on('-M [VAL]') {|v|
+	if v
+		OPTS[:M] = v
+	else
+		OPTS[:M] = "Makefile"
+	end
+}
 opt.on('-d VAL') {|v| OPTS[:d] = v + "/" }
 opt.on('-o') {|v| OPTS[:o] = v }
 opt.on('-p [VAL]') {|v|
@@ -26,10 +33,11 @@ opt.on('-p [VAL]') {|v|
 }
 opt.on('-h', '--help') {
 	print <<-"EOB"
-Usage: pcunit_template.rb suite_name1 [suite_name2 ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-o]
+Usage: pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-o]
     -d DIR     output directory
     -p [EXT]   C++ file extension (default: cpp)
     -m [FILE]  main file name (default: main.c or main.cpp)
+    -M [FILE]  Makefile name (default: Makefile)
     -o         overwrite flag
 
 	EOB
@@ -71,7 +79,7 @@ static int teardown(void)
 
 static void test_TODO(void)
 {
-	PCU_FAIL0("TODO");
+	PCU_FAIL("TODO");
 }
 
 
@@ -100,6 +108,7 @@ int main(void)
 	const PCU_SuiteMethod suites[] = {
 	};
 	PCU_set_putchar(putchar);
+	PCU_set_getchar(getchar);
 	PCU_enable_color();
 	PCU_run(suites, sizeof suites / sizeof suites[0]);
 	return 0;
@@ -108,15 +117,72 @@ int main(void)
 	EOB
 end
 
+def create_makefile(objs)
+	cc = OPTS[:p] == ".c" ? "gcc" : "g++"
+	ext = OPTS[:p]
+	file = File.open(OPTS[:d] + OPTS[:M], "w")
+	file.print <<-"EOB"
+INSTALLDIR = /usr/local
+
+CC = #{cc}
+CFLAGS = -Wall -g
+CFLAGS += -I$(INSTALLDIR)/include
+# CFLAGS += -DPCU_NO_LIBC
+# CFLAGS += -DPCU_NO_VSNPRINTF
+# CFLAGS += -DPCU_NO_MALLOC
+# CFLAGS += -DPCU_NO_SETJMP
+# CFLAGS += -DPCU_NO_WCHAR
+# CFLAGS += -DPCU_NO_FLOATINGPOINT
+# CFLAGS += -DPCU_NO_DIV32
+# CFLAGS += -DPCU_NO_STDARG
+
+LFLAGS = -L$(INSTALLDIR)/lib -lpcunit
+
+TARGET = alltests
+OBJS = main.o
+#{objs}
+
+.PHONY: all clean pcunit_register test
+
+all: pcunit_register $(TARGET) test
+
+pcunit_register:
+	ruby $(INSTALLDIR)/bin/pcunit_register.rb
+
+.SUFFIXES: #{ext} .o
+
+#{ext}.o:
+	$(CC) $(CFLAGS) -c $<
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
+
+test:
+	./$(TARGET)
+
+clean:
+	rm -f *.o $(TARGET)
+
+	EOB
+end
+
+makefile_objs = ""
 ARGV.each {|name|
 	if OPTS[:o] || !File.exist?(OPTS[:d] + name + OPTS[:p])
 		create_test(name)
 	end
+	makefile_objs += "OBJS += #{name}.o\n"
 }
 
 if OPTS[:m]
 	if OPTS[:o] || !File.exist?(OPTS[:d] + OPTS[:m])
 		create_alltests()
+	end
+end
+
+if OPTS[:M]
+	if OPTS[:o] || !File.exist?(OPTS[:d] + OPTS[:M])
+		create_makefile(makefile_objs)
 	end
 end
 

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "../PCUnit/PCUnit.h"
+#include "../../PCUnit/PCUnit.h"
 size_t PCU_strlen(const char *s);
 int PCU_strcmp(const char *s1, const char *s2);
 int PCU_strncmp(const char *s1, const char *s2, size_t len);

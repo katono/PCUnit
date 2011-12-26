@@ -6,13 +6,6 @@
 #define LIST_BEGIN(list)	(list)->next
 #define LIST_END(list)		(list)
 
-#ifndef PCU_MESSAGE_BUF_SIZE
-#define PCU_MESSAGE_BUF_SIZE	256
-#endif
-static size_t PCU_msg_buf_real[PCU_MESSAGE_BUF_SIZE / sizeof(size_t)];
-char * const PCU_msg_buf = (char *) PCU_msg_buf_real;
-const size_t PCU_msg_buf_size = sizeof PCU_msg_buf_real;
-
 static int enable_color;
 
 static PCU_Result result;
@@ -129,7 +122,7 @@ int PCU_get_not_flag(unsigned long type)
 
 #define PRINT_EXPECTED_ACTUAL_AUX(str, num, is_64bit_width)	\
 	do {\
-		PCU_PRINTF3("      " str " : 0x%0*llx (%lld)", \
+		PCU_PRINTF3("  " str " : 0x%0*llx (%lld)", \
 				(is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2, num, num);\
 		if (IS_ASCII(num)) {\
 			PCU_PRINTF1(" '%c'\n", (int) num);\
@@ -141,8 +134,8 @@ int PCU_get_not_flag(unsigned long type)
 #define PRINT_EXPECTED_ACTUAL_NO_DIV32(expected_str, actual_str)	\
 	do {\
 		if (pos->expected.num > 0xFFFF || pos->actual.num > 0xFFFF) {\
-			PCU_PRINTF2("      " expected_str " : 0x%0*x\n", sizeof(size_t) * 2, pos->expected.num);\
-			PCU_PRINTF2("      " actual_str   " : 0x%0*x\n", sizeof(size_t) * 2, pos->actual.num);\
+			PCU_PRINTF2("  " expected_str " : 0x%0*x\n", sizeof(size_t) * 2, pos->expected.num);\
+			PCU_PRINTF2("  " actual_str   " : 0x%0*x\n", sizeof(size_t) * 2, pos->actual.num);\
 		} else {\
 			PRINT_EXPECTED_ACTUAL_AUX(expected_str, pos->expected.num, 0);\
 			PRINT_EXPECTED_ACTUAL_AUX(actual_str  , pos->actual.num  , 0);\
@@ -161,24 +154,31 @@ static void print_failure(PCU_Test *test)
 {
 	PCU_TestFailure *pos;
 	PCU_TestFailure *list = &test->failure_list;
-	if (PCU_Test_is_failed(test)) {
-		PCU_PRINTF1("  Test: %s ... FAILED\n", test->name);
-	} else if (PCU_Test_contains_msg(test)) {
-		PCU_PRINTF1("  Test: %s\n", test->name);
+	if (PCU_Test_is_failed(test) || PCU_Test_contains_msg(test)) {
+		PCU_PRINTF0("\nTest: ");
+		PCU_PRINTF1("%s", test->name);
+		PCU_PRINTF0("\n");
 	}
 	for (pos = LIST_BEGIN(list); pos != LIST_END(list); pos = pos->next) {
 		unsigned long type;
 		type = PCU_get_assert_type(pos->type);
 		if (type == PCU_TYPE_SETUP) {
-			PCU_PRINTF1("    %s: ", test->name);
-		} else {
+			PCU_PRINTF0(" ");
+			PCU_PRINTF1("%s", test->name);
+			PCU_PRINTF0(": ");
+			PCU_PRINTF1("%s", pos->str_assert);
+			PCU_PRINTF0("\n");
+		} else if (type != PCU_TYPE_ADDMSG) {
+			PCU_PRINTF0(" ");
+			PCU_PRINTF1("%s", pos->file);
 #ifdef _MSC_VER
-			PCU_PRINTF2("    %s(%u) : ", pos->file, pos->line);
+			PCU_PRINTF1("(%u) : ", pos->line);
 #else
-			PCU_PRINTF2("    %s:%u: ", pos->file, pos->line);
+			PCU_PRINTF1(":%u: ", pos->line);
 #endif
+			PCU_PRINTF1("%s", pos->str_assert);
+			PCU_PRINTF0("\n");
 		}
-		PCU_PRINTF1("%s\n", pos->str_assert);
 		switch (type) {
 		case PCU_TYPE_NUM:
 #if (defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
@@ -197,21 +197,21 @@ static void print_failure(PCU_Test *test)
 			break;
 		case PCU_TYPE_PTR:
 			if (pos->expected.ptr) {
-				PCU_PRINTF1("      expected : %p\n", pos->expected.ptr);
+				PCU_PRINTF1("  expected : %p\n", pos->expected.ptr);
 			} else {
-				PCU_PRINTF0("      expected : NULL\n");
+				PCU_PRINTF0("  expected : NULL\n");
 			}
 			if (pos->actual.ptr) {
-				PCU_PRINTF1("      actual   : %p\n", pos->actual.ptr);
+				PCU_PRINTF1("  actual   : %p\n", pos->actual.ptr);
 			} else {
-				PCU_PRINTF0("      actual   : NULL\n");
+				PCU_PRINTF0("  actual   : NULL\n");
 			}
 			break;
 		case PCU_TYPE_PTR_NULL:
 			if (pos->actual.ptr) {
-				PCU_PRINTF1("      value    : %p\n", pos->actual.ptr);
+				PCU_PRINTF1("  value    : %p\n", pos->actual.ptr);
 			} else {
-				PCU_PRINTF0("      value    : NULL\n");
+				PCU_PRINTF0("  value    : NULL\n");
 			}
 			break;
 		case PCU_TYPE_STR:
@@ -222,51 +222,52 @@ static void print_failure(PCU_Test *test)
 #endif
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
 				if (pos->expected.str) {
-					PCU_PRINTF2("      expected : %s\"%s\"\n",
-							(type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "", pos->expected.str);
+					PCU_PRINTF1("  expected : %s\"", (type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "");
+					PCU_PRINTF1("%s", pos->expected.str);
+					PCU_PRINTF0("\"\n");
 				} else {
-					PCU_PRINTF0("      expected : NULL\n");
+					PCU_PRINTF0("  expected : NULL\n");
 				}
 				if (pos->actual.str) {
-					PCU_PRINTF2("      actual   : %s\"%s\"\n",
-							(type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "", pos->actual.str);
+					PCU_PRINTF1("  actual   : %s\"", (type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) ? "L" : "");
+					PCU_PRINTF1("%s", pos->actual.str);
+					PCU_PRINTF0("\"\n");
 				} else {
-					PCU_PRINTF0("      actual   : NULL\n");
+					PCU_PRINTF0("  actual   : NULL\n");
 				}
 			}
 			if (type == PCU_TYPE_NSTR || type == PCU_TYPE_NSTRW) {
-				PCU_PRINTF1("      length   : %d\n", PCU_get_nstr_len(pos->type));
+				PCU_PRINTF1("  length   : %d\n", PCU_get_nstr_len(pos->type));
 			}
 			break;
 #if !defined(PCU_NO_FLOATINGPOINT) && !defined(PCU_NO_VSNPRINTF) && !defined(PCU_NO_LIBC)
 		case PCU_TYPE_DBL:
-			PCU_PRINTF1("      expected : %g\n", pos->expected.dbl);
-			PCU_PRINTF1("      actual   : %g\n", pos->actual.dbl);
-			PCU_PRINTF1("      delta    : %g\n", pos->delta);
+			PCU_PRINTF1("  expected : %g\n", pos->expected.dbl);
+			PCU_PRINTF1("  actual   : %g\n", pos->actual.dbl);
+			PCU_PRINTF1("  delta    : %g\n", pos->delta);
 			break;
 		case PCU_TYPE_OP_DBL:
-			PCU_PRINTF1("      lhs      : %g\n", pos->expected.dbl);
-			PCU_PRINTF1("      rhs      : %g\n", pos->actual.dbl);
+			PCU_PRINTF1("  lhs      : %g\n", pos->expected.dbl);
+			PCU_PRINTF1("  rhs      : %g\n", pos->actual.dbl);
 			break;
 #endif
 		case PCU_TYPE_MSG:
+		case PCU_TYPE_ADDMSG:
 		case PCU_TYPE_FAIL:
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
-		case PCU_TYPE_MSGW:
-		case PCU_TYPE_FAILW:
-#endif
 			if (!PCU_TestFailure_str_malloc_is_failed(pos)) {
-				PCU_PRINTF1("      %s\n", pos->expected.str);
+				PCU_PRINTF0("  ");
+				PCU_PRINTF1("%s", pos->expected.str);
+				PCU_PRINTF0("\n");
 			}
 			break;
 		case PCU_TYPE_SETUP:
-			PCU_PRINTF1("      return   : 0x%x\n", (int) pos->actual.num);
+			PCU_PRINTF1("  return   : 0x%x\n", (int) pos->actual.num);
 			break;
 		default:
 			break;
 		}
-		if (PCU_Test_is_repeated_test(test)) {
-			PCU_PRINTF1("      repeat   : %d\n", pos->repeat);
+		if (PCU_Test_is_repeated_test(test) && type != PCU_TYPE_ADDMSG) {
+			PCU_PRINTF1("  repeat   : %d\n", pos->repeat);
 		}
 	}
 }
@@ -275,7 +276,9 @@ static void print_result(PCU_Suite *suite)
 {
 	int i;
 	PCU_Test *p;
-	PCU_PRINTF1("Suite: %s\n", suite->name);
+	PCU_PRINTF0("Suite: ");
+	PCU_PRINTF1("%s", suite->name);
+	PCU_PRINTF0("\n");
 	if (suite->initialize_error) {
 		set_color(COLOR_RED);
 		PCU_PRINTF1("INITIALIZE FAILED : 0x%x\n", suite->initialize_error);
@@ -334,7 +337,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_Suite_run(p);
 		PCU_Suite_get_result(p, &suite_result);
 		add_result();
-		PCU_PRINTF0("----\n");
+		PCU_PRINTF0("\n");
 		print_result(p);
 	}
 	reset(suite_methods, num);
@@ -356,12 +359,16 @@ static void print_result_selected(PCU_Suite *suite, int idx)
 	PCU_PRINTF0("\n");
 	if (PCU_Test_is_failed(test)) {
 		set_color(COLOR_RED);
-		PCU_PRINTF1("FAILED (%s)\n", test->name);
+		PCU_PRINTF0("FAILED (");
+		PCU_PRINTF1("%s", test->name);
+		PCU_PRINTF0(")\n");
 		reset_color();
 		PCU_PRINTF0("\n");
 	} else {
 		set_color(COLOR_GREEN);
-		PCU_PRINTF2("%s (%s)\n", PCU_Test_is_skipped(test) ? "Skipped" : "OK", test->name);
+		PCU_PRINTF1("%s (", PCU_Test_is_skipped(test) ? "Skipped" : "OK");
+		PCU_PRINTF1("%s", test->name);
+		PCU_PRINTF0(")\n");
 		reset_color();
 		PCU_PRINTF0("\n");
 	}
@@ -395,7 +402,9 @@ static void show_list_tests(const PCU_Test *tests, int num)
 	PCU_PRINTF0("List of Tests\n");
 	PCU_PRINTF0("  Number  Name\n");
 	for (i = 0, j = 1, p = tests; i < num; i++, j++, p++) {
-		PCU_PRINTF2("  %-6d  %s\n", j, p->name);
+		PCU_PRINTF1("  %-6d  ", j);
+		PCU_PRINTF1("%s", p->name);
+		PCU_PRINTF0("\n");
 	}
 	PCU_PRINTF0("\n");
 }
@@ -409,7 +418,9 @@ static void show_list_suites(const PCU_SuiteMethod *suite_methods, int num)
 	PCU_PRINTF0("  Number  Name\n");
 	for (i = 0, j = 1; i < num; i++, j++, method++) {
 		const PCU_Suite *p = (*method)();
-		PCU_PRINTF2("  %-6d  %s\n", j, p->name);
+		PCU_PRINTF1("  %-6d  ", j);
+		PCU_PRINTF1("%s", p->name);
+		PCU_PRINTF0("\n");
 	}
 	PCU_PRINTF0("\n");
 }
@@ -502,7 +513,9 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 
 	PCU_PRINTF0("\n");
 	while (1) {
-		PCU_PRINTF1("============== Suite: %s ==============\n", selected_suite->name);
+		PCU_PRINTF0("============== Suite: ");
+		PCU_PRINTF1("%s", selected_suite->name);
+		PCU_PRINTF0(" ==============\n");
 		PCU_PRINTF0("(R)un Suite, (S)elect Test, (L)ist of Tests, (M)ove up, (Q)uit\n");
 		PCU_PRINTF0("Enter Command: ");
 		get_line(input_buf, sizeof input_buf);

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../PCUnit/PCUnit.h"
+#include "../../PCUnit/PCUnit.h"
 long PCU_strtol(const char *s, char **endptr, int base);
 unsigned long PCU_strtoul(const char *s, char **endptr, int base);
 int PCU_atoi(const char *s);
