@@ -445,7 +445,8 @@ const char *PCU_format_aux4(const char *format, size_t arg1, size_t arg2, size_t
 	return PCU_msg_buf;
 }
 
-const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
+const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
+		size_t arg5)
 {
 	size_t arg_list[5];
 	arg_list[0] = arg1;
@@ -457,7 +458,8 @@ const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t
 	return PCU_msg_buf;
 }
 
-const char *PCU_format_aux6(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
+const char *PCU_format_aux6(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
+		size_t arg5, size_t arg6)
 {
 	size_t arg_list[6];
 	arg_list[0] = arg1;
@@ -470,7 +472,8 @@ const char *PCU_format_aux6(const char *format, size_t arg1, size_t arg2, size_t
 	return PCU_msg_buf;
 }
 
-const char *PCU_format_aux7(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7)
+const char *PCU_format_aux7(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
+		size_t arg5, size_t arg6, size_t arg7)
 {
 	size_t arg_list[7];
 	arg_list[0] = arg1;
@@ -484,7 +487,8 @@ const char *PCU_format_aux7(const char *format, size_t arg1, size_t arg2, size_t
 	return PCU_msg_buf;
 }
 
-const char *PCU_format_aux8(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8)
+const char *PCU_format_aux8(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
+		size_t arg5, size_t arg6, size_t arg7, size_t arg8)
 {
 	size_t arg_list[8];
 	arg_list[0] = arg1;
@@ -499,7 +503,8 @@ const char *PCU_format_aux8(const char *format, size_t arg1, size_t arg2, size_t
 	return PCU_msg_buf;
 }
 
-const char *PCU_format_aux9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
+const char *PCU_format_aux9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
+		size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
 {
 	size_t arg_list[9];
 	arg_list[0] = arg1;

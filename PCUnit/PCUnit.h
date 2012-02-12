@@ -48,18 +48,26 @@ typedef ptrdiff_t PCU_ssize_t;
 unsigned long PCU_get_assert_type(unsigned long type);
 size_t PCU_get_nstr_len(unsigned long type);
 int PCU_get_not_flag(unsigned long type);
-void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
-void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
-void PCU_assert_ptr_impl(const void *expected, const void *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
-void PCU_assert_str_impl(const char *expected, const char *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_ptr_impl(const void *expected, const void *actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_str_impl(const char *expected, const char *actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 #if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
-void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 #endif
 #ifndef PCU_NO_FLOATINGPOINT
-void PCU_assert_double_impl(double expected, double actual, double delta, unsigned long type, const char *str_assert, const char *file, unsigned int line);
-void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_double_impl(double expected, double actual, double delta, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 #endif
-void PCU_msg_impl(const char *msg, unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_msg_impl(const char *msg, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 
 void PCU_leave_test_func(void);
 int PCU_last_assertion(void);

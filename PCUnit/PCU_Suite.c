@@ -63,7 +63,8 @@ void PCU_Suite_run(PCU_Suite *self)
 		if (!PCU_Test_is_skipped(p)) {
 			self->result.num_tests_ran++;
 		}
-		if (test_result.num_asserts_failed > 0 || test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
+		if (test_result.num_asserts_failed > 0 || 
+				test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
 			self->result.num_tests_failed++;
 		}
 	}
@@ -94,7 +95,8 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 	if (!PCU_Test_is_skipped(&self->tests[idx])) {
 		self->result.num_tests_ran++;
 	}
-	if (test_result.num_asserts_failed > 0 || test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
+	if (test_result.num_asserts_failed > 0 || 
+			test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
 		self->result.num_tests_failed++;
 	}
 	self->cleanup_error = PCU_Suite_cleanup(self);
