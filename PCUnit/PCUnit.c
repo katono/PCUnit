@@ -3,8 +3,8 @@
 #include "PCU_Test.h"
 #include "PCU_Libc.h"
 
-#define LIST_BEGIN(list)	(list)->next
-#define LIST_END(list)		(list)
+#define LIST_BEGIN(list)	(list)->head
+#define LIST_END(list)		(0)
 
 static int enable_color;
 
@@ -153,7 +153,7 @@ int PCU_get_not_flag(unsigned long type)
 static void print_failure(PCU_Test *test)
 {
 	PCU_TestFailure *pos;
-	PCU_TestFailure *list = &test->failure_list;
+	PCU_TestFailureList *list = &test->failure_list;
 	if (PCU_Test_is_failed(test) || PCU_Test_contains_msg(test)) {
 		PCU_PRINTF0("\nTest: ");
 		PCU_PRINTF1("%s", test->name);

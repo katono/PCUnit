@@ -116,8 +116,12 @@ typedef struct PCU_TestFailure {
 	unsigned int line;
 	int repeat;
 	struct PCU_TestFailure *next;
-	struct PCU_TestFailure *prev;
 } PCU_TestFailure;
+
+typedef struct {
+	PCU_TestFailure *head;
+	PCU_TestFailure *tail;
+} PCU_TestFailureList;
 
 /* 
  * public
@@ -133,7 +137,7 @@ struct PCU_Test {
 	/* private */
 	const PCU_Suite *suite;
 	PCU_TestResult result;
-	PCU_TestFailure failure_list;
+	PCU_TestFailureList failure_list;
 };
 
 struct PCU_Suite {

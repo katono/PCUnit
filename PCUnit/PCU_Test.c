@@ -15,9 +15,9 @@ static PCU_TestFailure *PCU_TestFailure_new(PCU_size_t expected, PCU_size_t actu
 static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actual, double delta, unsigned long type, const char *str_assert, const char *file, unsigned int line, int repeat);
 #endif
 static void PCU_TestFailure_delete(PCU_TestFailure *self);
-static void list_push(PCU_TestFailure *list, PCU_TestFailure *node);
-static PCU_TestFailure *list_pop(PCU_TestFailure *list);
-#define LIST_EMPTY(list)	((list)->next == (list))
+static void list_push(PCU_TestFailureList *list, PCU_TestFailure *node);
+static PCU_TestFailure *list_pop(PCU_TestFailureList *list);
+#define LIST_EMPTY(list)	((list)->head == 0)
 
 static void PCU_Test_clear_result(PCU_Test *self)
 {
@@ -27,15 +27,10 @@ static void PCU_Test_clear_result(PCU_Test *self)
 void PCU_Test_reset(PCU_Test *self, const PCU_Suite *suite)
 {
 	self->suite = suite;
-	if (!self->failure_list.next) {
-		self->failure_list.next = &self->failure_list;
-		self->failure_list.prev = &self->failure_list;
-	} else {
-		PCU_TestFailure *list = &self->failure_list;
-		while (!LIST_EMPTY(list)) {
-			PCU_TestFailure *tmp = list_pop(list);
-			PCU_TestFailure_delete(tmp);
-		}
+	PCU_TestFailureList *list = &self->failure_list;
+	while (!LIST_EMPTY(list)) {
+		PCU_TestFailure *tmp = list_pop(list);
+		PCU_TestFailure_delete(tmp);
 	}
 	PCU_Test_clear_result(self);
 }
@@ -494,7 +489,7 @@ static PCU_TestFailure *PCU_TestFailure_new(PCU_size_t expected, PCU_size_t actu
 	self->file = file;
 	self->line = line;
 	self->repeat = repeat;
-	self->next = self->prev = 0;
+	self->next = 0;
 	return self;
 }
 
@@ -530,7 +525,7 @@ static PCU_TestFailure *PCU_TestFailure_new_double(double expected, double actua
 	self->file = file;
 	self->line = line;
 	self->repeat = repeat;
-	self->next = self->prev = 0;
+	self->next = 0;
 	return self;
 }
 #endif
@@ -567,20 +562,25 @@ int PCU_TestFailure_str_malloc_is_failed(PCU_TestFailure *self)
 	return self->actual.num == (PCU_size_t) -1;
 }
 
-static void list_push(PCU_TestFailure *list, PCU_TestFailure *node)
+static void list_push(PCU_TestFailureList *list, PCU_TestFailure *node)
 {
-	node->prev = list->prev;
-	node->next = list;
-	list->prev->next = node;
-	list->prev = node;
+	node->next = 0;
+	if (LIST_EMPTY(list)) {
+		list->head = node;
+		list->tail = node;
+	} else {
+		list->tail->next = node;
+		list->tail = node;
+	}
 }
 
-static PCU_TestFailure *list_pop(PCU_TestFailure *list)
+static PCU_TestFailure *list_pop(PCU_TestFailureList *list)
 {
-	PCU_TestFailure *node;
-	node = list->next;
-	node->prev->next = node->next;
-	node->next->prev = node->prev;
+	PCU_TestFailure *node = list->head;
+	list->head = list->head->next;
+	if (list->head == 0) {
+		list->tail = 0;
+	}
 	return node;
 }
 
