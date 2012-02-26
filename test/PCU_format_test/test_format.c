@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "../../PCUnit/PCUnit.h"
 #undef PCU_MESSAGE_BUF_SIZE
@@ -34,6 +35,10 @@ void test_format(void)
 	bufp = PCU_format_test(         "%hd, %ld, %ld, \"%8ld\"", 9999, 0L, -1L, -1234L);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
+	snprintf(sp_buf, sizeof sp_buf, "%lld, %lld, %lld, \"%8lld\"", 9999LL, 0LL, -1LL, -1234LL);
+	bufp = PCU_format_test(         "%lld, %lld, %lld, \"%8lld\"", 9999LL, 0LL, -1LL, -1234LL);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
 	snprintf(sp_buf, sizeof sp_buf, "%u, %u, %-d, \"%-8d\"", 12345, 0, -123, -111);
 	bufp = PCU_format_test(         "%u, %u, %-d, \"%-8d\"", 12345, 0, -123, -111);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
@@ -60,6 +65,14 @@ void test_format(void)
 
 	snprintf(sp_buf, sizeof sp_buf, "%x, \"%8x\", \"%-8X\", \"%-10d\"", 0x0, 0x5678, 0xABCD, 12345);
 	bufp = PCU_format_test(         "%x, \"%8x\", \"%-8X\", \"%-10d\"", 0x0, 0x5678, 0xABCD, 12345);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%lx, \"%8lx\", \"%-8lX\", \"%-10lx\"", 0x0L, 0x5678L, 0xABCDL, ULONG_MAX);
+	bufp = PCU_format_test(         "%lx, \"%8lx\", \"%-8lX\", \"%-10lx\"", 0x0L, 0x5678L, 0xABCDL, ULONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%llx, \"%8llx\", \"%-8llX\", \"%-10llx\"", 0x0LL, 0x5678LL, 0xABCDLL, ULLONG_MAX);
+	bufp = PCU_format_test(         "%llx, \"%8llx\", \"%-8llX\", \"%-10llx\"", 0x0LL, 0x5678LL, 0xABCDLL, ULLONG_MAX);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
 	snprintf(sp_buf, sizeof sp_buf, "%+d, \"%+8d\", \"%-+8d\", \"%+010d\"", 0, 0, -123, -1);
@@ -97,6 +110,26 @@ void test_format(void)
 	bufp = PCU_format_test(         "%p, %p, %p, %p", 1, bufp, sp_buf, 1);
 	PCU_MESSAGE(sp_buf);
 	PCU_MESSAGE(bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %d, %d, %u", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN, UCHAR_MAX, UCHAR_MAX);
+	bufp = PCU_format_test(         "%d, %d, %d, %d, %d, %u", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN, UCHAR_MAX, UCHAR_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	bufp = PCU_format_test(         "%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	bufp = PCU_format_test(         "%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	bufp = PCU_format_test(         "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
+	bufp = PCU_format_test(         "%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
 }
 

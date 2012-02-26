@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <locale.h>
 
 #include "../../PCUnit/PCUnit.h"
@@ -105,6 +106,26 @@ void test_formatW(void)
 
 	snprintf(sp_buf, sizeof sp_buf,  "あいうえお%s",   "かきくけこ");
 	bufp = PCU_formatW(             L"あいうえお%ls", L"かきくけこ");
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %d, %d, %u", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN, UCHAR_MAX, UCHAR_MAX);
+	bufp = PCU_formatW(            L"%d, %d, %d, %d, %d, %u", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN, UCHAR_MAX, UCHAR_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	bufp = PCU_formatW(            L"%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	bufp = PCU_formatW(            L"%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	bufp = PCU_formatW(            L"%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
+	bufp = PCU_formatW(            L"%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
 }

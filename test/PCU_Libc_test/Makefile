@@ -14,6 +14,7 @@ all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
+	cd ../../PCUnit && $(MAKE)
 
 
 PCU_LIBC_DEFINE = -DPCU_NO_LIBC -DPCU_NO_STDARG
@@ -33,7 +34,6 @@ PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 
 
 $(TARGET): $(OBJS)
-	cd ../../PCUnit && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	./$(TARGET)
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "../../PCUnit/PCUnit.h"
 #undef PCU_MESSAGE_BUF_SIZE
@@ -101,6 +102,27 @@ void test_format(void)
 	bufp = PCU_format4(             "%p, %p, %p, %p", 1, bufp, sp_buf, 1);
 	PCU_MESSAGE(sp_buf);
 	PCU_MESSAGE(bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %d", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN);
+	bufp = PCU_format4(             "%d, %d, %d, %d", CHAR_MAX, CHAR_MIN, SCHAR_MAX, SCHAR_MIN);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %u, %d, %d", UCHAR_MAX, UCHAR_MAX, 0, 0);
+	bufp = PCU_format4(             "%d, %u, %d, %d", UCHAR_MAX, UCHAR_MAX, 0, 0);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	bufp = PCU_format4(             "%d, %d, %d, %u", SHRT_MAX, SHRT_MIN, USHRT_MAX, USHRT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	bufp = PCU_format4(             "%d, %d, %d, %u", INT_MAX, INT_MIN, UINT_MAX, UINT_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
+	snprintf(sp_buf, sizeof sp_buf, "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	bufp = PCU_format4(             "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
+
 
 }
 

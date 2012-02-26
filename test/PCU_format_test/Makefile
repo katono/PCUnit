@@ -14,7 +14,7 @@ all: pcunit_register $(TARGET)
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
-	cd ../../PCUnit && $(MAKE) CFLAGS=-DPCU_MESSAGE_BUF_SIZE=256
+	cd ../../PCUnit && $(MAKE) CFLAGS="-g -DPCU_MESSAGE_BUF_SIZE=256"
 
 
 PCU_LIBC_DEFINE = -DPCU_NO_VSPRINTF

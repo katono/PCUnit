@@ -44,6 +44,7 @@ void PCU_puts(const char *str)
 #if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)
 
 #include <stddef.h>
+#include <limits.h>
 
 /* 
  * flags:
@@ -181,9 +182,19 @@ end:
 #ifdef PCU_NO_DIV32
 typedef unsigned int PCU_udec_t;
 typedef int PCU_dec_t;
+#define MIN_DEC		INT_MIN
 #else
 typedef PCU_size_t PCU_udec_t;
 typedef PCU_ssize_t PCU_dec_t;
+#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_STDARG)
+#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
+#define MIN_DEC		_I64_MIN
+#else
+#define MIN_DEC		LLONG_MIN
+#endif
+#else
+#define MIN_DEC		LONG_MIN
+#endif
 #endif
 static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long flags)
 {
@@ -197,7 +208,7 @@ static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long 
 		if (IS_SET_PLUS_FLAG(flags) || IS_SET_SPACE_FLAG(flags)) {
 			tmp[i++] = IS_SET_PLUS_FLAG(flags) ? '+' : ' ';
 		}
-	} else if (IS_SET_SIGNED_FLAG(flags) && signed_dec < 0) {
+	} else if (IS_SET_SIGNED_FLAG(flags) && signed_dec < 0 && signed_dec != MIN_DEC) {
 		signed_dec = -signed_dec;
 		for (i = 0; signed_dec > 0 && i < TMP_SIZE - 1; i++) {
 			tmp[i] = num_str[signed_dec % 10];
@@ -209,7 +220,9 @@ static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long 
 			tmp[i] = num_str[dec % 10];
 			dec /= 10;
 		}
-		if (IS_SET_PLUS_FLAG(flags) || IS_SET_SPACE_FLAG(flags)) {
+		if (signed_dec == MIN_DEC) {
+			tmp[i++] = '-';
+		} else if (IS_SET_PLUS_FLAG(flags) || IS_SET_SPACE_FLAG(flags)) {
 			tmp[i++] = IS_SET_PLUS_FLAG(flags) ? '+' : ' ';
 		}
 	}
@@ -383,6 +396,8 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 #endif
 			if (*p != 'u') {
 				SET_SIGNED_FLAG(flags);
+			} else if (long_flag != 2) {
+				tmp_val &= ((size_t) -1);
 			}
 			inc = dec2ascii(&buf[i], buf_size - 1 - i, (PCU_udec_t) tmp_val, flags);
 			i += inc;
