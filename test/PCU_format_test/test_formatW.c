@@ -4,6 +4,8 @@
 #include <locale.h>
 
 #include "../../PCUnit/PCUnit.h"
+#undef PCU_MESSAGE_BUF_SIZE
+#define PCU_MESSAGE_BUF_SIZE	256
 
 static int initialize(void)
 {
@@ -152,8 +154,6 @@ void test_formatW_shorten(void)
 #define LSTR_S	LSTR L"f123456789abcd%s"
 #define LSTR_D	LSTR L"f123456789abcd%d"
 #define LSTR_X	LSTR L"f123456789abcd%x"
-
-	PCU_ASSERT_EQUAL(256, PCU_MESSAGE_BUF_SIZE);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_0);
 	bufp = PCU_formatW(LSTR_0);

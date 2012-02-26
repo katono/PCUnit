@@ -4,25 +4,11 @@
 #include <time.h>
 
 #include "../../PCUnit/PCUnit.h"
-size_t PCU_strlen(const char *s);
 int PCU_strcmp(const char *s1, const char *s2);
 int PCU_strncmp(const char *s1, const char *s2, size_t len);
-char *PCU_strcpy(char *dst, const char *src);
-char *PCU_strncpy(char *dst, const char *src, size_t len);
 void *PCU_memset(void *b, int c, size_t len);
 void *PCU_memcpy(void *dst, const void *src, size_t len);
 
-
-void test_strlen(void)
-{
-	const char *s;
-
-	s = "hoge";
-	PCU_ASSERT_EQUAL(strlen(s), PCU_strlen(s));
-
-	s = "";
-	PCU_ASSERT_EQUAL(strlen(s), PCU_strlen(s));
-}
 
 void test_strcmp(void)
 {
@@ -100,63 +86,6 @@ void test_strncmp(void)
 		s1 = "";
 		s2 = "hoge";
 		ASSERT_STRNCMP(s1, s2, i);
-	}
-}
-
-void test_strcpy(void)
-{
-	char std_buf[32];
-	char pcu_buf[32];
-	const char *std_p;
-	const char *pcu_p;
-	const char *s;
-
-	s = "hoge";
-	memset(std_buf, 0xFF, sizeof(std_buf));
-	memset(pcu_buf, 0xFF, sizeof(pcu_buf));
-	std_p = strcpy(std_buf, s);
-	pcu_p = PCU_strcpy(pcu_buf, s);
-	PCU_ASSERT_STRING_EQUAL(std_p, pcu_p);
-	PCU_ASSERT_STRING_EQUAL(std_buf, pcu_buf);
-	PCU_ASSERT_PTR_EQUAL(pcu_buf, pcu_p);
-
-	s = "";
-	memset(std_buf, 0xFF, sizeof(std_buf));
-	memset(pcu_buf, 0xFF, sizeof(pcu_buf));
-	std_p = strcpy(std_buf, s);
-	pcu_p = PCU_strcpy(pcu_buf, s);
-	PCU_ASSERT_STRING_EQUAL(std_p, pcu_p);
-	PCU_ASSERT_STRING_EQUAL(std_buf, pcu_buf);
-	PCU_ASSERT_PTR_EQUAL(pcu_buf, pcu_p);
-}
-
-void test_strncpy(void)
-{
-	size_t i;
-	char std_buf[32];
-	char pcu_buf[32];
-	const char *std_p;
-	const char *pcu_p;
-	const char *s;
-
-	for (i = 0; i < 10; i++) {
-		s = "hoge";
-		memset(std_buf, 0xFF, sizeof(std_buf));
-		memset(pcu_buf, 0xFF, sizeof(pcu_buf));
-		std_p = strncpy(std_buf, s, i);
-		pcu_p = PCU_strncpy(pcu_buf, s, i);
-		PCU_ASSERT_NSTRING_EQUAL(std_p, pcu_p, i);
-		PCU_ASSERT_NSTRING_EQUAL(std_buf, pcu_buf, i);
-		PCU_ASSERT_PTR_EQUAL(pcu_buf, pcu_p);
-
-		s = "";
-		memset(std_buf, 0xFF, sizeof(std_buf));
-		memset(pcu_buf, 0xFF, sizeof(pcu_buf));
-		std_p = strncpy(std_buf, s, i);
-		pcu_p = PCU_strncpy(pcu_buf, s, i);
-		PCU_ASSERT_NSTRING_EQUAL(std_p, pcu_p, i);
-		PCU_ASSERT_NSTRING_EQUAL(std_buf, pcu_buf, i);
-		PCU_ASSERT_PTR_EQUAL(pcu_buf, pcu_p);
 	}
 }
 
@@ -241,11 +170,8 @@ void test_memcpy(void)
 PCU_Suite *StringTest_suite(void)
 {
 	static PCU_Test tests[] = {
-		{ "test_strlen", test_strlen },
 		{ "test_strcmp", test_strcmp },
 		{ "test_strncmp", test_strncmp },
-		{ "test_strcpy", test_strcpy },
-		{ "test_strncpy", test_strncpy },
 		{ "test_memset", test_memset },
 		{ "test_memcpy", test_memcpy },
 	};

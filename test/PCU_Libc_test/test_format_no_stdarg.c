@@ -3,10 +3,13 @@
 #include <string.h>
 
 #include "../../PCUnit/PCUnit.h"
-#define PCU_format4(f, a1, a2, a3, a4)                     PCU_format_aux4(f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
-#define PCU_format5(f, a1, a2, a3, a4, a5)                 PCU_format_aux5(f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
-const char *PCU_format_aux4(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
-const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
+#undef PCU_MESSAGE_BUF_SIZE
+#define PCU_MESSAGE_BUF_SIZE	256
+extern char PCU_msg_buf[];
+#define PCU_format4(f, a1, a2, a3, a4)     PCU_format_aux4(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
+#define PCU_format5(f, a1, a2, a3, a4, a5) PCU_format_aux5(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
+const char *PCU_format_aux4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
+const char *PCU_format_aux5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
 
 
 void test_format(void)

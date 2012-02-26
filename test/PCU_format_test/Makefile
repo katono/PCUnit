@@ -13,15 +13,18 @@ all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
+	cd ../../PCUnit && $(MAKE) clean
+	cd ../../PCUnit && $(MAKE) CFLAGS=-DPCU_MESSAGE_BUF_SIZE=256
 
 
-PCU_LIBC_DEFINE = -DPCU_NO_VSNPRINTF
+PCU_LIBC_DEFINE = -DPCU_NO_VSPRINTF
 PCU_LIBC_DEFINE += -DPCU_set_putchar=PCU_set_putchar_dummy
 PCU_LIBC_DEFINE += -DPCU_set_getchar=PCU_set_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_getchar=PCU_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_puts=PCU_puts_dummy
 PCU_LIBC_DEFINE += -DPCU_printf=PCU_printf_dummy
 PCU_LIBC_DEFINE += -DPCU_format=PCU_format_test
+PCU_LIBC_DEFINE += -DPCU_formatW=PCU_formatW_dummy
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 	$(CC) $(CFLAGS) $(PCU_LIBC_DEFINE) -c $<
@@ -34,12 +37,13 @@ PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 
 
 $(TARGET): $(OBJS)
-	cd ../../PCUnit && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	./$(TARGET)
+	cd ../../PCUnit && $(MAKE) clean
 
 test:
 	./$(TARGET)
+	cd ../../PCUnit && $(MAKE) clean
 
 
 .PHONY: clean

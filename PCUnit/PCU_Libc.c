@@ -6,6 +6,7 @@
 #include "PCUnit.h"
 
 char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
+char PCU_printf_buf[64];
 
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
@@ -40,7 +41,7 @@ void PCU_puts(const char *str)
 	}
 }
 
-#if defined(PCU_NO_VSNPRINTF) || defined(PCU_NO_LIBC)
+#if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)
 
 /* 
  * flags:
@@ -179,6 +180,7 @@ end:
 typedef unsigned int PCU_udec_t;
 typedef int PCU_dec_t;
 #else
+#include <stddef.h>
 typedef size_t PCU_udec_t;
 typedef ptrdiff_t PCU_dec_t;
 #endif
@@ -399,54 +401,58 @@ end:
 
 #ifdef PCU_NO_STDARG
 
-const char *PCU_format_aux0(const char *format)
+const char *PCU_format_aux0(char *buf, size_t size, const char *format)
 {
 	size_t arg_list[1];
 	arg_list[0] = 0;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux1(const char *format, size_t arg1)
+const char *PCU_format_aux1(char *buf, size_t size, const char *format, 
+		size_t arg1)
 {
 	size_t arg_list[1];
 	arg_list[0] = arg1;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux2(const char *format, size_t arg1, size_t arg2)
+const char *PCU_format_aux2(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2)
 {
 	size_t arg_list[2];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux3(const char *format, size_t arg1, size_t arg2, size_t arg3)
+const char *PCU_format_aux3(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3)
 {
 	size_t arg_list[3];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux4(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4)
+const char *PCU_format_aux4(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4)
 {
 	size_t arg_list[4];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
-		size_t arg5)
+const char *PCU_format_aux5(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
 {
 	size_t arg_list[5];
 	arg_list[0] = arg1;
@@ -454,12 +460,12 @@ const char *PCU_format_aux5(const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux6(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
-		size_t arg5, size_t arg6)
+const char *PCU_format_aux6(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
 {
 	size_t arg_list[6];
 	arg_list[0] = arg1;
@@ -468,12 +474,13 @@ const char *PCU_format_aux6(const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux7(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
-		size_t arg5, size_t arg6, size_t arg7)
+const char *PCU_format_aux7(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
+		size_t arg7)
 {
 	size_t arg_list[7];
 	arg_list[0] = arg1;
@@ -483,12 +490,13 @@ const char *PCU_format_aux7(const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux8(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
-		size_t arg5, size_t arg6, size_t arg7, size_t arg8)
+const char *PCU_format_aux8(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
+		size_t arg7, size_t arg8)
 {
 	size_t arg_list[8];
 	arg_list[0] = arg1;
@@ -499,12 +507,13 @@ const char *PCU_format_aux8(const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
-const char *PCU_format_aux9(const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, 
-		size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9)
+const char *PCU_format_aux9(char *buf, size_t size, const char *format, 
+		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
+		size_t arg7, size_t arg8, size_t arg9)
 {
 	size_t arg_list[9];
 	arg_list[0] = arg1;
@@ -516,28 +525,25 @@ const char *PCU_format_aux9(const char *format, size_t arg1, size_t arg2, size_t
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
 	arg_list[8] = arg9;
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, arg_list);
-	return PCU_msg_buf;
+	PCU_vsnprintf(buf, size, format, arg_list);
+	return buf;
 }
 
 #else
 
-#ifdef PCU_NO_VSNPRINTF
-#define PCU_VSNPRINTF	PCU_vsnprintf
-#else
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
 #include <stdio.h>
-#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-#define PCU_VSNPRINTF	_vsnprintf
-#else
-#define PCU_VSNPRINTF	vsnprintf
-#endif
 #endif
 
 const char *PCU_format(const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	PCU_VSNPRINTF(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
+	vsprintf(PCU_msg_buf, format, ap);
+#else
+	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+#endif
 	va_end(ap);
 	return PCU_msg_buf;
 }
@@ -546,81 +552,36 @@ void PCU_printf(const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	PCU_VSNPRINTF(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
+	vsprintf(PCU_printf_buf, format, ap);
+#else
+	PCU_vsnprintf(PCU_printf_buf, sizeof PCU_printf_buf, format, ap);
+#endif
 	va_end(ap);
-	PCU_puts(PCU_msg_buf);
+	PCU_puts(PCU_printf_buf);
+}
+
+#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+
+const char *PCU_formatW(const wchar_t *format, ...)
+{
+	wchar_t PCU_msgw_buf[PCU_MESSAGE_BUF_SIZE];
+	va_list ap;
+	va_start(ap, format);
+#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
+	_vsnwprintf(PCU_msgw_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+#else
+	vswprintf(PCU_msgw_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+#endif
+	va_end(ap);
+	return PCU_format("%ls", PCU_msgw_buf);
 }
 
 #endif
-
-#if defined(PCU_NO_MALLOC) || defined(PCU_NO_LIBC)
-
-#ifndef PCU_MAX_FAILURES
-#define PCU_MAX_FAILURES	64
 #endif
 
-#ifndef PCU_STRING_POOL_SIZE
-#define PCU_STRING_POOL_SIZE	4096
-#endif
-
-/* 
- * malloc for PCU_TestFailure
- */
-static PCU_TestFailure failure_pool[PCU_MAX_FAILURES];
-
-void *PCU_malloc(size_t size)
-{
-	PCU_TestFailure *p = failure_pool;
-	const PCU_TestFailure * const end = &failure_pool[PCU_MAX_FAILURES];
-	(void) size;
-	for (; p != end; p++) {
-		/* p->str_assert is used as used_flag */
-		if (p->str_assert == 0) {
-			return p;
-		}
-	}
-	return 0;
-}
-
-void PCU_free(void *ptr)
-{
-	if (!ptr) return;
-	((PCU_TestFailure *) ptr)->str_assert = 0;
-}
-
-/* 
- * malloc for string
- */
-static char str_pool[(PCU_STRING_POOL_SIZE > 0) ? PCU_STRING_POOL_SIZE : 1];
-static char *str_pool_next_ptr = str_pool;
-
-char *PCU_str_malloc(size_t size)
-{
-	char *p = str_pool_next_ptr;
-	const char * const end = &str_pool[(PCU_STRING_POOL_SIZE > 0) ? PCU_STRING_POOL_SIZE : 0];
-	if (str_pool_next_ptr + size > end) {
-		return 0;
-	}
-	str_pool_next_ptr += size;
-	return p;
-}
-
-void PCU_str_free(char *ptr)
-{
-	(void) ptr;
-	str_pool_next_ptr = str_pool;
-}
-
-#endif
 
 #ifdef PCU_NO_LIBC
-
-size_t PCU_strlen(const char *s)
-{
-	size_t i = 0;
-	for (; *s; i++, s++) ;
-	return i;
-}
 
 int PCU_strcmp(const char *s1, const char *s2)
 {
@@ -645,28 +606,6 @@ int PCU_strncmp(const char *s1, const char *s2, size_t len)
 		len--;
 	}
 	return 0;
-}
-
-char *PCU_strcpy(char *dst, const char *src)
-{
-	char *d = dst;
-	while (*src) {
-		*(d++) = *(src++);
-	}
-	*d = '\0';
-	return dst;
-}
-
-char *PCU_strncpy(char *dst, const char *src, size_t len)
-{
-	size_t i;
-	for (i = 0; i < len && src[i] != '\0'; i++) {
-		dst[i] = src[i];
-	}
-	for (; i < len; i++) {
-		dst[i] = '\0';
-	}
-	return dst;
 }
 
 void *PCU_memset(void *b, int c, size_t len)

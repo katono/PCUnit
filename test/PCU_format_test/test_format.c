@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "../../PCUnit/PCUnit.h"
+#undef PCU_MESSAGE_BUF_SIZE
+#define PCU_MESSAGE_BUF_SIZE	256
 const char *PCU_format_test(const char *format, ...);
 
 
@@ -122,8 +124,6 @@ void test_format_shorten(void)
 #define STR_S	STR "f123456789abcd%s"
 #define STR_D	STR "f123456789abcd%d"
 #define STR_X	STR "f123456789abcd%x"
-
-	PCU_ASSERT_EQUAL(256, PCU_MESSAGE_BUF_SIZE);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_0);
 	bufp = PCU_format_test(STR_0);
