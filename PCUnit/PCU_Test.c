@@ -339,7 +339,7 @@ static void print_repeat(unsigned long type, int repeat)
 
 #define IS_ASCII(c)		(' ' == 0x20 && 0x20 <= (c) && (c) <= 0x7e)
 
-#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
+#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_STDARG)
 #if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
 #define LX_LD	" : 0x%0*I64x (%I64d)"
 #else

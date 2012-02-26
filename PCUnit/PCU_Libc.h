@@ -5,6 +5,20 @@
 extern "C" {
 #endif
 
+#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_STDARG)
+#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
+typedef unsigned _int64 PCU_size_t;
+typedef _int64 PCU_ssize_t;
+#else
+typedef unsigned long long PCU_size_t;
+typedef long long PCU_ssize_t;
+#endif
+#else
+#include <stddef.h>
+typedef size_t PCU_size_t;
+typedef ptrdiff_t PCU_ssize_t;
+#endif
+
 #ifndef PCU_MESSAGE_BUF_SIZE
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_MESSAGE_BUF_SIZE	512

@@ -13,20 +13,6 @@ extern "C" {
  * private
  */
 
-#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-typedef unsigned _int64 PCU_size_t;
-typedef _int64 PCU_ssize_t;
-#else
-typedef unsigned long long PCU_size_t;
-typedef long long PCU_ssize_t;
-#endif
-#else
-#include <stddef.h>
-typedef size_t PCU_size_t;
-typedef ptrdiff_t PCU_ssize_t;
-#endif
-
 #define PCU_TYPE_NONE      0x00000000
 #define PCU_TYPE_BOOL      0x00000001
 #define PCU_TYPE_NUM       0x00000002

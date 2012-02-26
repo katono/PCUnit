@@ -43,6 +43,8 @@ void PCU_puts(const char *str)
 
 #if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)
 
+#include <stddef.h>
+
 /* 
  * flags:
  *
@@ -180,9 +182,8 @@ end:
 typedef unsigned int PCU_udec_t;
 typedef int PCU_dec_t;
 #else
-#include <stddef.h>
-typedef size_t PCU_udec_t;
-typedef ptrdiff_t PCU_dec_t;
+typedef PCU_size_t PCU_udec_t;
+typedef PCU_ssize_t PCU_dec_t;
 #endif
 static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long flags)
 {
@@ -215,7 +216,7 @@ static int dec2ascii(char *ascii, int ascii_size, PCU_udec_t dec, unsigned long 
 	return set_ascii(ascii, ascii_size, tmp, i, flags);
 }
 
-static int hex2ascii(char *ascii, int ascii_size, size_t hex, unsigned long flags)
+static int hex2ascii(char *ascii, int ascii_size, PCU_size_t hex, unsigned long flags)
 {
 	int i;
 	char tmp[TMP_SIZE];
@@ -237,7 +238,7 @@ static int hex2ascii(char *ascii, int ascii_size, size_t hex, unsigned long flag
 }
 
 #ifdef PCU_NO_STDARG
-static int PCU_vsnprintf(char *buf, size_t size, const char *format, size_t *arg_list)
+static int PCU_vsnprintf(char *buf, size_t size, const char *format, PCU_size_t *arg_list)
 #else
 static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg_list)
 #endif
@@ -248,7 +249,7 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 	size_t arg_idx = 0;
 #endif
 	const char *tmp_str;
-	size_t tmp_val;
+	PCU_size_t tmp_val;
 	unsigned long flags = 0;
 	int inc;
 	const int buf_size = (int) size;
@@ -326,8 +327,27 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 			p++;
 			if (*p == 'l') {
 				p++;
+				long_flag = 2;
 			}
 		}
+#ifdef _MSC_VER
+		else if (*p == 'I') {
+			long_flag = 1;
+			p++;
+			if (*p == '6') {
+				p++;
+				if (*p == '4') {
+					p++;
+					long_flag = 2;
+				}
+			} else if (*p == '3') {
+				p++;
+				if (*p == '2') {
+					p++;
+				}
+			}
+		}
+#endif
 		switch (*p) {
 		case 'c':
 #ifdef PCU_NO_STDARG
@@ -344,7 +364,22 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 #ifdef PCU_NO_STDARG
 			tmp_val = arg_list[arg_idx++];
 #else
-			tmp_val = long_flag ? va_arg(arg_list, size_t) : (size_t) va_arg(arg_list, int);
+			switch (long_flag) {
+			case 1:
+				tmp_val = va_arg(arg_list, ptrdiff_t);
+				break;
+			case 2:
+#ifdef PCU_NO_LONGLONG
+				tmp_val = va_arg(arg_list, ptrdiff_t);
+#else
+				tmp_val = va_arg(arg_list, long long);
+#endif
+				break;
+			case 0:
+			default:
+				tmp_val = va_arg(arg_list, int);
+				break;
+			}
 #endif
 			if (*p != 'u') {
 				SET_SIGNED_FLAG(flags);
@@ -365,7 +400,22 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 #ifdef PCU_NO_STDARG
 			tmp_val = arg_list[arg_idx++];
 #else
-			tmp_val = long_flag ? va_arg(arg_list, size_t) : (size_t) va_arg(arg_list, int);
+			switch (long_flag) {
+			case 1:
+				tmp_val = va_arg(arg_list, size_t);
+				break;
+			case 2:
+#ifdef PCU_NO_LONGLONG
+				tmp_val = va_arg(arg_list, size_t);
+#else
+				tmp_val = va_arg(arg_list, unsigned long long);
+#endif
+				break;
+			case 0:
+			default:
+				tmp_val = va_arg(arg_list, unsigned int);
+				break;
+			}
 #endif
 			if (*p == 'X') {
 				SET_LARGEX_FLAG(flags);
