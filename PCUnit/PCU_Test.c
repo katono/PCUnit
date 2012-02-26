@@ -351,9 +351,10 @@ static void print_repeat(unsigned long type, int repeat)
 
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
 {
+	const int width = (int) ((is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2);
 	PCU_puts("  ");
 	PCU_puts(str);
-	PCU_PRINTF3(LX_LD, (is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2, value, value);
+	PCU_PRINTF3(LX_LD, width, value, value);
 	if (IS_ASCII(value)) {
 		PCU_PRINTF1(" '%c'\n", (int) value);
 	} else {
