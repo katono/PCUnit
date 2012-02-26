@@ -382,11 +382,7 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 				tmp_val = va_arg(arg_list, ptrdiff_t);
 				break;
 			case 2:
-#ifdef PCU_NO_LONGLONG
-				tmp_val = va_arg(arg_list, ptrdiff_t);
-#else
-				tmp_val = va_arg(arg_list, long long);
-#endif
+				tmp_val = va_arg(arg_list, PCU_ssize_t);
 				break;
 			case 0:
 			default:
@@ -420,11 +416,7 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 				tmp_val = va_arg(arg_list, size_t);
 				break;
 			case 2:
-#ifdef PCU_NO_LONGLONG
-				tmp_val = va_arg(arg_list, size_t);
-#else
-				tmp_val = va_arg(arg_list, unsigned long long);
-#endif
+				tmp_val = va_arg(arg_list, PCU_size_t);
 				break;
 			case 0:
 			default:
