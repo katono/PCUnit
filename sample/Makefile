@@ -35,10 +35,10 @@ test:
 clean:
 	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)
 
-main.o:  $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
+main.o:  $(PCUNITDIR)/PCUnit.h
 StrToken.o: StrToken.h
-test_StrToken.o: StrToken.h $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
+test_StrToken.o: StrToken.h $(PCUNITDIR)/PCUnit.h
 RingBuf.o: RingBuf.h
-test_RingBuf.o: RingBuf.h $(PCUNITDIR)/PCU_Libc.h $(PCUNITDIR)/PCUnit.h
+test_RingBuf.o: RingBuf.h $(PCUNITDIR)/PCUnit.h
 
 $(LIBPCUNIT): $(PCUNITDIR)/*.h $(PCUNITDIR)/*.c

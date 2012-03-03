@@ -50,8 +50,8 @@ clean:
 
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-main.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-test_format_no_stdarg.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-test_string.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-test_strtol.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+main.o: ../../PCUnit/PCUnit.h
+test_format_no_stdarg.o: ../../PCUnit/PCUnit.h
+test_string.o: ../../PCUnit/PCUnit.h
+test_strtol.o: ../../PCUnit/PCUnit.h
 

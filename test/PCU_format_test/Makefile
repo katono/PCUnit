@@ -52,7 +52,7 @@ clean:
 
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-main.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-test_format.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-test_formatW.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+main.o: ../../PCUnit/PCUnit.h
+test_format.o: ../../PCUnit/PCUnit.h
+test_formatW.o: ../../PCUnit/PCUnit.h
 
