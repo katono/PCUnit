@@ -30,12 +30,16 @@ int main(int argc, char **argv)
 		SetupTest_suite,
 	};
 
-	PCU_enable_color();
 	PCU_set_putchar(putchar);
 	PCU_set_getchar(getchar);
-	if (argc > 1) {
+	if (argc > 1 && !strcmp(argv[1], "console")) {
+		PCU_enable_color();
 		PCU_console_run(suites, sizeof suites / sizeof *suites);
+	} else if (argc > 1 && !strcmp(argv[1], "nocolor")) {
+		PCU_disable_color();
+		PCU_run(suites, sizeof suites / sizeof *suites);
 	} else {
+		PCU_enable_color();
 		PCU_run(suites, sizeof suites / sizeof *suites);
 	}
 	return 0;

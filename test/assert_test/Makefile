@@ -22,6 +22,10 @@ OBJS += CleanupTest.o
 all: pcunit_register $(LIBPCUNIT) $(TARGET)
 
 no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
+	$(MAKE) all
+	./$(TARGET) > $(TARGET).txt
+	./$(TARGET_NO_SETJMP) > $(TARGET_NO_SETJMP).txt
+	diff $(TARGET).txt $(TARGET_NO_SETJMP).txt
 
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
@@ -30,7 +34,7 @@ pcunit_register:
 .SUFFIXES: .c .o
 
 .c.o:
-	$(CC) $(CFLAGS) -E $< > $<.i
+#     $(CC) $(CFLAGS) -E $< > $<.i
 	$(CC) $(CFLAGS) -c $<
 
 $(LIBPCUNIT):
@@ -43,21 +47,22 @@ $(LIBPCUNIT_NO_SETJMP):
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
-#     ./$(TARGET)
 	cd ../../PCUnit && $(MAKE) clean
 
 $(TARGET_NO_SETJMP): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
-#     ./$(TARGET)
 	cd ../../PCUnit && $(MAKE) clean
 
 test:
-	./$(TARGET) 1
+	./$(TARGET)
+
+console:
+	./$(TARGET) console
 
 
 .PHONY: clean
 clean:
-	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP)
+	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET).txt $(TARGET_NO_SETJMP).txt
 
 
 main.o: ../../PCUnit/PCUnit.h
