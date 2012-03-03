@@ -4,19 +4,19 @@
 #include <limits.h>
 
 #include "../../PCUnit/PCUnit.h"
-#undef PCU_MESSAGE_BUF_SIZE
-#define PCU_MESSAGE_BUF_SIZE	256
-extern char PCU_msg_buf[];
-#define PCU_format4(f, a1, a2, a3, a4)     PCU_format_aux4(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
-#define PCU_format5(f, a1, a2, a3, a4, a5) PCU_format_aux5(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
-const char *PCU_format_aux4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
-const char *PCU_format_aux5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
+#undef PCU_FORMAT_BUFSIZE
+#define PCU_FORMAT_BUFSIZE	256
+extern char PCU_format_buf[];
+#define PCU_format4(f, a1, a2, a3, a4)     PCU_format_aux4(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4))
+#define PCU_format5(f, a1, a2, a3, a4, a5) PCU_format_aux5(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5))
+const char *PCU_format_aux4(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4);
+const char *PCU_format_aux5(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5);
 
 
 void test_format(void)
 {
 	const char *bufp = 0;
-	char sp_buf[PCU_MESSAGE_BUF_SIZE];
+	char sp_buf[PCU_FORMAT_BUFSIZE];
 	int n;
 
 	snprintf(sp_buf, sizeof sp_buf, "hogehoge");
@@ -123,13 +123,16 @@ void test_format(void)
 	bufp = PCU_format4(             "%ld, %ld, %ld, %lu", LONG_MAX, LONG_MIN, ULONG_MAX, ULONG_MAX);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
+	snprintf(sp_buf, sizeof sp_buf, "%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
+	bufp = PCU_format4(             "%lld, %lld, %lld, %llu", LLONG_MAX, LLONG_MIN, ULLONG_MAX, ULLONG_MAX);
+	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
 
 }
 
 void test_format_shorten(void)
 {
 	const char *bufp = 0;
-	char sp_buf[PCU_MESSAGE_BUF_SIZE];
+	char sp_buf[PCU_FORMAT_BUFSIZE];
 #define STR	"0123456789abcdef"\
 			"1123456789abcdef"\
 			"2123456789abcdef"\
@@ -151,7 +154,7 @@ void test_format_shorten(void)
 #define STR_D	STR "f123456789abcd%d"
 #define STR_X	STR "f123456789abcd%x"
 
-	PCU_ASSERT_EQUAL(256, PCU_MESSAGE_BUF_SIZE);
+	PCU_ASSERT_EQUAL(256, PCU_FORMAT_BUFSIZE);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_0);
 	bufp = PCU_format4(STR_0, 0, 0, 0, 0);

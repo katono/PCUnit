@@ -64,25 +64,25 @@ int PCU_atoi(const char *s);
 #ifdef PCU_NO_STDARG
 extern char PCU_printf_buf[64];
 # define PCU_PRINTF0(f)                                     PCU_puts(PCU_format_aux0(PCU_printf_buf, sizeof PCU_printf_buf, f))
-# define PCU_PRINTF1(f, a1)                                 PCU_puts(PCU_format_aux1(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1)))
-# define PCU_PRINTF2(f, a1, a2)                             PCU_puts(PCU_format_aux2(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2)))
-# define PCU_PRINTF3(f, a1, a2, a3)                         PCU_puts(PCU_format_aux3(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3)))
-# define PCU_PRINTF4(f, a1, a2, a3, a4)                     PCU_puts(PCU_format_aux4(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4)))
-# define PCU_PRINTF5(f, a1, a2, a3, a4, a5)                 PCU_puts(PCU_format_aux5(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5)))
-# define PCU_PRINTF6(f, a1, a2, a3, a4, a5, a6)             PCU_puts(PCU_format_aux6(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6)))
-# define PCU_PRINTF7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_puts(PCU_format_aux7(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7)))
-# define PCU_PRINTF8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_puts(PCU_format_aux8(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8)))
-# define PCU_PRINTF9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_puts(PCU_format_aux9(PCU_printf_buf, sizeof PCU_printf_buf, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9)))
+# define PCU_PRINTF1(f, a1)                                 PCU_puts(PCU_format_aux1(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1)))
+# define PCU_PRINTF2(f, a1, a2)                             PCU_puts(PCU_format_aux2(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2)))
+# define PCU_PRINTF3(f, a1, a2, a3)                         PCU_puts(PCU_format_aux3(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3)))
+# define PCU_PRINTF4(f, a1, a2, a3, a4)                     PCU_puts(PCU_format_aux4(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4)))
+# define PCU_PRINTF5(f, a1, a2, a3, a4, a5)                 PCU_puts(PCU_format_aux5(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5)))
+# define PCU_PRINTF6(f, a1, a2, a3, a4, a5, a6)             PCU_puts(PCU_format_aux6(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6)))
+# define PCU_PRINTF7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_puts(PCU_format_aux7(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7)))
+# define PCU_PRINTF8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_puts(PCU_format_aux8(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8)))
+# define PCU_PRINTF9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_puts(PCU_format_aux9(PCU_printf_buf, sizeof PCU_printf_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8), (PCU_size_t)(a9)))
 const char *PCU_format_aux0(char *buf, size_t size, const char *format);
-const char *PCU_format_aux1(char *buf, size_t size, const char *format, size_t arg1);
-const char *PCU_format_aux2(char *buf, size_t size, const char *format, size_t arg1, size_t arg2);
-const char *PCU_format_aux3(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3);
-const char *PCU_format_aux4(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4);
-const char *PCU_format_aux5(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5);
-const char *PCU_format_aux6(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6);
-const char *PCU_format_aux7(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7);
-const char *PCU_format_aux8(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8);
-const char *PCU_format_aux9(char *buf, size_t size, const char *format, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, size_t arg7, size_t arg8, size_t arg9);
+const char *PCU_format_aux1(char *buf, size_t size, const char *format, PCU_size_t arg1);
+const char *PCU_format_aux2(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2);
+const char *PCU_format_aux3(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3);
+const char *PCU_format_aux4(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4);
+const char *PCU_format_aux5(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5);
+const char *PCU_format_aux6(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6);
+const char *PCU_format_aux7(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7);
+const char *PCU_format_aux8(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7, PCU_size_t arg8);
+const char *PCU_format_aux9(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7, PCU_size_t arg8, PCU_size_t arg9);
 #else
 # include <stdarg.h>
 # define PCU_PRINTF0	PCU_printf

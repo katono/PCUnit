@@ -1,3 +1,4 @@
+#include <string.h>
 
 static int initialize(void)
 {

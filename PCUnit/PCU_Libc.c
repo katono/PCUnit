@@ -376,7 +376,18 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 		case 'i':
 		case 'u':
 #ifdef PCU_NO_STDARG
-			tmp_val = arg_list[arg_idx++];
+			switch (long_flag) {
+			case 1:
+				tmp_val = (ptrdiff_t) arg_list[arg_idx++];
+				break;
+			case 2:
+				tmp_val = (PCU_ssize_t) arg_list[arg_idx++];
+				break;
+			case 0:
+			default:
+				tmp_val = (int) arg_list[arg_idx++];
+				break;
+			}
 #else
 			switch (long_flag) {
 			case 1:
@@ -410,7 +421,18 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 		case 'x':
 		case 'X':
 #ifdef PCU_NO_STDARG
-			tmp_val = arg_list[arg_idx++];
+			switch (long_flag) {
+			case 1:
+				tmp_val = (size_t) arg_list[arg_idx++];
+				break;
+			case 2:
+				tmp_val = (PCU_size_t) arg_list[arg_idx++];
+				break;
+			case 0:
+			default:
+				tmp_val = (unsigned int) arg_list[arg_idx++];
+				break;
+			}
 #else
 			switch (long_flag) {
 			case 1:
@@ -437,7 +459,7 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 #ifdef PCU_USE_WCHAR
 			if (long_flag) {
 #ifdef PCU_NO_STDARG
-				tmp_wstr = (const wchar_t *) arg_list[arg_idx++];
+				tmp_wstr = (const wchar_t *)(size_t) arg_list[arg_idx++];
 #else
 				tmp_wstr = va_arg(arg_list, const wchar_t *);
 #endif
@@ -449,7 +471,7 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 #endif
 			{
 #ifdef PCU_NO_STDARG
-				tmp_str = (const char *) arg_list[arg_idx++];
+				tmp_str = (const char *)(size_t) arg_list[arg_idx++];
 #else
 				tmp_str = va_arg(arg_list, const char *);
 #endif
@@ -476,25 +498,25 @@ end:
 
 const char *PCU_format_aux0(char *buf, size_t size, const char *format)
 {
-	size_t arg_list[1];
+	PCU_size_t arg_list[1];
 	arg_list[0] = 0;
 	PCU_vsnprintf(buf, size, format, arg_list);
 	return buf;
 }
 
 const char *PCU_format_aux1(char *buf, size_t size, const char *format, 
-		size_t arg1)
+		PCU_size_t arg1)
 {
-	size_t arg_list[1];
+	PCU_size_t arg_list[1];
 	arg_list[0] = arg1;
 	PCU_vsnprintf(buf, size, format, arg_list);
 	return buf;
 }
 
 const char *PCU_format_aux2(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2)
+		PCU_size_t arg1, PCU_size_t arg2)
 {
-	size_t arg_list[2];
+	PCU_size_t arg_list[2];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	PCU_vsnprintf(buf, size, format, arg_list);
@@ -502,9 +524,9 @@ const char *PCU_format_aux2(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux3(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3)
 {
-	size_t arg_list[3];
+	PCU_size_t arg_list[3];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -513,9 +535,9 @@ const char *PCU_format_aux3(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux4(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4)
 {
-	size_t arg_list[4];
+	PCU_size_t arg_list[4];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -525,9 +547,9 @@ const char *PCU_format_aux4(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux5(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5)
 {
-	size_t arg_list[5];
+	PCU_size_t arg_list[5];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -538,9 +560,9 @@ const char *PCU_format_aux5(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux6(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6)
 {
-	size_t arg_list[6];
+	PCU_size_t arg_list[6];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -552,10 +574,10 @@ const char *PCU_format_aux6(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux7(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
-		size_t arg7)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
+		PCU_size_t arg7)
 {
-	size_t arg_list[7];
+	PCU_size_t arg_list[7];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -568,10 +590,10 @@ const char *PCU_format_aux7(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux8(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
-		size_t arg7, size_t arg8)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
+		PCU_size_t arg7, PCU_size_t arg8)
 {
-	size_t arg_list[8];
+	PCU_size_t arg_list[8];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
@@ -585,10 +607,10 @@ const char *PCU_format_aux8(char *buf, size_t size, const char *format,
 }
 
 const char *PCU_format_aux9(char *buf, size_t size, const char *format, 
-		size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5, size_t arg6, 
-		size_t arg7, size_t arg8, size_t arg9)
+		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
+		PCU_size_t arg7, PCU_size_t arg8, PCU_size_t arg9)
 {
-	size_t arg_list[9];
+	PCU_size_t arg_list[9];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;

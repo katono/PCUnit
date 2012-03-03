@@ -14,6 +14,7 @@ all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
+	cd ../../PCUnit && $(MAKE) clean
 	cd ../../PCUnit && $(MAKE)
 
 

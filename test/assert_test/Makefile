@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g
+CFLAGS = -Wall -DPCU_USE_WCHAR -g
 
 TARGET = assert_test
 
@@ -31,6 +31,8 @@ all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
+	cd ../../PCUnit && $(MAKE) clean
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g"
 
 
 .SUFFIXES: .c .o
@@ -44,6 +46,7 @@ $(TARGET): $(OBJS)
 	cd ../../PCUnit && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	./$(TARGET)
+	cd ../../PCUnit && $(MAKE) clean
 
 test:
 	./$(TARGET) 1

@@ -404,7 +404,11 @@ static void print_type_ptr(const char *str, const void *value)
 	if (value) {
 		PCU_puts("  ");
 		PCU_puts(str);
+#ifdef PCU_NO_STDARG
+		PCU_PRINTF1(" : %p\n", (size_t) value);
+#else
 		PCU_PRINTF1(" : %p\n", value);
+#endif
 	} else {
 		print_null(str);
 	}

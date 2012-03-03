@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -ansi -pedantic-errors -g
+CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -ansi -pedantic-errors -DPCU_USE_WCHAR -g
 CFLAGS += -std=c99
 
 TARGET = PCU_format_test
@@ -14,7 +14,7 @@ all: pcunit_register $(TARGET)
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
-	cd ../../PCUnit && $(MAKE) CFLAGS="-g -DPCU_MESSAGE_BUF_SIZE=256"
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g -DPCU_FORMAT_BUFSIZE=256"
 
 
 PCU_LIBC_DEFINE = -DPCU_NO_VSPRINTF
@@ -43,7 +43,6 @@ $(TARGET): $(OBJS)
 
 test:
 	./$(TARGET)
-	cd ../../PCUnit && $(MAKE) clean
 
 
 .PHONY: clean

@@ -5,8 +5,8 @@
 #include <locale.h>
 
 #include "../../PCUnit/PCUnit.h"
-#undef PCU_MESSAGE_BUF_SIZE
-#define PCU_MESSAGE_BUF_SIZE	256
+#undef PCU_FORMAT_BUFSIZE
+#define PCU_FORMAT_BUFSIZE	256
 
 static int initialize(void)
 {
@@ -17,7 +17,7 @@ static int initialize(void)
 void test_formatW(void)
 {
 	const char *bufp = 0;
-	char sp_buf[PCU_MESSAGE_BUF_SIZE];
+	char sp_buf[PCU_FORMAT_BUFSIZE];
 	int n;
 
 	snprintf(sp_buf, sizeof sp_buf,  "hogehoge");
@@ -133,7 +133,7 @@ void test_formatW(void)
 void test_formatW_shorten(void)
 {
 	const char *bufp = 0;
-	char sp_buf[PCU_MESSAGE_BUF_SIZE];
+	char sp_buf[PCU_FORMAT_BUFSIZE];
 #define STR	"0123456789abcdef"\
 			"1123456789abcdef"\
 			"2123456789abcdef"\
