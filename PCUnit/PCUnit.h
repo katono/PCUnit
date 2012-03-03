@@ -43,7 +43,7 @@ void PCU_assert_ptr_impl(const void *expected, const void *actual,
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 #endif
@@ -138,9 +138,6 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #endif
 #ifndef PCU_NO_STDARG
 const char *PCU_format(const char *format, ...);
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
-const char *PCU_formatW(const wchar_t *format, ...);
-#endif
 #else
 extern char PCU_msg_buf[];
 #define PCU_format0(f)                                     PCU_format_aux0(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f)
@@ -153,6 +150,9 @@ extern char PCU_msg_buf[];
 #define PCU_format7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_format_aux7(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
 #define PCU_format8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_format_aux8(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
 #define PCU_format9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_format_aux9(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
+#endif
+#ifdef PCU_USE_WCHAR
+const char *PCU_formatW(const wchar_t *format, ...);
 #endif
 
 
@@ -241,7 +241,7 @@ extern char PCU_msg_buf[];
 		str_assert,\
 		__FILE__, __LINE__)
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual, str_assert)\
 	PCU_assert_strw_impl((const wchar_t *) (expected), (const wchar_t *) (actual),\
 		PCU_TYPE_STRW,\
@@ -428,7 +428,7 @@ extern char PCU_msg_buf[];
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL(expected, actual)\
 	do {\
 		PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual,\
@@ -587,7 +587,7 @@ extern char PCU_msg_buf[];
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL_MESSAGE(expected, actual, msg)\
 	do {\
 		PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual,\
@@ -667,7 +667,7 @@ extern char PCU_msg_buf[];
 	} while (0)
 
 
-#if (defined(_UNICODE) || defined(UNICODE)) && !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#if (defined(_UNICODE) || defined(UNICODE))
 #define PCU_ASSERT_STRINGT_EQUAL      PCU_ASSERT_STRINGW_EQUAL
 #define PCU_ASSERT_STRINGT_NOT_EQUAL  PCU_ASSERT_STRINGW_NOT_EQUAL
 #define PCU_ASSERT_NSTRINGT_EQUAL     PCU_ASSERT_NSTRINGW_EQUAL

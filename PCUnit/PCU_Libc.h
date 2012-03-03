@@ -28,6 +28,10 @@ typedef ptrdiff_t PCU_ssize_t;
 #endif
 #endif
 
+#if defined(_WIN32) && !defined(PCU_USE_WCHAR)
+#define PCU_USE_WCHAR
+#endif
+
 int PCU_getchar(void);
 void PCU_puts(const char *str);
 
@@ -107,8 +111,12 @@ typedef jmp_buf PCU_jmp_buf;
 #endif
 
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
-# include <wchar.h>
+#ifdef PCU_USE_WCHAR
+# if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
+#  include <string.h>
+# else
+#  include <wchar.h>
+# endif
 # define PCU_WCSCMP		wcscmp
 # define PCU_WCSNCMP	wcsncmp
 # define PCU_WCSLEN		wcslen

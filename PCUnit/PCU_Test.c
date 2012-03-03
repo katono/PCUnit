@@ -166,7 +166,7 @@ void PCU_assert_str_impl(const char *expected, const char *actual,
 	}
 }
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
@@ -439,7 +439,7 @@ static void print_type_nstr(const char *str, const char *value, size_t len)
 	}
 }
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 static void print_type_strw(const char *str, const wchar_t *value)
 {
 	if (value) {
@@ -515,7 +515,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		print_type_nstr(actual_str  , (const char *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %d\n", len);
 		break;
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#ifdef PCU_USE_WCHAR
 	case PCU_TYPE_STRW:
 		print_type_strw(expected_str, (const wchar_t *)(size_t) expected);
 		print_type_strw(actual_str  , (const wchar_t *)(size_t) actual);

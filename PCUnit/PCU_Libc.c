@@ -5,7 +5,7 @@
 #include "PCU_Libc.h"
 #include "PCUnit.h"
 
-char PCU_msg_buf[PCU_MESSAGE_BUF_SIZE];
+char PCU_msg_buf[(PCU_MESSAGE_BUF_SIZE > 0) ? PCU_MESSAGE_BUF_SIZE : 1];
 char PCU_printf_buf[64];
 
 static PCU_Putchar putchar_func;
@@ -260,6 +260,9 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 	size_t arg_idx = 0;
 #endif
 	const char *tmp_str;
+#ifdef PCU_USE_WCHAR
+	const wchar_t *tmp_wstr;
+#endif
 	PCU_size_t tmp_val;
 	unsigned long flags = 0;
 	int inc;
@@ -431,14 +434,29 @@ static int PCU_vsnprintf(char *buf, size_t size, const char *format, va_list arg
 			p++;
 			break;
 		case 's':
+#ifdef PCU_USE_WCHAR
+			if (long_flag) {
 #ifdef PCU_NO_STDARG
-			tmp_str = (const char *) arg_list[arg_idx++];
+				tmp_wstr = (const wchar_t *) arg_list[arg_idx++];
 #else
-			tmp_str = va_arg(arg_list, const char *);
+				tmp_wstr = va_arg(arg_list, const wchar_t *);
 #endif
-			while (*tmp_str != '\0') {
-				buf[i++] = *(tmp_str++);
-				if (i >= buf_size - 1) goto end;
+				while (*tmp_wstr != L'\0') {
+					buf[i++] = (char) *(tmp_wstr++);
+					if (i >= buf_size - 1) goto end;
+				}
+			} else 
+#endif
+			{
+#ifdef PCU_NO_STDARG
+				tmp_str = (const char *) arg_list[arg_idx++];
+#else
+				tmp_str = va_arg(arg_list, const char *);
+#endif
+				while (*tmp_str != '\0') {
+					buf[i++] = *(tmp_str++);
+					if (i >= buf_size - 1) goto end;
+				}
 			}
 			p++;
 			break;
@@ -616,11 +634,16 @@ void PCU_printf(const char *format, ...)
 	PCU_puts(PCU_printf_buf);
 }
 
-#if !defined(PCU_NO_WCHAR) && !defined(PCU_NO_LIBC)
+#endif
+
+#ifdef PCU_USE_WCHAR
+
+#include <stdio.h>
+#include <stdarg.h>
 
 const char *PCU_formatW(const wchar_t *format, ...)
 {
-	wchar_t PCU_msgw_buf[PCU_MESSAGE_BUF_SIZE];
+	wchar_t PCU_msgw_buf[(PCU_MESSAGE_BUF_SIZE) > 0 ? PCU_MESSAGE_BUF_SIZE : 1];
 	va_list ap;
 	va_start(ap, format);
 #if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
@@ -632,7 +655,6 @@ const char *PCU_formatW(const wchar_t *format, ...)
 	return PCU_format("%ls", PCU_msgw_buf);
 }
 
-#endif
 #endif
 
 
