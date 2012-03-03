@@ -1,3 +1,4 @@
+#include "../../PCUnit/PCUnit.h"
 
 static int initialize(void)
 {
@@ -93,4 +94,12 @@ static PCU_Test tests[] = {
 	PCU_TEST(test_assert_false_MSG),
 };
 
+
+PCU_Suite *AssertTest_suite(void)
+{
+	static PCU_Suite suite = {
+		"AssertTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+	};
+	return &suite;
+}
 

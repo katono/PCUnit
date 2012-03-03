@@ -1,3 +1,4 @@
+#include "../../PCUnit/PCUnit.h"
 #include <string.h>
 
 static int initialize(void)
@@ -56,4 +57,12 @@ static PCU_Test tests[] = {
 	PCU_TEST_SKIPPED(test_skip),
 	PCU_TEST_REPEATED(test_repeated, 5),
 };
+
+PCU_Suite *SetupTest_suite(void)
+{
+	static PCU_Suite suite = {
+		"SetupTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+	};
+	return &suite;
+}
 

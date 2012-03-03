@@ -1,3 +1,4 @@
+#include "../../PCUnit/PCUnit.h"
 
 static int initialize(void)
 {
@@ -105,4 +106,12 @@ static PCU_Test tests[] = {
 	PCU_TEST(test_assert_dbl_not_equal_FAIL),
 	PCU_TEST(test_assert_dbl_not_equal_MSG),
 };
+
+PCU_Suite *AssertDoubleTest_suite(void)
+{
+	static PCU_Suite suite = {
+		"AssertDoubleTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+	};
+	return &suite;
+}
 

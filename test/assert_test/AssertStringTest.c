@@ -1,3 +1,4 @@
+#include "../../PCUnit/PCUnit.h"
 
 static int initialize(void)
 {
@@ -242,4 +243,12 @@ static PCU_Test tests[] = {
 	PCU_TEST(test_assert_nstr_not_equal_FAIL_actual_null),
 	PCU_TEST(test_assert_nstr_not_equal_FAIL_null_null),
 };
+
+PCU_Suite *AssertStringTest_suite(void)
+{
+	static PCU_Suite suite = {
+		"AssertStringTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+	};
+	return &suite;
+}
 

@@ -1,3 +1,4 @@
+#include "../../PCUnit/PCUnit.h"
 
 static int initialize(void)
 {
@@ -37,4 +38,12 @@ static PCU_Test tests[] = {
 	PCU_TEST(test_fail1),
 	PCU_TEST(test_fail2),
 };
+
+PCU_Suite *FailTest_suite(void)
+{
+	static PCU_Suite suite = {
+		"FailTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+	};
+	return &suite;
+}
 

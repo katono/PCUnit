@@ -4,28 +4,17 @@ TARGET = assert_test
 
 OBJS = main.o
 OBJS += ../../PCUnit/libpcunit.a
-OBJS += AssertTestLongjmp.o
-OBJS += AssertTestReturn.o
-OBJS += AssertEqualTestLongjmp.o
-OBJS += AssertEqualTestReturn.o
-OBJS += AssertPtrTestLongjmp.o
-OBJS += AssertPtrTestReturn.o
-OBJS += AssertStringTestLongjmp.o
-OBJS += AssertStringTestReturn.o
-OBJS += AssertStringWTestLongjmp.o
-OBJS += AssertStringWTestReturn.o
-OBJS += AssertDoubleTestLongjmp.o
-OBJS += AssertDoubleTestReturn.o
-OBJS += AssertOperatorTestLongjmp.o
-OBJS += AssertOperatorTestReturn.o
-OBJS += FailTestLongjmp.o
-OBJS += FailTestReturn.o
-OBJS += SetupTestLongjmp.o
-OBJS += SetupTestReturn.o
-OBJS += InitializeTestLongjmp.o
-OBJS += InitializeTestReturn.o
-OBJS += CleanupTestLongjmp.o
-OBJS += CleanupTestReturn.o
+OBJS += AssertTest.o
+OBJS += AssertEqualTest.o
+OBJS += AssertPtrTest.o
+OBJS += AssertStringTest.o
+OBJS += AssertStringWTest.o
+OBJS += AssertDoubleTest.o
+OBJS += AssertOperatorTest.o
+OBJS += FailTest.o
+OBJS += SetupTest.o
+OBJS += InitializeTest.o
+OBJS += CleanupTest.o
 
 all: pcunit_register $(TARGET)
 
@@ -58,25 +47,14 @@ clean:
 
 
 main.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertTestLongjmp.o: AssertTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertTestReturn.o:  AssertTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertEqualTestLongjmp.o:  AssertEqualTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertEqualTestReturn.o:   AssertEqualTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertPtrTestLongjmp.o:  AssertPtrTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertPtrTestReturn.o:   AssertPtrTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertStringTestLongjmp.o:  AssertStringTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertStringTestReturn.o:   AssertStringTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertStringWTestLongjmp.o:  AssertStringWTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertStringWTestReturn.o:   AssertStringWTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertDoubleTestLongjmp.o:  AssertDoubleTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertDoubleTestReturn.o:   AssertDoubleTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertOperatorTestLongjmp.o:  AssertOperatorTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-AssertOperatorTestReturn.o:   AssertOperatorTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-FailTestLongjmp.o:  FailTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-FailTestReturn.o:   FailTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-SetupTestLongjmp.o:  SetupTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-SetupTestReturn.o:   SetupTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-InitializeTestLongjmp.o:  InitializeTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-InitializeTestReturn.o:   InitializeTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-CleanupTestLongjmp.o:  CleanupTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
-CleanupTestReturn.o:   CleanupTest.c ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertTest.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertEqualTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertPtrTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertStringTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertStringWTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertDoubleTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+AssertOperatorTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+FailTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+SetupTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+InitializeTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
+CleanupTest.o:  ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
