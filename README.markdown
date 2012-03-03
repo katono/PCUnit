@@ -24,7 +24,7 @@ PCUnitは以下のような特長があります。
 
     * プラットフォーム非依存な実装なので、大抵のPC向けまたは組み込み向けのC/C++コンパイラでビルドすることができます。
       つまり、ホスト環境とターゲット環境の両方で動作する共通のテストコードを実装することができます。
-    * たとえ標準Cライブラリが使えない環境でも、条件コンパイルの設定をすることで使用可能です。
+    * たとえ標準Cライブラリが使えない環境でも使用可能です。
 
 
 ## リポジトリ
@@ -50,56 +50,28 @@ GNU開発環境でない場合は、PCUnitディレクトリ以下のソース�
 テストコードと共にビルドしてください。あるいはPCUnitの静的ライブラリをビルドするプロジェクトを作成し、
 ビルドしたライブラリをテストプロジェクトに静的リンクしてください。
 
-### 条件コンパイル
+### ビルド設定
 
-C99の標準関数が全て使用できる場合は条件コンパイルをする必要はありません。
-使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。
+PCUnitはコンパイラオプションのマクロ定義で以下の設定をすることができます。
+PCUnitのビルドが失敗する場合は、適宜`PCU_NO_*`マクロを定義することでビルド可能になります。
+ただし、PCUnitをビルドするためには最低限`<stddef.h>`と`<limits.h>`が必要です。
 
-* vsnprintfが使用できない、または`long long`型が使用できない場合は、`PCU_NO_VSNPRINTF`マクロを定義してください。
-* malloc/freeが使用できない場合は、`PCU_NO_MALLOC`マクロを定義してください。
-* setjmp/longjmpが使用できない場合は、`PCU_NO_SETJMP`マクロを定義してください。
-* wchar.hの関数が使用できない場合は、`PCU_NO_WCHAR`マクロを定義してください。
-* strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでも使用できない場合は、
+* vsprintfが使用できないためにビルドが失敗する場合は、`PCU_NO_VSPRINTF`マクロを定義してください。
+* setjmp/longjmpが使用できないためにビルドが失敗する場合は、`PCU_NO_SETJMP`マクロを定義してください。
+* `<string.h>`と`<stdlib.h>`の関数が使用できないためにビルドが失敗する場合は、
   `PCU_NO_LIBC`マクロを定義してください。
-  このマクロを定義した場合は`PCU_NO_VSNPRINTF`、`PCU_NO_MALLOC`、`PCU_NO_SETJMP`、`PCU_NO_WCHAR`を定義する必要はありません。
-* stdarg.hがない場合は、`PCU_NO_STDARG`マクロを定義してください。
-* プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できない場合は、
+  このマクロを定義した場合は`PCU_NO_VSPRINTF`、`PCU_NO_SETJMP`を定義する必要はありません。
+* `<stdarg.h>`がないためにビルドが失敗する場合は、`PCU_NO_STDARG`マクロを定義してください。
+* プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できないためにビルドが失敗する場合は、
   `PCU_NO_FLOATINGPOINT`マクロを定義してください。
+* 32ビットの除算ができないためにビルドが失敗する(例えばgccで`___divsi3`などのリンクエラーが発生する)場合は、
+  `PCU_NO_DIV32`マクロを定義してください。
 * コンソールモードが不要な場合は、`PCU_NO_CONSOLE_RUN`マクロを定義してください。
   `PCU_console_run`が使用できなくなりますが、コードサイズが少し小さくなります。
-
-#### `PCU_NO_MALLOC` または `PCU_NO_LIBC` を定義した場合
-
-標準のmallocが使えない場合、PCUnitはあらかじめ静的領域に2つのメモリプールを確保します。
-必要ならばコンパイラオプションでそれぞれのメモリプールのサイズを調整してください。
-
-1つ目のメモリプールはアサートマクロ失敗用データのメモリプールです。
-アサートマクロ失敗の最大数を`PCU_MAX_FAILURES`マクロの値で定義できます。定義しない場合のデフォルト値は64です。
-この最大数を超えてアサートマクロが失敗した場合はテスト結果が正しく表示されません。
-なお、アサートマクロ失敗用データの構造体サイズは`sizeof(PCU_TestFailure)`で確認できます。
-つまりこのメモリプールでは`sizeof(PCU_TestFailure) * PCU_MAX_FAILURES`バイトの静的領域を使用します。
-
-2つ目のメモリプールは文字列表示用のメモリプールです。
-このメモリプールのバイト数を`PCU_STRING_POOL_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
-このメモリプールは、`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`、`PCU_ASSERT*_MESSAGE`、`PCU_FAIL`、
-`PCU_MESSAGE`のマクロで使用されます(`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`、`PCU_ASSERT*_MESSAGE`は失敗時のみ使用)。
-このメモリプールを使い切ってしまった場合は`PCU_ASSERT_STRING*`、`PCU_ASSERT_NSTRING*`の引数や
-`PCU_ASSERT*_MESSAGE`、`PCU_FAIL`、`PCU_MESSAGE`のメッセージが表示されません。
-これらの文字列表示が不要で、メモリを節約したいならば`PCU_STRING_POOL_SIZE`に0を指定してください。
-
-#### `PCU_NO_VSNPRINTF` または `PCU_NO_LIBC` を定義した場合
-
-32ビットの除算ができないためにビルドが失敗する(例えばgccで`___divsi3`などのリンクエラーが発生する)場合は、
-`PCU_NO_DIV32`マクロを定義してください。
-このマクロを定義するとビルドは成功しますが、
-`PCU_ASSERT_EQUAL`の失敗での引数表示にて負の数または65536以上の10進数の値が表示されなくなります。
-(16進数の値は表示されます。)
-
-#### `PCU_NO_*` のいずれかを定義した場合
-
-* `size_t`型と`ptrdiff_t`型をtypedefした`stddef.h`が必要です。
-  もし`stddef.h`がなければ作成してインクルードパスの通ったディレクトリに置いてください。
-* テストプロジェクトのコンパイラオプションで、必ずPCUnitビルド時と同じ`PCU_NO_*`マクロを定義してください。
+* ワイド文字列をチェックするアサートマクロを使用したい場合は、`PCU_USE_WCHAR`マクロを定義してください。
+  `_WIN32`マクロが定義済みならば、`PCU_USE_WCHAR`マクロは自動的に定義済みになります。
+* `PCU_format`/`PCU_formatW`で使用する静的領域のサイズを変更したい場合は、
+  `PCU_FORMAT_BUFSIZE`マクロの値を定義してください。
 
 
 ## テスト構成
@@ -366,8 +338,8 @@ OKのメッセージは1つのテストスイートにつき1つ表示されま�
 各アサートマクロの引数は2回以上評価されないので、マクロ展開による副作用を気にする必要はありません。
 
 アサーション失敗時はlongjmpによってテスト関数から抜けます。
-ただし、テストプロジェクトのコンパイラオプションで`PCU_NO_SETJMP`マクロまたは`PCU_NO_LIBC`マクロが定義済みの場合は、
-setjmp/longjmpが使用できないので代わりにreturnによってテスト関数から抜けるようになります。
+ただし、PCUnitが`PCU_NO_SETJMP`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は、
+longjmpの代わりにreturnによってテスト関数から抜けます。
 この場合、スタブ等のテスト関数内で呼び出される関数から一気に抜けることはできなくなります。
 
 以下にPCUnitが提供するアサートマクロを示します。
@@ -395,19 +367,11 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
     等しくないならば失敗を登録し、テスト関数から抜けます。
 
-    注意:
-    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
-    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
-
 
 * **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
     等しいならば失敗を登録し、テスト関数から抜けます。
-
-    注意:
-    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
-    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
 
 * **`PCU_ASSERT_PTR_EQUAL(expected, actual)`**
@@ -463,7 +427,7 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
     等しくないならば失敗を登録し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
-    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+    なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
 * **`PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)`**
@@ -471,7 +435,7 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
     等しいならば失敗を登録し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
-    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+    なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
 * **`PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)`**
@@ -479,7 +443,7 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
     等しくないならば失敗を登録し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
-    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+    なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
 * **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)`**
@@ -487,35 +451,31 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を登録し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
-    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+    なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
 * **`PCU_ASSERT_STRINGT_EQUAL(expected, actual)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_STRING_EQUAL`に展開されます。
-    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_STRING_EQUAL`に展開されます。
 
 
 * **`PCU_ASSERT_STRINGT_NOT_EQUAL(expected, actual)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
-    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
 
 
 * **`PCU_ASSERT_NSTRINGT_EQUAL(expected, actual, n)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
-    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
 
 
 * **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(expected, actual, n)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
-    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
 
 
 * **`PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)`**
@@ -537,10 +497,6 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録し、テスト関数から抜けます。
 
-    注意:
-    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
-    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
-
     例:
     * `PCU_ASSERT_OPERATOR(x < 0, ||, 100 <= x);` xが0未満または100以上かチェック
     * `PCU_ASSERT_OPERATOR(x, &, 0x01);` xの最下位ビットが立っているかチェック
@@ -550,10 +506,6 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
 
     lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
     偽ならば失敗を登録し、テスト関数から抜けます。
-
-    注意:
-    PCUnitが`PCU_NO_VSNPRINTF`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合、
-    引数に`size_t`型より大きいビット幅の整数型の値を指定すると正しい結果になりません。
 
     例:
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
@@ -666,7 +618,8 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
 
     引数に指定したprintf形式の文字列を静的領域に展開し、その領域のポインタを返します。
     `PCU_ASSERT*_MESSAGE`、`PCU_FAIL`、`PCU_MESSAGE`のメッセージをprintf形式にしたい場合に利用できます。
-    静的領域のサイズはPCUnitのビルド時に`PCU_MESSAGE_BUF_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は256です。
+    静的領域のサイズはPCUnitのビルド時に`PCU_FORMAT_BUFSIZE`マクロの値で定義できます。定義しない場合のデフォルト値は512です。
+    内部でvsprintfを使用しているので文字列展開後のサイズが`PCU_FORMAT_BUFSIZE`を超えないように注意してください。
 
     例:
     * `PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_format("a:%s, b:%x, c:%d", a, b, c));`
@@ -674,13 +627,17 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     なお、PCUnitが`PCU_NO_STDARG`マクロが定義済みでビルドされている場合は使用できません。
     `PCU_NO_STDARG`マクロが定義済みの場合は、代わりに`PCU_format0`～`PCU_format9`(0～9は引数`format`より後の引数の個数)を使用してください。
 
+    例:
+    * `PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_format3("a:%s, b:%x, c:%d", a, b, c));`
+
 
 * **`const char *PCU_formatW(const wchar_t *format, ...)`**
 
     引数に指定したwprintf形式のワイド文字列をマルチバイト文字列に変換して静的領域に展開し、その領域のポインタを返します。
     `PCU_ASSERT*_MESSAGE`、`PCU_FAIL`、`PCU_MESSAGE`のメッセージをwprintf形式にしたい場合に利用できます。
-    静的領域のサイズはPCUnitのビルド時に`PCU_MESSAGE_BUF_SIZE`マクロの値で定義できます。定義しない場合のデフォルト値は256です。
-    なお、PCUnitが`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義済みでビルドされている場合は使用できません。
+    静的領域のサイズはPCUnitのビルド時に`PCU_FORMAT_BUFSIZE`マクロの値で定義できます。定義しない場合のデフォルト値は512です。
+    内部でvsprintfを使用しているので文字列展開後のサイズが`PCU_FORMAT_BUFSIZE`を超えないように注意してください。
+    なお、この関数を使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
     例:
     * `PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_formatW(L"a:%s, b:%x, c:%d", a, b, c));`
@@ -691,7 +648,6 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
     `PCU_formatT`はマクロです。
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_formatW`に展開され、
     そうでない場合は`PCU_format`に展開されます。
-    また、`PCU_NO_WCHAR`マクロまたは`PCU_NO_LIBC`マクロが定義されている場合は常に`PCU_format`に展開されます。
 
 
 ## ヘルパーマクロ
