@@ -5,14 +5,15 @@
 extern "C" {
 #endif
 
-#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_STDARG)
-#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-typedef unsigned _int64 PCU_size_t;
-typedef _int64 PCU_ssize_t;
-#else
+#include <limits.h>
+#ifdef LLONG_MIN
+#define PCU_DEFINED_LLONG
 typedef unsigned long long PCU_size_t;
 typedef long long PCU_ssize_t;
-#endif
+#elif (defined(_WIN32) && defined(_I64_MIN))
+#define PCU_DEFINED_WIN32_I64
+typedef unsigned __int64 PCU_size_t;
+typedef __int64 PCU_ssize_t;
 #else
 #include <stddef.h>
 typedef size_t PCU_size_t;

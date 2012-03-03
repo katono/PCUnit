@@ -339,14 +339,12 @@ static void print_repeat(unsigned long type, int repeat)
 
 #define IS_ASCII(c)		(' ' == 0x20 && 0x20 <= (c) && (c) <= 0x7e)
 
-#if !defined(PCU_NO_LONGLONG) && !defined(PCU_NO_STDARG)
-#if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-#define LX_LD	" : 0x%0*I64x (%I64d)"
+#ifdef PCU_DEFINED_LLONG
+#define PCU_LX_LD	" : 0x%0*llx (%lld)"
+#elif defined(PCU_DEFINED_WIN32_I64)
+#define PCU_LX_LD	" : 0x%0*I64x (%I64d)"
 #else
-#define LX_LD	" : 0x%0*llx (%lld)"
-#endif
-#else
-#define LX_LD	" : 0x%0*lx (%ld)"
+#define PCU_LX_LD	" : 0x%0*lx (%ld)"
 #endif
 
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
@@ -354,7 +352,7 @@ static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width
 	const int width = (int) ((is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2);
 	PCU_puts("  ");
 	PCU_puts(str);
-	PCU_PRINTF3(LX_LD, width, value, value);
+	PCU_PRINTF3(PCU_LX_LD, width, value, value);
 	if (IS_ASCII(value)) {
 		PCU_PRINTF1(" '%c'\n", (int) value);
 	} else {
