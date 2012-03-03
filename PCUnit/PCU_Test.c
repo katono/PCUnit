@@ -167,7 +167,7 @@ void PCU_assert_str_impl(const char *expected, const char *actual,
 }
 
 #ifdef PCU_USE_WCHAR
-void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, 
+void PCU_assert_strw_impl(const void *expected, const void *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
 	if (expected == 0 || actual == 0) {
@@ -178,18 +178,18 @@ void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual,
 	if (PCU_get_assert_type(type) == PCU_TYPE_NSTRW) {
 		size_t len = PCU_get_nstr_len(type);
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) != 0), 
+			PCU_assert_impl((PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, len) != 0), 
 					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 		} else {
-			PCU_assert_impl((PCU_WCSNCMP(expected, actual, len) == 0), 
+			PCU_assert_impl((PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, len) == 0), 
 					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 		}
 	} else {
 		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSCMP(expected, actual) != 0), 
+			PCU_assert_impl((PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual) != 0), 
 					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 		} else {
-			PCU_assert_impl((PCU_WCSCMP(expected, actual) == 0), 
+			PCU_assert_impl((PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual) == 0), 
 					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 		}
 	}

@@ -1,13 +1,15 @@
 CC = gcc
 AR = ar
 CFLAGS = -Wall -W -Wno-long-long -ansi -pedantic-errors -Os
-# CFLAGS += -DPCU_NO_LIBC
 # CFLAGS += -DPCU_NO_VSPRINTF
 # CFLAGS += -DPCU_NO_SETJMP
+# CFLAGS += -DPCU_NO_LIBC
+# CFLAGS += -DPCU_NO_STDARG
 # CFLAGS += -DPCU_NO_FLOATINGPOINT
 # CFLAGS += -DPCU_NO_DIV32
-# CFLAGS += -DPCU_NO_STDARG
-# CFLAGS += -DPCU_USE_WCHAR
+# CFLAGS += -DPCU_NO_CONSOLE_RUN
+CFLAGS += -DPCU_USE_WCHAR
+# CFLAGS += -DPCU_FORMAT_BUFSIZE=256
 TARGET = libpcunit.a
 OBJS = PCUnit.o
 OBJS += PCU_Test.o
@@ -33,7 +35,7 @@ install:
 	install -d $(INSTALLDIR)/include/PCUnit
 	install -d $(INSTALLDIR)/bin
 	install -m 644 $(TARGET) $(INSTALLDIR)/lib
-	install -m 644 PCUnit.h PCU_Libc.h $(INSTALLDIR)/include/PCUnit
+	install -m 644 PCUnit.h $(INSTALLDIR)/include/PCUnit
 	if [ -d ../util ]; then\
 		if [ -e ../util/pcunit_template.rb ]; then\
 			install -m 755 ../util/pcunit_template.rb $(INSTALLDIR)/bin;\

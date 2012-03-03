@@ -1,8 +1,6 @@
 #ifndef PCUNIT_H_INCLUDED
 #define PCUNIT_H_INCLUDED
 
-#include "PCU_Libc.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,6 +10,22 @@ extern "C" {
 /* 
  * private
  */
+
+#include <stddef.h>
+#include <limits.h>
+
+#ifdef LLONG_MIN
+#define PCU_DEFINED_LLONG
+typedef unsigned long long PCU_size_t;
+typedef long long PCU_ssize_t;
+#elif (defined(_WIN32) && defined(_I64_MIN))
+#define PCU_DEFINED_WIN32_I64
+typedef unsigned __int64 PCU_size_t;
+typedef __int64 PCU_ssize_t;
+#else
+typedef size_t PCU_size_t;
+typedef ptrdiff_t PCU_ssize_t;
+#endif
 
 #define PCU_TYPE_NONE      0x00000000
 #define PCU_TYPE_BOOL      0x00000001
@@ -43,16 +57,12 @@ void PCU_assert_ptr_impl(const void *expected, const void *actual,
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
-#ifdef PCU_USE_WCHAR
-void PCU_assert_strw_impl(const wchar_t *expected, const wchar_t *actual, 
+void PCU_assert_strw_impl(const void *expected, const void *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
-#endif
-#ifndef PCU_NO_FLOATINGPOINT
 void PCU_assert_double_impl(double expected, double actual, double delta, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
-#endif
 void PCU_msg_impl(const char *msg, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 
@@ -85,6 +95,22 @@ typedef struct {
 	PCU_SuiteResult suite_result;
 } PCU_Result;
 
+typedef struct {
+	char * const buf;
+	const size_t size;
+} PCU_FormatBuf;
+
+extern PCU_FormatBuf PCU_format_buf;
+const char *PCU_format_aux0(PCU_FormatBuf *fbuf, const char *format);
+const char *PCU_format_aux1(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1);
+const char *PCU_format_aux2(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2);
+const char *PCU_format_aux3(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3);
+const char *PCU_format_aux4(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4);
+const char *PCU_format_aux5(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5);
+const char *PCU_format_aux6(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6);
+const char *PCU_format_aux7(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7);
+const char *PCU_format_aux8(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7, PCU_size_t arg8);
+const char *PCU_format_aux9(PCU_FormatBuf *fbuf, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, PCU_size_t arg7, PCU_size_t arg8, PCU_size_t arg9);
 
 /* 
  * public
@@ -133,27 +159,19 @@ const char *PCU_test_name(void);
 const char *PCU_suite_name(void);
 void PCU_enable_color(void);
 void PCU_disable_color(void);
-#ifndef PCU_NO_CONSOLE_RUN
 void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
-#endif
-#ifndef PCU_NO_STDARG
 const char *PCU_format(const char *format, ...);
-#else
-extern char PCU_format_buf[];
-#define PCU_format0(f)                                     PCU_format_aux0(PCU_format_buf, PCU_FORMAT_BUFSIZE, f)
-#define PCU_format1(f, a1)                                 PCU_format_aux1(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1))
-#define PCU_format2(f, a1, a2)                             PCU_format_aux2(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2))
-#define PCU_format3(f, a1, a2, a3)                         PCU_format_aux3(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3))
-#define PCU_format4(f, a1, a2, a3, a4)                     PCU_format_aux4(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4))
-#define PCU_format5(f, a1, a2, a3, a4, a5)                 PCU_format_aux5(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5))
-#define PCU_format6(f, a1, a2, a3, a4, a5, a6)             PCU_format_aux6(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6))
-#define PCU_format7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_format_aux7(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7))
-#define PCU_format8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_format_aux8(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8))
-#define PCU_format9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_format_aux9(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8), (PCU_size_t)(a9))
-#endif
-#ifdef PCU_USE_WCHAR
-const char *PCU_formatW(const wchar_t *format, ...);
-#endif
+const char *PCU_formatW(const void *format, ...);
+#define PCU_format0(f)                                     PCU_format_aux0(&PCU_format_buf, f)
+#define PCU_format1(f, a1)                                 PCU_format_aux1(&PCU_format_buf, f, (PCU_size_t)(a1))
+#define PCU_format2(f, a1, a2)                             PCU_format_aux2(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2))
+#define PCU_format3(f, a1, a2, a3)                         PCU_format_aux3(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3))
+#define PCU_format4(f, a1, a2, a3, a4)                     PCU_format_aux4(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4))
+#define PCU_format5(f, a1, a2, a3, a4, a5)                 PCU_format_aux5(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5))
+#define PCU_format6(f, a1, a2, a3, a4, a5, a6)             PCU_format_aux6(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6))
+#define PCU_format7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_format_aux7(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7))
+#define PCU_format8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_format_aux8(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8))
+#define PCU_format9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_format_aux9(&PCU_format_buf, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5), (PCU_size_t)(a6), (PCU_size_t)(a7), (PCU_size_t)(a8), (PCU_size_t)(a9))
 
 
 /* 
@@ -241,33 +259,30 @@ const char *PCU_formatW(const wchar_t *format, ...);
 		str_assert,\
 		__FILE__, __LINE__)
 
-#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual, str_assert)\
-	PCU_assert_strw_impl((const wchar_t *) (expected), (const wchar_t *) (actual),\
+	PCU_assert_strw_impl((const void *) (expected), (const void *) (actual),\
 		PCU_TYPE_STRW,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_STRINGW_NOT_EQUAL_AUX(expected, actual, str_assert)\
-	PCU_assert_strw_impl((const wchar_t *) (expected), (const wchar_t *) (actual),\
+	PCU_assert_strw_impl((const void *) (expected), (const void *) (actual),\
 		PCU_TYPE_STRW | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_NSTRINGW_EQUAL_AUX(expected, actual, n, str_assert)\
-	PCU_assert_strw_impl((const wchar_t *) (expected), (const wchar_t *) (actual),\
+	PCU_assert_strw_impl((const void *) (expected), (const void *) (actual),\
 		PCU_TYPE_NSTRW | (n),\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_NSTRINGW_NOT_EQUAL_AUX(expected, actual, n, str_assert)\
-	PCU_assert_strw_impl((const wchar_t *) (expected), (const wchar_t *) (actual),\
+	PCU_assert_strw_impl((const void *) (expected), (const void *) (actual),\
 		PCU_TYPE_NSTRW | PCU_TYPE_NOT | (n),\
 		str_assert,\
 		__FILE__, __LINE__)
-#endif
 
-#ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL_AUX(expected, actual, delta, str_assert)\
 	PCU_assert_double_impl((expected), (actual), (delta),\
 		PCU_TYPE_DBL,\
@@ -290,13 +305,12 @@ const char *PCU_formatW(const wchar_t *format, ...);
 			str_assert,\
 			__FILE__, __LINE__);\
 	} while (0)
-#endif
 
 #define PCU_ASSERT_OPERATOR_AUX(lhs, op, rhs, str_assert)\
 	do {\
 		const PCU_size_t pcu_assert_operator_aux_lhs = (PCU_size_t) (lhs);\
 		const PCU_size_t pcu_assert_operator_aux_rhs = (PCU_size_t) (rhs);\
-		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
+		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs) != 0,\
 			pcu_assert_operator_aux_lhs, pcu_assert_operator_aux_rhs,\
 			PCU_TYPE_OP,\
 			str_assert,\
@@ -307,7 +321,7 @@ const char *PCU_formatW(const wchar_t *format, ...);
 	do {\
 		const PCU_ssize_t pcu_assert_operator_aux_lhs = (PCU_ssize_t) (lhs);\
 		const PCU_ssize_t pcu_assert_operator_aux_rhs = (PCU_ssize_t) (rhs);\
-		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
+		PCU_assert_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs) != 0,\
 			(PCU_size_t) pcu_assert_operator_aux_lhs, (PCU_size_t) pcu_assert_operator_aux_rhs,\
 			PCU_TYPE_OP_INT,\
 			str_assert,\
@@ -315,16 +329,11 @@ const char *PCU_formatW(const wchar_t *format, ...);
 	} while (0)
 
 
-#if defined(PCU_NO_SETJMP) || defined(PCU_NO_LIBC)
-#define PCU_LEAVE_TEST_FUNC()	return
-#else
-#define PCU_LEAVE_TEST_FUNC()	PCU_leave_test_func()
-#endif
-
 #define PCU_LEAVE_TEST_FUNC_IF_FAILED()	\
 	do {\
 		if (!PCU_last_assertion()) {\
-			PCU_LEAVE_TEST_FUNC();\
+			PCU_leave_test_func();\
+			return;\
 		}\
 	} while (0)
 
@@ -332,7 +341,8 @@ const char *PCU_formatW(const wchar_t *format, ...);
 	do {\
 		if (!PCU_last_assertion()) {\
 			PCU_msg_impl(msg, PCU_TYPE_ADDMSG , "", "", 0);\
-			PCU_LEAVE_TEST_FUNC();\
+			PCU_leave_test_func();\
+			return;\
 		}\
 	} while (0)
 
@@ -428,7 +438,6 @@ const char *PCU_formatW(const wchar_t *format, ...);
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
-#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL(expected, actual)\
 	do {\
 		PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual,\
@@ -456,9 +465,7 @@ const char *PCU_formatW(const wchar_t *format, ...);
 			"PCU_ASSERT_NSTRINGW_NOT_EQUAL(" #expected ", " #actual ", " #n ")");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
-#endif
 
-#ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)\
 	do {\
 		PCU_ASSERT_DOUBLE_EQUAL_AUX(expected, actual, delta,\
@@ -479,7 +486,6 @@ const char *PCU_formatW(const wchar_t *format, ...);
 			"PCU_ASSERT_OPERATOR_DOUBLE((" #lhs ") " #op " (" #rhs "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
-#endif
 
 #define PCU_ASSERT_OPERATOR(lhs, op, rhs)\
 	do {\
@@ -587,7 +593,6 @@ const char *PCU_formatW(const wchar_t *format, ...);
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
-#ifdef PCU_USE_WCHAR
 #define PCU_ASSERT_STRINGW_EQUAL_MESSAGE(expected, actual, msg)\
 	do {\
 		PCU_ASSERT_STRINGW_EQUAL_AUX(expected, actual,\
@@ -615,9 +620,7 @@ const char *PCU_formatW(const wchar_t *format, ...);
 			"PCU_ASSERT_NSTRINGW_NOT_EQUAL(" #expected ", " #actual ", " #n ")");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
-#endif
 
-#ifndef PCU_NO_FLOATINGPOINT
 #define PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(expected, actual, delta, msg)\
 	do {\
 		PCU_ASSERT_DOUBLE_EQUAL_AUX(expected, actual, delta,\
@@ -638,7 +641,6 @@ const char *PCU_formatW(const wchar_t *format, ...);
 			"PCU_ASSERT_OPERATOR_DOUBLE((" #lhs ") " #op " (" #rhs "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
-#endif
 
 #define PCU_ASSERT_OPERATOR_MESSAGE(lhs, op, rhs, msg)\
 	do {\
@@ -667,7 +669,7 @@ const char *PCU_formatW(const wchar_t *format, ...);
 	} while (0)
 
 
-#if (defined(_UNICODE) || defined(UNICODE))
+#if defined(_UNICODE) || defined(UNICODE)
 #define PCU_ASSERT_STRINGT_EQUAL      PCU_ASSERT_STRINGW_EQUAL
 #define PCU_ASSERT_STRINGT_NOT_EQUAL  PCU_ASSERT_STRINGW_NOT_EQUAL
 #define PCU_ASSERT_NSTRINGT_EQUAL     PCU_ASSERT_NSTRINGW_EQUAL

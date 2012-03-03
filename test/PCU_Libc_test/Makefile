@@ -1,5 +1,4 @@
-CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -ansi -pedantic-errors -g
-CFLAGS += -std=c99
+CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -g
 
 TARGET = PCU_Libc_test
 
@@ -15,7 +14,7 @@ all: pcunit_register $(TARGET)
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
-	cd ../../PCUnit && $(MAKE)
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g -DPCU_FORMAT_BUFSIZE=256"
 
 
 PCU_LIBC_DEFINE = -DPCU_NO_LIBC -DPCU_NO_STDARG
@@ -23,6 +22,8 @@ PCU_LIBC_DEFINE += -DPCU_set_putchar=PCU_set_putchar_dummy
 PCU_LIBC_DEFINE += -DPCU_set_getchar=PCU_set_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_getchar=PCU_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_puts=PCU_puts_dummy
+PCU_LIBC_DEFINE += -DPCU_format_buf=PCU_format_buf_dummy
+PCU_LIBC_DEFINE += -DPCU_printf_buf=PCU_printf_buf_dummy
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 	$(CC) $(CFLAGS) $(PCU_LIBC_DEFINE) -c $<
@@ -37,6 +38,7 @@ PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	./$(TARGET)
+	cd ../../PCUnit && $(MAKE) clean
 
 test:
 	./$(TARGET)

@@ -3,10 +3,24 @@
 #endif
 
 #include "PCU_Libc.h"
-#include "PCUnit.h"
 
-char PCU_format_buf[(PCU_FORMAT_BUFSIZE > 0) ? PCU_FORMAT_BUFSIZE : 1];
-char PCU_printf_buf[64];
+#ifndef PCU_FORMAT_BUFSIZE
+#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
+#define PCU_FORMAT_BUFSIZE	512
+#else
+#define PCU_FORMAT_BUFSIZE	256
+#endif
+#endif
+
+#if PCU_FORMAT_BUFSIZE <= 0
+#undef PCU_FORMAT_BUFSIZE
+#define PCU_FORMAT_BUFSIZE	1
+#endif
+
+static char format_buf[PCU_FORMAT_BUFSIZE];
+PCU_FormatBuf PCU_format_buf = { format_buf, sizeof format_buf / sizeof format_buf[0] };
+static char printf_buf[64];
+PCU_FormatBuf PCU_printf_buf = { printf_buf, sizeof printf_buf / sizeof printf_buf[0] };
 
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
@@ -42,8 +56,6 @@ void PCU_puts(const char *str)
 }
 
 #if defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)
-
-#include <stddef.h>
 
 /* 
  * flags:
@@ -492,49 +504,48 @@ end:
 	buf[i] = '\0';
 	return i;
 }
-#endif
 
 #ifdef PCU_NO_STDARG
 
-const char *PCU_format_aux0(char *buf, size_t size, const char *format)
+const char *PCU_format_aux0(PCU_FormatBuf *fbuf, const char *format)
 {
 	PCU_size_t arg_list[1];
 	arg_list[0] = 0;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux1(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux1(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1)
 {
 	PCU_size_t arg_list[1];
 	arg_list[0] = arg1;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux2(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux2(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2)
 {
 	PCU_size_t arg_list[2];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux3(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux3(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3)
 {
 	PCU_size_t arg_list[3];
 	arg_list[0] = arg1;
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux4(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux4(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4)
 {
 	PCU_size_t arg_list[4];
@@ -542,11 +553,11 @@ const char *PCU_format_aux4(char *buf, size_t size, const char *format,
 	arg_list[1] = arg2;
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux5(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux5(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5)
 {
 	PCU_size_t arg_list[5];
@@ -555,11 +566,11 @@ const char *PCU_format_aux5(char *buf, size_t size, const char *format,
 	arg_list[2] = arg3;
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux6(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux6(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6)
 {
 	PCU_size_t arg_list[6];
@@ -569,11 +580,11 @@ const char *PCU_format_aux6(char *buf, size_t size, const char *format,
 	arg_list[3] = arg4;
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux7(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux7(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
 		PCU_size_t arg7)
 {
@@ -585,11 +596,11 @@ const char *PCU_format_aux7(char *buf, size_t size, const char *format,
 	arg_list[4] = arg5;
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux8(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux8(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
 		PCU_size_t arg7, PCU_size_t arg8)
 {
@@ -602,11 +613,11 @@ const char *PCU_format_aux8(char *buf, size_t size, const char *format,
 	arg_list[5] = arg6;
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-const char *PCU_format_aux9(char *buf, size_t size, const char *format, 
+const char *PCU_format_aux9(PCU_FormatBuf *fbuf, const char *format, 
 		PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5, PCU_size_t arg6, 
 		PCU_size_t arg7, PCU_size_t arg8, PCU_size_t arg9)
 {
@@ -620,11 +631,14 @@ const char *PCU_format_aux9(char *buf, size_t size, const char *format,
 	arg_list[6] = arg7;
 	arg_list[7] = arg8;
 	arg_list[8] = arg9;
-	PCU_vsnprintf(buf, size, format, arg_list);
-	return buf;
+	PCU_vsnprintf(fbuf->buf, fbuf->size, format, arg_list);
+	return fbuf->buf;
 }
 
-#else
+#endif
+#endif
+
+#ifndef PCU_NO_STDARG
 
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
 #include <stdio.h>
@@ -635,12 +649,12 @@ const char *PCU_format(const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-	vsprintf(PCU_format_buf, format, ap);
+	vsprintf(format_buf, format, ap);
 #else
-	PCU_vsnprintf(PCU_format_buf, PCU_FORMAT_BUFSIZE, format, ap);
+	PCU_vsnprintf(format_buf, PCU_FORMAT_BUFSIZE, format, ap);
 #endif
 	va_end(ap);
-	return PCU_format_buf;
+	return format_buf;
 }
 
 void PCU_printf(const char *format, ...)
@@ -648,12 +662,12 @@ void PCU_printf(const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-	vsprintf(PCU_printf_buf, format, ap);
+	vsprintf(printf_buf, format, ap);
 #else
-	PCU_vsnprintf(PCU_printf_buf, sizeof PCU_printf_buf, format, ap);
+	PCU_vsnprintf(printf_buf, sizeof printf_buf, format, ap);
 #endif
 	va_end(ap);
-	PCU_puts(PCU_printf_buf);
+	PCU_puts(printf_buf);
 }
 
 #endif
@@ -663,18 +677,18 @@ void PCU_printf(const char *format, ...)
 #include <stdio.h>
 #include <stdarg.h>
 
-const char *PCU_formatW(const wchar_t *format, ...)
+const char *PCU_formatW(const void *format, ...)
 {
-	wchar_t PCU_formatw_buf[(PCU_FORMAT_BUFSIZE) > 0 ? PCU_FORMAT_BUFSIZE : 1];
+	wchar_t formatw_buf[PCU_FORMAT_BUFSIZE];
 	va_list ap;
-	va_start(ap, format);
+	va_start(ap, (const wchar_t *) format);
 #if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-	_vsnwprintf(PCU_formatw_buf, PCU_FORMAT_BUFSIZE, format, ap);
+	_vsnwprintf(formatw_buf, PCU_FORMAT_BUFSIZE, (const wchar_t *) format, ap);
 #else
-	vswprintf(PCU_formatw_buf, PCU_FORMAT_BUFSIZE, format, ap);
+	vswprintf(formatw_buf, PCU_FORMAT_BUFSIZE, (const wchar_t *) format, ap);
 #endif
 	va_end(ap);
-	return PCU_format("%ls", PCU_formatw_buf);
+	return PCU_format("%ls", formatw_buf);
 }
 
 #endif
@@ -709,7 +723,7 @@ int PCU_strncmp(const char *s1, const char *s2, size_t len)
 
 void *PCU_memset(void *b, int c, size_t len)
 {
-	char *p = b;
+	char *p = (char *) b;
 	for (; len > 0; len--) {
 		*(p++) = (char) c;
 	}
@@ -718,8 +732,8 @@ void *PCU_memset(void *b, int c, size_t len)
 
 void *PCU_memcpy(void *dst, const void *src, size_t len)
 {
-	char *p = dst;
-	const char *q = src;
+	char *p = (char *) dst;
+	const char *q = (const char *) src;
 	for (; len > 0; len--) {
 		*(p++) = *(q++);
 	}

@@ -4,13 +4,7 @@
 #include <limits.h>
 
 #include "../../PCUnit/PCUnit.h"
-#undef PCU_FORMAT_BUFSIZE
 #define PCU_FORMAT_BUFSIZE	256
-extern char PCU_format_buf[];
-#define PCU_format4(f, a1, a2, a3, a4)     PCU_format_aux4(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4))
-#define PCU_format5(f, a1, a2, a3, a4, a5) PCU_format_aux5(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (PCU_size_t)(a1), (PCU_size_t)(a2), (PCU_size_t)(a3), (PCU_size_t)(a4), (PCU_size_t)(a5))
-const char *PCU_format_aux4(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4);
-const char *PCU_format_aux5(char *buf, size_t size, const char *format, PCU_size_t arg1, PCU_size_t arg2, PCU_size_t arg3, PCU_size_t arg4, PCU_size_t arg5);
 
 
 void test_format(void)

@@ -104,19 +104,19 @@ void test_memset(void)
 	memset(i_buf, 0xFF, sizeof(i_buf));
 	memset(st_buf, 1, sizeof(st_buf));
 
-	p = PCU_memset(c_buf, 0xFF, sizeof(c_buf));
+	p = (unsigned char *) PCU_memset(c_buf, 0xFF, sizeof(c_buf));
 	PCU_ASSERT_PTR_EQUAL(c_buf, p);
 	for (i = 0; i < sizeof(c_buf); i++) {
 		PCU_ASSERT_EQUAL(0xFF, p[i]);
 	}
 
-	p = PCU_memset(i_buf, 0, sizeof(i_buf));
+	p = (unsigned char *) PCU_memset(i_buf, 0, sizeof(i_buf));
 	PCU_ASSERT_PTR_EQUAL(i_buf, p);
 	for (i = 0; i < sizeof(i_buf); i++) {
 		PCU_ASSERT_EQUAL(0, p[i]);
 	}
 
-	p = PCU_memset(st_buf, 128, sizeof(st_buf));
+	p = (unsigned char *) PCU_memset(st_buf, 128, sizeof(st_buf));
 	PCU_ASSERT_PTR_EQUAL(st_buf, p);
 	for (i = 0; i < sizeof(st_buf); i++) {
 		PCU_ASSERT_EQUAL(128, p[i]);
@@ -148,19 +148,19 @@ void test_memcpy(void)
 		((char *)st_buf)[i] = (char) rand();
 	}
 
-	p = PCU_memcpy(c_buf2, c_buf, sizeof(c_buf2));
+	p = (char *) PCU_memcpy(c_buf2, c_buf, sizeof(c_buf2));
 	PCU_ASSERT_PTR_EQUAL(c_buf2, p);
 	for (i = 0; i < sizeof(c_buf2); i++) {
 		PCU_ASSERT_EQUAL(c_buf[i], p[i]);
 	}
 
-	p = PCU_memcpy(i_buf2, i_buf, sizeof(i_buf2));
+	p = (char *) PCU_memcpy(i_buf2, i_buf, sizeof(i_buf2));
 	PCU_ASSERT_PTR_EQUAL(i_buf2, p);
 	for (i = 0; i < sizeof(i_buf2); i++) {
 		PCU_ASSERT_EQUAL(((char *)i_buf)[i], p[i]);
 	}
 
-	p = PCU_memcpy(st_buf2, st_buf, sizeof(st_buf2));
+	p = (char *) PCU_memcpy(st_buf2, st_buf, sizeof(st_buf2));
 	PCU_ASSERT_PTR_EQUAL(st_buf2, p);
 	for (i = 0; i < sizeof(st_buf2); i++) {
 		PCU_ASSERT_EQUAL(((char *)st_buf)[i], p[i]);

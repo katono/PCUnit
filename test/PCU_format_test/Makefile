@@ -1,5 +1,4 @@
-CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -ansi -pedantic-errors -DPCU_USE_WCHAR -g
-CFLAGS += -std=c99
+CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -g
 
 TARGET = PCU_format_test
 
@@ -25,6 +24,8 @@ PCU_LIBC_DEFINE += -DPCU_puts=PCU_puts_dummy
 PCU_LIBC_DEFINE += -DPCU_printf=PCU_printf_dummy
 PCU_LIBC_DEFINE += -DPCU_format=PCU_format_test
 PCU_LIBC_DEFINE += -DPCU_formatW=PCU_formatW_dummy
+PCU_LIBC_DEFINE += -DPCU_format_buf=PCU_format_buf_dummy
+PCU_LIBC_DEFINE += -DPCU_printf_buf=PCU_printf_buf_dummy
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 	$(CC) $(CFLAGS) $(PCU_LIBC_DEFINE) -c $<

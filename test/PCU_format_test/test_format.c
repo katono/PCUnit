@@ -4,9 +4,14 @@
 #include <limits.h>
 
 #include "../../PCUnit/PCUnit.h"
-#undef PCU_FORMAT_BUFSIZE
 #define PCU_FORMAT_BUFSIZE	256
+#ifdef __cplusplus
+extern "C" {
+#endif
 const char *PCU_format_test(const char *format, ...);
+#ifdef __cplusplus
+}
+#endif
 
 
 void test_format(void)
