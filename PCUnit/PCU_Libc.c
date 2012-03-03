@@ -679,7 +679,7 @@ void PCU_printf(const char *format, ...)
 
 const char *PCU_formatW(const void *format, ...)
 {
-	wchar_t formatw_buf[PCU_FORMAT_BUFSIZE];
+	static wchar_t formatw_buf[PCU_FORMAT_BUFSIZE];
 	va_list ap;
 	va_start(ap, (const wchar_t *) format);
 #if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
