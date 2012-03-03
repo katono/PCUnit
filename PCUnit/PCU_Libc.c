@@ -5,7 +5,7 @@
 #include "PCU_Libc.h"
 #include "PCUnit.h"
 
-char PCU_msg_buf[(PCU_MESSAGE_BUF_SIZE > 0) ? PCU_MESSAGE_BUF_SIZE : 1];
+char PCU_format_buf[(PCU_FORMAT_BUFSIZE > 0) ? PCU_FORMAT_BUFSIZE : 1];
 char PCU_printf_buf[64];
 
 static PCU_Putchar putchar_func;
@@ -613,12 +613,12 @@ const char *PCU_format(const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-	vsprintf(PCU_msg_buf, format, ap);
+	vsprintf(PCU_format_buf, format, ap);
 #else
-	PCU_vsnprintf(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+	PCU_vsnprintf(PCU_format_buf, PCU_FORMAT_BUFSIZE, format, ap);
 #endif
 	va_end(ap);
-	return PCU_msg_buf;
+	return PCU_format_buf;
 }
 
 void PCU_printf(const char *format, ...)
@@ -643,16 +643,16 @@ void PCU_printf(const char *format, ...)
 
 const char *PCU_formatW(const wchar_t *format, ...)
 {
-	wchar_t PCU_msgw_buf[(PCU_MESSAGE_BUF_SIZE) > 0 ? PCU_MESSAGE_BUF_SIZE : 1];
+	wchar_t PCU_formatw_buf[(PCU_FORMAT_BUFSIZE) > 0 ? PCU_FORMAT_BUFSIZE : 1];
 	va_list ap;
 	va_start(ap, format);
 #if (defined(_MSC_VER) && _MSC_VER < 1400) /* VC2005 */
-	_vsnwprintf(PCU_msgw_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+	_vsnwprintf(PCU_formatw_buf, PCU_FORMAT_BUFSIZE, format, ap);
 #else
-	vswprintf(PCU_msgw_buf, PCU_MESSAGE_BUF_SIZE, format, ap);
+	vswprintf(PCU_formatw_buf, PCU_FORMAT_BUFSIZE, format, ap);
 #endif
 	va_end(ap);
-	return PCU_format("%ls", PCU_msgw_buf);
+	return PCU_format("%ls", PCU_formatw_buf);
 }
 
 #endif

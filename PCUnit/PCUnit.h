@@ -139,17 +139,17 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 #ifndef PCU_NO_STDARG
 const char *PCU_format(const char *format, ...);
 #else
-extern char PCU_msg_buf[];
-#define PCU_format0(f)                                     PCU_format_aux0(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f)
-#define PCU_format1(f, a1)                                 PCU_format_aux1(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1))
-#define PCU_format2(f, a1, a2)                             PCU_format_aux2(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2))
-#define PCU_format3(f, a1, a2, a3)                         PCU_format_aux3(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3))
-#define PCU_format4(f, a1, a2, a3, a4)                     PCU_format_aux4(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
-#define PCU_format5(f, a1, a2, a3, a4, a5)                 PCU_format_aux5(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
-#define PCU_format6(f, a1, a2, a3, a4, a5, a6)             PCU_format_aux6(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6))
-#define PCU_format7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_format_aux7(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
-#define PCU_format8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_format_aux8(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
-#define PCU_format9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_format_aux9(PCU_msg_buf, PCU_MESSAGE_BUF_SIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
+extern char PCU_format_buf[];
+#define PCU_format0(f)                                     PCU_format_aux0(PCU_format_buf, PCU_FORMAT_BUFSIZE, f)
+#define PCU_format1(f, a1)                                 PCU_format_aux1(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1))
+#define PCU_format2(f, a1, a2)                             PCU_format_aux2(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2))
+#define PCU_format3(f, a1, a2, a3)                         PCU_format_aux3(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3))
+#define PCU_format4(f, a1, a2, a3, a4)                     PCU_format_aux4(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4))
+#define PCU_format5(f, a1, a2, a3, a4, a5)                 PCU_format_aux5(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5))
+#define PCU_format6(f, a1, a2, a3, a4, a5, a6)             PCU_format_aux6(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6))
+#define PCU_format7(f, a1, a2, a3, a4, a5, a6, a7)         PCU_format_aux7(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7))
+#define PCU_format8(f, a1, a2, a3, a4, a5, a6, a7, a8)     PCU_format_aux8(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8))
+#define PCU_format9(f, a1, a2, a3, a4, a5, a6, a7, a8, a9) PCU_format_aux9(PCU_format_buf, PCU_FORMAT_BUFSIZE, f, (size_t)(a1), (size_t)(a2), (size_t)(a3), (size_t)(a4), (size_t)(a5), (size_t)(a6), (size_t)(a7), (size_t)(a8), (size_t)(a9))
 #endif
 #ifdef PCU_USE_WCHAR
 const char *PCU_formatW(const wchar_t *format, ...);

@@ -20,11 +20,11 @@ typedef size_t PCU_size_t;
 typedef ptrdiff_t PCU_ssize_t;
 #endif
 
-#ifndef PCU_MESSAGE_BUF_SIZE
+#ifndef PCU_FORMAT_BUFSIZE
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-#define PCU_MESSAGE_BUF_SIZE	512
+#define PCU_FORMAT_BUFSIZE	512
 #else
-#define PCU_MESSAGE_BUF_SIZE	256
+#define PCU_FORMAT_BUFSIZE	256
 #endif
 #endif
 
