@@ -299,7 +299,7 @@ const char *PCU_formatW(const void *format, ...);
 	do {\
 		const double pcu_assert_operator_aux_lhs = (double) (lhs);\
 		const double pcu_assert_operator_aux_rhs = (double) (rhs);\
-		PCU_assert_op_double_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs),\
+		PCU_assert_op_double_impl((pcu_assert_operator_aux_lhs op pcu_assert_operator_aux_rhs) != 0,\
 			pcu_assert_operator_aux_lhs, pcu_assert_operator_aux_rhs,\
 			PCU_TYPE_OP_DBL,\
 			str_assert,\
