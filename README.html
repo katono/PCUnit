@@ -27,7 +27,7 @@
 <ul>
 <li>プラットフォーム非依存な実装なので、大抵のPC向けまたは組み込み向けのC/C++コンパイラでビルドすることができます。
 つまり、ホスト環境とターゲット環境の両方で動作する共通のテストコードを実装することができます。</li>
-<li>たとえ標準Cライブラリが使えない環境でも、条件コンパイルの設定をすることで使用可能です。</li>
+<li>たとえ標準Cライブラリが使えない環境でも使用可能です。</li>
 </ul></li>
 </ul>
 
@@ -55,59 +55,29 @@ make install INSTALLDIR=/foo/barのようにINSTALLDIRに任意のインスト�
 テストコードと共にビルドしてください。あるいはPCUnitの静的ライブラリをビルドするプロジェクトを作成し、
 ビルドしたライブラリをテストプロジェクトに静的リンクしてください。</p>
 
-<h3>条件コンパイル</h3>
+<h3>ビルド設定</h3>
 
-<p>C99の標準関数が全て使用できる場合は条件コンパイルをする必要はありません。
-使用できない標準関数がある場合は適宜コンパイラオプションでマクロを定義してください。</p>
+<p>PCUnitはコンパイラオプションのマクロ定義で以下の設定をすることができます。
+PCUnitのビルドが失敗する場合は、適宜<code>PCU_NO_*</code>マクロを定義することでビルド可能になります。
+ただし、PCUnitをビルドするためには最低限<code>&lt;stddef.h&gt;</code>と<code>&lt;limits.h&gt;</code>が必要です。</p>
 
 <ul>
-<li>vsnprintfが使用できない、または<code>long long</code>型が使用できない場合は、<code>PCU_NO_VSNPRINTF</code>マクロを定義してください。</li>
-<li>malloc/freeが使用できない場合は、<code>PCU_NO_MALLOC</code>マクロを定義してください。</li>
-<li>setjmp/longjmpが使用できない場合は、<code>PCU_NO_SETJMP</code>マクロを定義してください。</li>
-<li>wchar.hの関数が使用できない場合は、<code>PCU_NO_WCHAR</code>マクロを定義してください。</li>
-<li>strlen, strcmp, strncmp, strcpy, strncpy, memset, memcpy, atoiのいずれか1つでも使用できない場合は、
+<li>vsprintfが使用できないためにビルドが失敗する場合は、<code>PCU_NO_VSPRINTF</code>マクロを定義してください。</li>
+<li>setjmp/longjmpが使用できないためにビルドが失敗する場合は、<code>PCU_NO_SETJMP</code>マクロを定義してください。</li>
+<li><code>&lt;string.h&gt;</code>と<code>&lt;stdlib.h&gt;</code>の関数が使用できないためにビルドが失敗する場合は、
 <code>PCU_NO_LIBC</code>マクロを定義してください。
-このマクロを定義した場合は<code>PCU_NO_VSNPRINTF</code>、<code>PCU_NO_MALLOC</code>、<code>PCU_NO_SETJMP</code>、<code>PCU_NO_WCHAR</code>を定義する必要はありません。</li>
-<li>stdarg.hがない場合は、<code>PCU_NO_STDARG</code>マクロを定義してください。</li>
-<li>プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できない場合は、
+このマクロを定義した場合は<code>PCU_NO_VSPRINTF</code>、<code>PCU_NO_SETJMP</code>を定義する必要はありません。</li>
+<li><code>&lt;stdarg.h&gt;</code>がないためにビルドが失敗する場合は、<code>PCU_NO_STDARG</code>マクロを定義してください。</li>
+<li>プロセッサにFPUがなく、ソフトウェア浮動小数点ライブラリも使用できないためにビルドが失敗する場合は、
 <code>PCU_NO_FLOATINGPOINT</code>マクロを定義してください。</li>
+<li>32ビットの除算ができないためにビルドが失敗する(例えばgccで<code>___divsi3</code>などのリンクエラーが発生する)場合は、
+<code>PCU_NO_DIV32</code>マクロを定義してください。</li>
 <li>コンソールモードが不要な場合は、<code>PCU_NO_CONSOLE_RUN</code>マクロを定義してください。
 <code>PCU_console_run</code>が使用できなくなりますが、コードサイズが少し小さくなります。</li>
-</ul>
-
-<h4><code>PCU_NO_MALLOC</code> または <code>PCU_NO_LIBC</code> を定義した場合</h4>
-
-<p>標準のmallocが使えない場合、PCUnitはあらかじめ静的領域に2つのメモリプールを確保します。
-必要ならばコンパイラオプションでそれぞれのメモリプールのサイズを調整してください。</p>
-
-<p>1つ目のメモリプールはアサートマクロ失敗用データのメモリプールです。
-アサートマクロ失敗の最大数を<code>PCU_MAX_FAILURES</code>マクロの値で定義できます。定義しない場合のデフォルト値は64です。
-この最大数を超えてアサートマクロが失敗した場合はテスト結果が正しく表示されません。
-なお、アサートマクロ失敗用データの構造体サイズは<code>sizeof(PCU_TestFailure)</code>で確認できます。
-つまりこのメモリプールでは<code>sizeof(PCU_TestFailure) * PCU_MAX_FAILURES</code>バイトの静的領域を使用します。</p>
-
-<p>2つ目のメモリプールは文字列表示用のメモリプールです。
-このメモリプールのバイト数を<code>PCU_STRING_POOL_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は4096です。
-このメモリプールは、<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>、<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、
-<code>PCU_MESSAGE</code>のマクロで使用されます(<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>、<code>PCU_ASSERT*_MESSAGE</code>は失敗時のみ使用)。
-このメモリプールを使い切ってしまった場合は<code>PCU_ASSERT_STRING*</code>、<code>PCU_ASSERT_NSTRING*</code>の引数や
-<code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージが表示されません。
-これらの文字列表示が不要で、メモリを節約したいならば<code>PCU_STRING_POOL_SIZE</code>に0を指定してください。</p>
-
-<h4><code>PCU_NO_VSNPRINTF</code> または <code>PCU_NO_LIBC</code> を定義した場合</h4>
-
-<p>32ビットの除算ができないためにビルドが失敗する(例えばgccで<code>___divsi3</code>などのリンクエラーが発生する)場合は、
-<code>PCU_NO_DIV32</code>マクロを定義してください。
-このマクロを定義するとビルドは成功しますが、
-<code>PCU_ASSERT_EQUAL</code>の失敗での引数表示にて負の数または65536以上の10進数の値が表示されなくなります。
-(16進数の値は表示されます。)</p>
-
-<h4><code>PCU_NO_*</code> のいずれかを定義した場合</h4>
-
-<ul>
-<li><code>size_t</code>型と<code>ptrdiff_t</code>型をtypedefした<code>stddef.h</code>が必要です。
-もし<code>stddef.h</code>がなければ作成してインクルードパスの通ったディレクトリに置いてください。</li>
-<li>テストプロジェクトのコンパイラオプションで、必ずPCUnitビルド時と同じ<code>PCU_NO_*</code>マクロを定義してください。</li>
+<li>ワイド文字列をチェックするアサートマクロを使用したい場合は、<code>PCU_USE_WCHAR</code>マクロを定義してください。
+<code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義済みならば、<code>PCU_USE_WCHAR</code>マクロは自動的に定義済みになります。</li>
+<li><code>PCU_format</code>/<code>PCU_formatW</code>で使用する静的領域のサイズを変更したい場合は、
+<code>PCU_FORMAT_BUFSIZE</code>マクロの値を定義してください。</li>
 </ul>
 
 <h2>テスト構成</h2>
@@ -395,8 +365,8 @@ OK
 各アサートマクロの引数は2回以上評価されないので、マクロ展開による副作用を気にする必要はありません。</p>
 
 <p>アサーション失敗時はlongjmpによってテスト関数から抜けます。
-ただし、テストプロジェクトのコンパイラオプションで<code>PCU_NO_SETJMP</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みの場合は、
-setjmp/longjmpが使用できないので代わりにreturnによってテスト関数から抜けるようになります。
+ただし、PCUnitが<code>PCU_NO_SETJMP</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は、
+longjmpの代わりにreturnによってテスト関数から抜けます。
 この場合、スタブ等のテスト関数内で呼び出される関数から一気に抜けることはできなくなります。</p>
 
 <p>以下にPCUnitが提供するアサートマクロを示します。</p>
@@ -417,19 +387,11 @@ setjmp/longjmpが使用できないので代わりにreturnによってテスト
 <li><p><strong><code>PCU_ASSERT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
-等しくないならば失敗を登録し、テスト関数から抜けます。</p>
-
-<p>注意:
-PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
-引数に<code>size_t</code>型より大きいビット幅の整数型の値を指定すると正しい結果になりません。</p></li>
+等しくないならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
-等しいならば失敗を登録し、テスト関数から抜けます。</p>
-
-<p>注意:
-PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
-引数に<code>size_t</code>型より大きいビット幅の整数型の値を指定すると正しい結果になりません。</p></li>
+等しいならば失敗を登録し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
@@ -467,45 +429,41 @@ NULLならば失敗を登録し、テスト関数から抜けます。</p></li>
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
 等しくないならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
-なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
+なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
 等しいならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
-なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
+なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
 等しくないならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
-なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
+なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
 等しいならば失敗を登録し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
-なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
+なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGT_EQUAL(expected, actual)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_EQUAL</code>に展開され、
-そうでない場合は<code>PCU_ASSERT_STRING_EQUAL</code>に展開されます。
-また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_ASSERT_STRING_EQUAL</code>に展開されます。</p></li>
+そうでない場合は<code>PCU_ASSERT_STRING_EQUAL</code>に展開されます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL(expected, actual)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_NOT_EQUAL</code>に展開され、
-そうでない場合は<code>PCU_ASSERT_STRING_NOT_EQUAL</code>に展開されます。
-また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_ASSERT_STRING_NOT_EQUAL</code>に展開されます。</p></li>
+そうでない場合は<code>PCU_ASSERT_STRING_NOT_EQUAL</code>に展開されます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGT_EQUAL(expected, actual, n)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_EQUAL</code>に展開され、
-そうでない場合は<code>PCU_ASSERT_NSTRING_EQUAL</code>に展開されます。
-また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_ASSERT_NSTRING_EQUAL</code>に展開されます。</p></li>
+そうでない場合は<code>PCU_ASSERT_NSTRING_EQUAL</code>に展開されます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL(expected, actual, n)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_NOT_EQUAL</code>に展開され、
-そうでない場合は<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。
-また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。</p></li>
+そうでない場合は<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。</p></li>
 <li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)</code></strong></p>
 
 <p>expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| &lt;= |delta|が真かどうかチェックします。
@@ -521,10 +479,6 @@ NULLならば失敗を登録し、テスト関数から抜けます。</p></li>
 <p>lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
 偽ならば失敗を登録し、テスト関数から抜けます。</p>
 
-<p>注意:
-PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
-引数に<code>size_t</code>型より大きいビット幅の整数型の値を指定すると正しい結果になりません。</p>
-
 <p>例:</p>
 
 <ul>
@@ -535,10 +489,6 @@ PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>
 
 <p>lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
 偽ならば失敗を登録し、テスト関数から抜けます。</p>
-
-<p>注意:
-PCUnitが<code>PCU_NO_VSNPRINTF</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合、
-引数に<code>size_t</code>型より大きいビット幅の整数型の値を指定すると正しい結果になりません。</p>
 
 <p>例:</p>
 
@@ -637,7 +587,8 @@ msgの型は<code>const char *</code>です。
 
 <p>引数に指定したprintf形式の文字列を静的領域に展開し、その領域のポインタを返します。
 <code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージをprintf形式にしたい場合に利用できます。
-静的領域のサイズはPCUnitのビルド時に<code>PCU_MESSAGE_BUF_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は256です。</p>
+静的領域のサイズはPCUnitのビルド時に<code>PCU_FORMAT_BUFSIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は512です。
+内部でvsprintfを使用しているので文字列展開後のサイズが<code>PCU_FORMAT_BUFSIZE</code>を超えないように注意してください。</p>
 
 <p>例:</p>
 
@@ -646,13 +597,20 @@ msgの型は<code>const char *</code>です。
 </ul>
 
 <p>なお、PCUnitが<code>PCU_NO_STDARG</code>マクロが定義済みでビルドされている場合は使用できません。
-<code>PCU_NO_STDARG</code>マクロが定義済みの場合は、代わりに<code>PCU_format0</code>～<code>PCU_format9</code>(0～9は引数<code>format</code>より後の引数の個数)を使用してください。</p></li>
+<code>PCU_NO_STDARG</code>マクロが定義済みの場合は、代わりに<code>PCU_format0</code>～<code>PCU_format9</code>(0～9は引数<code>format</code>より後の引数の個数)を使用してください。</p>
+
+<p>例:</p>
+
+<ul>
+<li><code>PCU_ASSERT_EQUAL_MESSAGE(x, y, PCU_format3("a:%s, b:%x, c:%d", a, b, c));</code></li>
+</ul></li>
 <li><p><strong><code>const char *PCU_formatW(const wchar_t *format, ...)</code></strong></p>
 
 <p>引数に指定したwprintf形式のワイド文字列をマルチバイト文字列に変換して静的領域に展開し、その領域のポインタを返します。
 <code>PCU_ASSERT*_MESSAGE</code>、<code>PCU_FAIL</code>、<code>PCU_MESSAGE</code>のメッセージをwprintf形式にしたい場合に利用できます。
-静的領域のサイズはPCUnitのビルド時に<code>PCU_MESSAGE_BUF_SIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は256です。
-なお、PCUnitが<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義済みでビルドされている場合は使用できません。</p>
+静的領域のサイズはPCUnitのビルド時に<code>PCU_FORMAT_BUFSIZE</code>マクロの値で定義できます。定義しない場合のデフォルト値は512です。
+内部でvsprintfを使用しているので文字列展開後のサイズが<code>PCU_FORMAT_BUFSIZE</code>を超えないように注意してください。
+なお、この関数を使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p>
 
 <p>例:</p>
 
@@ -663,8 +621,7 @@ msgの型は<code>const char *</code>です。
 
 <p><code>PCU_formatT</code>はマクロです。
 <code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_formatW</code>に展開され、
-そうでない場合は<code>PCU_format</code>に展開されます。
-また、<code>PCU_NO_WCHAR</code>マクロまたは<code>PCU_NO_LIBC</code>マクロが定義されている場合は常に<code>PCU_format</code>に展開されます。</p></li>
+そうでない場合は<code>PCU_format</code>に展開されます。</p></li>
 </ul>
 
 <h2>ヘルパーマクロ</h2>
