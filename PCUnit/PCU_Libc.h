@@ -3,7 +3,7 @@
 
 #include "PCUnit.h"
 
-#if defined(_WIN32) && !defined(PCU_USE_WCHAR)
+#if (defined(_UNICODE) || defined(UNICODE)) && !defined(PCU_USE_WCHAR)
 #define PCU_USE_WCHAR
 #endif
 
