@@ -466,7 +466,7 @@ Suite: CleanupTest
 1 Tests, 0 Failures, 0 Skipped
 OK
 
-CLEANUP FAILED : 0xffffffff
+CLEANUP FAILED : -1
 
 
 Suite: FailTest
@@ -488,18 +488,18 @@ Test: test_fail2
 
 Suite: InitializeTest
 
-INITIALIZE FAILED : 0xffffffff
+INITIALIZE FAILED : -1
 
 
 Suite: SetupTest
 
 Test: test_assert_setup_err
  test_assert_setup_err: SETUP FAILED
-  return   : 0xffffffff
+  return   : -1
 
 Test: test_assert_teardown_err
  test_assert_teardown_err: TEARDOWN FAILED
-  return   : 0xfffffffe
+  return   : -2
 
 Test: test_repeated
  SetupTest.c:49: PCU_ASSERT_EQUAL(-1, PCU_repeat_counter())

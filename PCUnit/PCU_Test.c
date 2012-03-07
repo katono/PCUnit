@@ -552,7 +552,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		PCU_puts("\n");
 		break;
 	case PCU_TYPE_SETUP:
-		PCU_PRINTF1("  return   : 0x%x\n", (int) actual);
+		PCU_PRINTF1("  return   : %d\n", (int) actual);
 		break;
 	default:
 		break;

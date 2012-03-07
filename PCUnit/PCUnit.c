@@ -126,7 +126,7 @@ static void print_before_test(PCU_Suite *suite)
 static void print_initialize_error(PCU_Suite *suite)
 {
 	set_color(COLOR_RED);
-	PCU_PRINTF1("INITIALIZE FAILED : 0x%x\n", suite->initialize_error);
+	PCU_PRINTF1("INITIALIZE FAILED : %d\n", suite->initialize_error);
 	reset_color();
 	PCU_puts("\n");
 }
@@ -134,7 +134,7 @@ static void print_initialize_error(PCU_Suite *suite)
 static void print_cleanup_error(PCU_Suite *suite)
 {
 	set_color(COLOR_RED);
-	PCU_PRINTF1("CLEANUP FAILED : 0x%x\n", suite->cleanup_error);
+	PCU_PRINTF1("CLEANUP FAILED : %d\n", suite->cleanup_error);
 	reset_color();
 	PCU_puts("\n");
 }
