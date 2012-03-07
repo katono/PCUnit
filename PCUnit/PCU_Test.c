@@ -13,9 +13,7 @@ static int last_assertion;
 static void print_test_name(unsigned long type, const char *str_assert, const char *file, unsigned int line);
 static void print_repeat(unsigned long type, int repeat);
 static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t actual);
-#ifndef PCU_NO_FLOATINGPOINT
 static void print_params_double(unsigned long type, double expected, double actual, double delta);
-#endif
 
 static void PCU_Test_clear_result(PCU_Test *self)
 {
@@ -166,10 +164,10 @@ void PCU_assert_str_impl(const char *expected, const char *actual,
 	}
 }
 
-#ifdef PCU_USE_WCHAR
 void PCU_assert_strw_impl(const void *expected, const void *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
+#ifdef PCU_USE_WCHAR
 	if (expected == 0 || actual == 0) {
 		PCU_assert_impl(0, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
 				type, str_assert, file, line);
@@ -193,13 +191,16 @@ void PCU_assert_strw_impl(const void *expected, const void *actual,
 					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 		}
 	}
-}
+#else
+	PCU_assert_impl(0, 
+			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 #endif
+}
 
-#ifndef PCU_NO_FLOATINGPOINT
 void PCU_assert_double_impl(double expected, double actual, double delta, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
+#ifndef PCU_NO_FLOATINGPOINT
 	double dlt = delta;
 	int not_flag;
 	current_test->result.num_asserts++;
@@ -225,6 +226,7 @@ void PCU_assert_double_impl(double expected, double actual, double delta,
 			return;
 		}
 	}
+#endif
 
 	last_assertion = 0;
 	current_test->result.num_asserts_failed++;
@@ -252,7 +254,6 @@ void PCU_assert_op_double_impl(int passed_flag, double expected, double actual,
 	print_params_double(type, expected, actual, 0.0);
 	print_repeat(type, repeat_counter);
 }
-#endif
 
 void PCU_msg_impl(const char *msg, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
@@ -480,6 +481,13 @@ static void print_type_nstrw(const char *str, const wchar_t *value, size_t len)
 
 #endif
 
+#if !defined(PCU_USE_WCHAR) || defined(PCU_NO_FLOATINGPOINT)
+static void print_not_supported(void)
+{
+	PCU_puts("  NOT SUPPORTED\n");
+}
+#endif
+
 static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t actual)
 {
 	const char * const expected_str = "expected";
@@ -530,6 +538,11 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		print_type_nstrw(actual_str  , (const wchar_t *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %d\n", len);
 		break;
+#else
+	case PCU_TYPE_STRW:
+	case PCU_TYPE_NSTRW:
+		print_not_supported();
+		break;
 #endif
 	case PCU_TYPE_MSG:
 	case PCU_TYPE_ADDMSG:
@@ -546,9 +559,9 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	}
 }
 
-#ifndef PCU_NO_FLOATINGPOINT
 static void print_params_double(unsigned long type, double expected, double actual, double delta)
 {
+#ifndef PCU_NO_FLOATINGPOINT
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
@@ -570,6 +583,12 @@ static void print_params_double(unsigned long type, double expected, double actu
 	default:
 		break;
 	}
-}
+#else
+	(void) type;
+	(void) expected;
+	(void) actual;
+	(void) delta;
+	print_not_supported();
 #endif
+}
 

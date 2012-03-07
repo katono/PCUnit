@@ -2,9 +2,11 @@ CFLAGS = -Wall -g
 
 TARGET = assert_test
 TARGET_NO_SETJMP = assert_test_nosetjmp
+TARGET_NOT_SUPPORTED = assert_test_not_supported
 
 LIBPCUNIT = ../../PCUnit/libpcunit.a
 LIBPCUNIT_NO_SETJMP = dummy.a
+LIBPCUNIT_NOT_SUPPORTED = dummy2.a
 OBJS = main.o
 OBJS += $(LIBPCUNIT)
 OBJS += AssertTest.o
@@ -27,8 +29,11 @@ no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
 	./$(TARGET_NO_SETJMP) > $(TARGET_NO_SETJMP).txt
 	diff $(TARGET).txt $(TARGET_NO_SETJMP).txt
 
+not_supported: pcunit_register $(LIBPCUNIT_NOT_SUPPORTED) $(TARGET_NOT_SUPPORTED)
+
 pcunit_register:
 	ruby ../../util/pcunit_register.rb
+	cd ../../PCUnit && $(MAKE) clean
 
 
 .SUFFIXES: .c .o
@@ -38,18 +43,23 @@ pcunit_register:
 	$(CC) $(CFLAGS) -c $<
 
 $(LIBPCUNIT):
-	cd ../../PCUnit && $(MAKE) clean
 	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g"
 
 $(LIBPCUNIT_NO_SETJMP):
-	cd ../../PCUnit && $(MAKE) clean
 	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -DPCU_NO_SETJMP -g"
+
+$(LIBPCUNIT_NOT_SUPPORTED):
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_NO_FLOATINGPOINT -g"
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	cd ../../PCUnit && $(MAKE) clean
 
 $(TARGET_NO_SETJMP): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@
+	cd ../../PCUnit && $(MAKE) clean
+
+$(TARGET_NOT_SUPPORTED): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 	cd ../../PCUnit && $(MAKE) clean
 
@@ -62,7 +72,7 @@ console:
 
 .PHONY: clean
 clean:
-	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET).txt $(TARGET_NO_SETJMP).txt
+	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET_NOT_SUPPORTED) $(TARGET).txt $(TARGET_NO_SETJMP).txt
 
 
 main.o: ../../PCUnit/PCUnit.h

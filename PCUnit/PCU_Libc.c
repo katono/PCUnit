@@ -691,6 +691,12 @@ const char *PCU_formatW(const void *format, ...)
 	return PCU_format("%ls", formatw_buf);
 }
 
+#else
+const char *PCU_formatW(const void *format, ...)
+{
+	(void) format;
+	return "";
+}
 #endif
 
 

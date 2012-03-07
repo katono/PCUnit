@@ -1,11 +1,13 @@
 #include "PCUnit/PCUnit.h"
 #include <stdio.h>
 
+PCU_Suite *AssertNotSupportedTest_suite(void);
 PCU_Suite *AssertOutputTest_suite(void);
 
 int main(void)
 {
 	const PCU_SuiteMethod suites[] = {
+		AssertNotSupportedTest_suite,
 		AssertOutputTest_suite,
 	};
 	PCU_set_putchar(putchar);

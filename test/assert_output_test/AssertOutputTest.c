@@ -59,15 +59,15 @@ static void cut_newline(char *str, int line)
 	*p = '\0';
 }
 
-static void test_output(void)
+void output_test(FILE *fp_exp, FILE *fp_act)
 {
-	char buf_expected[1024];
-	char buf_actual[1024];
 	int line = 1;
 	while (1) {
+		char buf_expected[512];
+		char buf_actual[512];
 		char *ret_expected, *ret_actual;
-		ret_expected = fgets(buf_expected, sizeof buf_expected, fp_expected);
-		ret_actual   = fgets(buf_actual, sizeof buf_actual, fp_actual);
+		ret_expected = fgets(buf_expected, sizeof buf_expected, fp_exp);
+		ret_actual   = fgets(buf_actual, sizeof buf_actual, fp_act);
 		PCU_ASSERT_FALSE_MESSAGE( ret_expected && !ret_actual, PCU_format("line:%d", line));
 		PCU_ASSERT_FALSE_MESSAGE(!ret_expected &&  ret_actual, PCU_format("line:%d", line));
 		if (!ret_expected && !ret_actual) {
@@ -79,6 +79,11 @@ static void test_output(void)
 		line_check(buf_expected, buf_actual, line);
 		line++;
 	}
+}
+
+static void test_output(void)
+{
+	output_test(fp_expected, fp_actual);
 }
 
 

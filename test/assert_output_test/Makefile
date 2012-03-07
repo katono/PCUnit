@@ -6,6 +6,7 @@ TARGET = assert_output_test
 OBJS = main.o
 OBJS += ../../PCUnit/libpcunit.a
 OBJS += AssertOutputTest.o
+OBJS += AssertNotSupportedTest.o
 
 
 .PHONY: all clean pcunit_register test
@@ -16,6 +17,8 @@ pcunit_register:
 	ruby ../../util/pcunit_register.rb
 	cd ../assert_test && $(MAKE)
 	../assert_test/assert_test nocolor > assert_output_actual.txt
+	cd ../assert_test && $(MAKE) not_supported
+	../assert_test/assert_test_not_supported nocolor > assert_not_supported_actual.txt
 
 .SUFFIXES: .c .o
 
@@ -34,5 +37,5 @@ test:
 	./$(TARGET)
 
 clean:
-	rm -f *.o $(TARGET) assert_output_actual.txt
+	rm -f *.o $(TARGET) assert_output_actual.txt assert_not_supported_actual.txt
 
