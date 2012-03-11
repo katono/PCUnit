@@ -347,85 +347,85 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT(expr)`**
 
     任意の式exprが真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_TRUE(expr)`**
 
     任意の式exprが真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_FALSE(expr)`**
 
     任意の式exprが偽かどうかチェックします。
-    真ならば失敗を登録し、テスト関数から抜けます。
+    真ならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_PTR_EQUAL(expected, actual)`**
 
     expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)`**
 
     expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_PTR_NULL(value)`**
 
     valueがポインタである前提で、valueがNULLかどうかチェックします。
-    NULLでないならば失敗を登録し、テスト関数から抜けます。
+    NULLでないならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_PTR_NOT_NULL(value)`**
 
     valueがポインタである前提で、valueがNULLでないかどうかチェックします。
-    NULLならば失敗を登録し、テスト関数から抜けます。
+    NULLならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_STRING_EQUAL(expected, actual)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)`**
 
     expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
 
 
 * **`PCU_ASSERT_STRINGW_EQUAL(expected, actual)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
@@ -433,7 +433,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
@@ -441,7 +441,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_NSTRINGW_EQUAL(expected, actual, n)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しいかどうかチェックします。
-    等しくないならば失敗を登録し、テスト関数から抜けます。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
@@ -449,7 +449,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)`**
 
     expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
-    等しいならば失敗を登録し、テスト関数から抜けます。
+    等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
@@ -481,21 +481,21 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)`**
 
     expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
 * **`PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)`**
 
     expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が偽かどうかチェックします。
-    真ならば失敗を登録し、テスト関数から抜けます。
+    真ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
 * **`PCU_ASSERT_OPERATOR(lhs, op, rhs)`**
 
     lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
     * `PCU_ASSERT_OPERATOR(x < 0, ||, 100 <= x);` xが0未満または100以上かチェック
@@ -505,7 +505,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)`**
 
     lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
@@ -514,7 +514,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)`**
 
     lhsとrhsが浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
-    偽ならば失敗を登録し、テスト関数から抜けます。
+    偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
     例:
@@ -535,7 +535,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 * **`PCU_FAIL(msg)`**
 
-    無条件に失敗を登録し、テスト関数から抜けます。
+    無条件に失敗を出力し、テスト関数から抜けます。
     失敗表示の際にmsgで指定したメッセージを表示します。
     msgの型は`const char *`です。
     なお、`PCU_format`/`PCU_formatW`を使用すればprintf/wprintfと同じ形式の文字列を指定することができます。
