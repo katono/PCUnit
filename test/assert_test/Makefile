@@ -32,7 +32,7 @@ no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
 not_supported: pcunit_register $(LIBPCUNIT_NOT_SUPPORTED) $(TARGET_NOT_SUPPORTED)
 
 pcunit_register:
-	ruby ../../util/pcunit_register.rb
+	ruby ../../PCUnit/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
 
 

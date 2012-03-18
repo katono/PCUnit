@@ -14,7 +14,7 @@ OBJS += AssertNotSupportedTest.o
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby ../../util/pcunit_register.rb
+	ruby ../../PCUnit/pcunit_register.rb
 	cd ../assert_test && $(MAKE)
 	../assert_test/assert_test nocolor > assert_output_actual.txt
 	cd ../assert_test && $(MAKE) not_supported

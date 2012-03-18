@@ -11,7 +11,7 @@ OBJS += ../../PCUnit/libpcunit.a
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby ../../util/pcunit_register.rb
+	ruby ../../PCUnit/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
 	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g -DPCU_FORMAT_BUFSIZE=256"
 

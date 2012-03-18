@@ -37,13 +37,11 @@ install:
 	install -d $(INSTALLDIR)/bin
 	install -m 644 $(TARGET) $(INSTALLDIR)/lib
 	install -m 644 PCUnit.h $(INSTALLDIR)/include/PCUnit
-	if [ -d ../util ]; then\
-		if [ -e ../util/pcunit_template.rb ]; then\
-			install -m 755 ../util/pcunit_template.rb $(INSTALLDIR)/bin;\
-		fi;\
-		if [ -e ../util/pcunit_register.rb ]; then\
-			install -m 755 ../util/pcunit_register.rb $(INSTALLDIR)/bin;\
-		fi;\
+	if [ -e pcunit_template.rb ]; then\
+		install -m 755 pcunit_template.rb $(INSTALLDIR)/bin;\
+	fi;\
+	if [ -e pcunit_register.rb ]; then\
+		install -m 755 pcunit_register.rb $(INSTALLDIR)/bin;\
 	fi
 
 uninstall:

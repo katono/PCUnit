@@ -16,7 +16,7 @@ OBJS += $(LIBPCUNIT)
 all: pcunit_register $(TARGET) test
 
 pcunit_register:
-	ruby ../util/pcunit_register.rb
+	ruby ../PCUnit/pcunit_register.rb
 
 .SUFFIXES: .c .o
 
