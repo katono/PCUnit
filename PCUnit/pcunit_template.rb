@@ -22,6 +22,7 @@ opt.on('-M [VAL]') {|v|
 		OPTS[:M] = "Makefile"
 	end
 }
+opt.on('-i') {|v| OPTS[:i] = v }
 opt.on('-d VAL') {|v| OPTS[:d] = v + "/" }
 opt.on('-o') {|v| OPTS[:o] = v }
 opt.on('-p [VAL]') {|v|
@@ -33,11 +34,12 @@ opt.on('-p [VAL]') {|v|
 }
 opt.on('-h', '--help') {
 	print <<-"EOB"
-Usage: pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-o]
+Usage: pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-M [FILE] [-i]] [-o]
     -d DIR     output directory
     -p [EXT]   C++ file extension (default: cpp)
     -m [FILE]  main file name (default: main.c or main.cpp)
     -M [FILE]  Makefile name (default: Makefile)
+       [-i]    whether libpcunit.a is installed
     -o         overwrite flag
 
 	EOB
@@ -122,12 +124,51 @@ def create_makefile(objs)
 	ext = OPTS[:p]
 	file = File.open(OPTS[:d] + OPTS[:M], "w")
 	file.print <<-"EOB"
+CC = #{cc}
+CFLAGS = -Wall -g
+CFLAGS += -I.
+LFLAGS = -LPCUnit -lpcunit
+
+TARGET = alltests
+OBJS = main.o
+#{objs}
+
+.PHONY: all clean pcunit_register test
+
+all: pcunit_register $(TARGET) test
+
+pcunit_register:
+	ruby PCUnit/pcunit_register.rb
+
+.SUFFIXES: #{ext} .o
+
+#{ext}.o:
+	$(CC) $(CFLAGS) -c $<
+
+$(TARGET): $(OBJS)
+	cd PCUnit && $(MAKE)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
+
+test:
+	./$(TARGET)
+
+clean:
+	cd PCUnit && $(MAKE) clean
+	rm -f *.o $(TARGET)
+
+	EOB
+end
+
+def create_makefile_installed(objs)
+	cc = OPTS[:p] == ".c" ? "gcc" : "g++"
+	ext = OPTS[:p]
+	file = File.open(OPTS[:d] + OPTS[:M], "w")
+	file.print <<-"EOB"
 INSTALLDIR = /usr/local
 
 CC = #{cc}
 CFLAGS = -Wall -g
 CFLAGS += -I$(INSTALLDIR)/include
-
 LFLAGS = -L$(INSTALLDIR)/lib -lpcunit
 
 TARGET = alltests
@@ -174,7 +215,11 @@ end
 
 if OPTS[:M]
 	if OPTS[:o] || !File.exist?(OPTS[:d] + OPTS[:M])
-		create_makefile(makefile_objs)
+		if OPTS[:i]
+			create_makefile_installed(makefile_objs)
+		else
+			create_makefile(makefile_objs)
+		end
 	end
 end
 
