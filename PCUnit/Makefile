@@ -10,6 +10,7 @@ CFLAGS = -Wall -W -Wno-long-long -ansi -pedantic-errors -Os
 # CFLAGS += -DPCU_NO_CONSOLE_RUN
 CFLAGS += -DPCU_USE_WCHAR
 # CFLAGS += -DPCU_FORMAT_BUFSIZE=256
+
 TARGET = libpcunit.a
 OBJS = PCUnit.o
 OBJS += PCU_Test.o
@@ -53,7 +54,7 @@ uninstall:
 clean:
 	rm -f *.o *.a
 
-PCUnit.o: PCU_Suite.h PCU_Libc.h PCUnit.h
-PCU_Test.o: PCU_Test.h PCU_Libc.h PCUnit.h
-PCU_Suite.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h
-PCU_Libc.o: PCU_Libc.h PCUnit.h
+PCUnit.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h Makefile
+PCU_Test.o: PCU_Test.h PCU_Libc.h PCUnit.h Makefile
+PCU_Suite.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h Makefile
+PCU_Libc.o: PCU_Libc.h PCUnit.h Makefile
