@@ -676,7 +676,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 `pcunit_template.rb`はPCUnit用のソースファイルの雛形を生成するRubyスクリプトです。
 書式は次の通りです。
 
-    pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-M [FILE]] [-o]
+    pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-M [FILE] [-i]] [-o]
 
 `suite_name`に1つ以上のテストスイート名を指定すると、`テストスイート名.c`というファイルを生成します。
 生成されたファイルにはあらかじめ`テストスイート名_suite()`という名前のスイートメソッドや、
@@ -702,11 +702,13 @@ setup関数・テスト関数等の雛形が定義されています。
     `FILE`にファイル名を指定してください。
     `FILE`を省略した場合、ファイル名は`main.c`(`-p`指定の場合は`main.cpp`)になります。
 
-* `-M [FILE]`
+* `-M [FILE] [-i]`
 
     テストプロジェクトのMakefileの雛型を生成します。
     `FILE`にファイル名を指定してください。
     `FILE`を省略した場合、ファイル名は`Makefile`になります。
+    `-i`を指定した場合、libpcunit.aが既にインストールされている前提のMakefileを生成します。
+    `-i`を省略した場合、テストコードとPCUnitを共にビルドするMakefileを生成します。
 
 * `-o`
 
