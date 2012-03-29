@@ -1,6 +1,6 @@
 CC = gcc
 AR = ar
-CFLAGS = -Wall -W -Wno-long-long -ansi -pedantic-errors -Os
+CFLAGS = -Wall -W -Os
 # CFLAGS += -DPCU_NO_VSPRINTF
 # CFLAGS += -DPCU_NO_SETJMP
 # CFLAGS += -DPCU_NO_LIBC
