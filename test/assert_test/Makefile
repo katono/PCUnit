@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g
+CFLAGS = -Wall -std=c99 -g
 
 TARGET = assert_test
 TARGET_NO_SETJMP = assert_test_nosetjmp
@@ -43,13 +43,13 @@ pcunit_register:
 	$(CC) $(CFLAGS) -c $<
 
 $(LIBPCUNIT):
-	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -g"
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -std=c99 -DPCU_USE_WCHAR -g"
 
 $(LIBPCUNIT_NO_SETJMP):
-	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_USE_WCHAR -DPCU_NO_SETJMP -g"
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -std=c99 -DPCU_USE_WCHAR -DPCU_NO_SETJMP -g"
 
 $(LIBPCUNIT_NOT_SUPPORTED):
-	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -Wno-long-long -ansi -pedantic-errors -DPCU_NO_FLOATINGPOINT -g"
+	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -std=c99 -DPCU_NO_FLOATINGPOINT -g"
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
