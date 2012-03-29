@@ -1,4 +1,4 @@
-#include "PCUnit/PCUnit.h"
+#include "../../PCUnit/PCUnit.h"
 #include <stdio.h>
 
 PCU_Suite *AssertNotSupportedTest_suite(void);
