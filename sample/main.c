@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	if (argc >= 2) {
 		PCU_console_run(suites, sizeof suites / sizeof suites[0]);
 	} else {
-		PCU_run(suites, sizeof suites / sizeof suites[0]);
+		return PCU_run(suites, sizeof suites / sizeof suites[0]);
 	}
 	return 0;
 }

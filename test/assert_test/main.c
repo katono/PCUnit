@@ -37,10 +37,10 @@ int main(int argc, char **argv)
 		PCU_console_run(suites, sizeof suites / sizeof *suites);
 	} else if (argc > 1 && !strcmp(argv[1], "nocolor")) {
 		PCU_disable_color();
-		PCU_run(suites, sizeof suites / sizeof *suites);
+		return PCU_run(suites, sizeof suites / sizeof *suites);
 	} else {
 		PCU_enable_color();
-		PCU_run(suites, sizeof suites / sizeof *suites);
+		return PCU_run(suites, sizeof suites / sizeof *suites);
 	}
 	return 0;
 }

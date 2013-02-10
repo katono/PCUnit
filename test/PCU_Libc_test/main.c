@@ -18,7 +18,6 @@ int main(void)
 	PCU_enable_color();
 	PCU_set_putchar(putchar);
 	PCU_set_getchar(getchar);
-	PCU_run(suites, sizeof suites / sizeof *suites);
-	return 0;
+	return PCU_run(suites, sizeof suites / sizeof *suites);
 }
 
