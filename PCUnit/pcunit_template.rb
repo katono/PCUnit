@@ -36,9 +36,9 @@ opt.on('-h', '--help') {
 	print <<-"EOB"
 Usage: pcunit_template.rb [suite_name ...] [-d DIR] [-p [EXT]] [-m [FILE]] [-M [FILE] [-i]] [-o]
     -d DIR     output directory
-    -p [EXT]   C++ file extension (default: cpp)
-    -m [FILE]  main file name (default: main.c or main.cpp)
-    -M [FILE]  Makefile name (default: Makefile)
+    -p [EXT]   change file extension from C to C++ (default: cpp)
+    -m [FILE]  create main file (default: main.c or main.cpp)
+    -M [FILE]  create Makefile (default: Makefile)
        [-i]    whether libpcunit.a is installed
     -o         overwrite flag
 
