@@ -151,7 +151,7 @@ typedef int (*PCU_Getchar)(void);
 /* 
  * PCUnit API
  */
-void PCU_run(const PCU_SuiteMethod *suite_methods, int num);
+int PCU_run(const PCU_SuiteMethod *suite_methods, int num);
 void PCU_set_putchar(PCU_Putchar func);
 void PCU_set_getchar(PCU_Getchar func);
 int PCU_repeat_counter(void);

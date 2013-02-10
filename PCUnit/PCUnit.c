@@ -193,13 +193,13 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_puts("\n");
 		print_after_test(p);
 	}
-	reset(suite_methods, num);
 }
 
-void PCU_run(const PCU_SuiteMethod *suite_methods, int num)
+int PCU_run(const PCU_SuiteMethod *suite_methods, int num)
 {
 	reset(suite_methods, num);
 	run_all(suite_methods, num);
+	return result.num_suites_failed > 0;
 }
 
 #ifndef PCU_NO_CONSOLE_RUN
@@ -240,23 +240,23 @@ static void print_result_selected(PCU_Suite *suite, int idx)
 static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
 {
 	PCU_Suite *p = (suite_methods[suite_idx])();
+	reset(suite_methods, num);
 	print_before_test(p);
 	PCU_Suite_run(p);
 	PCU_Suite_get_result(p, &suite_result);
 	add_result();
 	PCU_puts("\n");
 	print_after_test(p);
-	reset(suite_methods, num);
 }
 
 static void run_selected_test(const PCU_SuiteMethod *suite_methods, int num, int suite_idx, int test_idx)
 {
 	PCU_Suite *p = (suite_methods[suite_idx])();
+	reset(suite_methods, num);
 	PCU_Suite_run_selected(p, test_idx);
 	PCU_Suite_get_result(p, &suite_result);
 	add_result();
 	print_result_selected(p, test_idx);
-	reset(suite_methods, num);
 }
 
 static void show_list_tests(const PCU_Test *tests, int num)
