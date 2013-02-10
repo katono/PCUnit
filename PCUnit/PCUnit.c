@@ -262,12 +262,11 @@ static void run_selected_test(const PCU_SuiteMethod *suite_methods, int num, int
 static void show_list_tests(const PCU_Test *tests, int num)
 {
 	int i;
-	int j;
 	const PCU_Test *p;
 	PCU_puts("List of Tests\n");
 	PCU_puts("  Number  Name\n");
-	for (i = 0, j = 1, p = tests; i < num; i++, j++, p++) {
-		PCU_PRINTF1("  %-6d  ", j);
+	for (i = 0, p = tests; i < num; i++, p++) {
+		PCU_PRINTF1("  %-6d  ", i + 1);
 		PCU_puts(p->name);
 		PCU_puts("\n");
 	}
@@ -277,13 +276,12 @@ static void show_list_tests(const PCU_Test *tests, int num)
 static void show_list_suites(const PCU_SuiteMethod *suite_methods, int num)
 {
 	int i;
-	int j;
 	const PCU_SuiteMethod *method = suite_methods;
 	PCU_puts("List of Suites\n");
 	PCU_puts("  Number  Name\n");
-	for (i = 0, j = 1; i < num; i++, j++, method++) {
+	for (i = 0; i < num; i++, method++) {
 		const PCU_Suite *p = (*method)();
-		PCU_PRINTF1("  %-6d  ", j);
+		PCU_PRINTF1("  %-6d  ", i + 1);
 		PCU_puts(p->name);
 		PCU_puts("\n");
 	}
