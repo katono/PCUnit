@@ -25,8 +25,8 @@ all: pcunit_register $(LIBPCUNIT) $(TARGET)
 
 no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
 	$(MAKE) all
-	./$(TARGET) > $(TARGET).txt
-	./$(TARGET_NO_SETJMP) > $(TARGET_NO_SETJMP).txt
+	- ./$(TARGET) > $(TARGET).txt
+	- ./$(TARGET_NO_SETJMP) > $(TARGET_NO_SETJMP).txt
 	diff $(TARGET).txt $(TARGET_NO_SETJMP).txt
 
 not_supported: pcunit_register $(LIBPCUNIT_NOT_SUPPORTED) $(TARGET_NOT_SUPPORTED)
