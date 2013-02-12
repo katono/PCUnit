@@ -159,6 +159,7 @@ const char *PCU_test_name(void);
 const char *PCU_suite_name(void);
 void PCU_enable_color(void);
 void PCU_disable_color(void);
+void PCU_set_verbose(int verbose_flag);
 void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 const char *PCU_format(const char *format, ...);
 const char *PCU_formatW(const void *format, ...);

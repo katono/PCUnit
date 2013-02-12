@@ -9,8 +9,11 @@ static PCU_Test *current_test;
 static int repeat_counter;
 static PCU_jmp_buf fatal_jmp;
 static int last_assertion;
+static int is_verbose;
 
-static void print_test_name(unsigned long type, const char *str_assert, const char *file, unsigned int line);
+static void print_test_name(void);
+static void print_result(const char *str);
+static void print_file_line_assert(unsigned long type, const char *str_assert, const char *file, unsigned int line);
 static void print_repeat(unsigned long type, int repeat);
 static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t actual);
 static void print_params_double(unsigned long type, double expected, double actual, double delta);
@@ -49,13 +52,16 @@ void PCU_Test_run(PCU_Test *self)
 	volatile int repeat;
 	current_test = self;
 
+	if (is_verbose) {
+		print_test_name();
+	}
 	repeat = (self->ntimes != 0) ? self->ntimes : 1;
 	for (repeat_counter = 0; repeat_counter < repeat; repeat_counter++) {
 		int err;
 		err = PCU_Test_setup(self);
 		if (err) {
 			self->result.num_errors_setup++;
-			print_test_name(PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1);
+			print_file_line_assert(PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1);
 			print_params(PCU_TYPE_SETUP, 0, (PCU_size_t) err);
 			print_repeat(PCU_TYPE_SETUP, repeat_counter);
 			continue;
@@ -66,10 +72,19 @@ void PCU_Test_run(PCU_Test *self)
 		err = PCU_Test_teardown(self);
 		if (err) {
 			self->result.num_errors_teardown++;
-			print_test_name(PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1);
+			print_file_line_assert(PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1);
 			print_params(PCU_TYPE_SETUP, 0, (PCU_size_t) err);
 			print_repeat(PCU_TYPE_SETUP, repeat_counter);
 			continue;
+		}
+	}
+	if (is_verbose) {
+		if (repeat < 0) {
+			print_result("SKIPPED");
+		} else if (PCU_Test_is_failed(self)) {
+			print_result("FAILED");
+		} else {
+			print_result("PASSED");
 		}
 	}
 }
@@ -109,7 +124,7 @@ void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual,
 	last_assertion = 0;
 	current_test->result.num_asserts_failed++;
 
-	print_test_name(type, str_assert, file, line);
+	print_file_line_assert(type, str_assert, file, line);
 	print_params(type, expected, actual);
 	print_repeat(type, repeat_counter);
 }
@@ -231,7 +246,7 @@ void PCU_assert_double_impl(double expected, double actual, double delta,
 	last_assertion = 0;
 	current_test->result.num_asserts_failed++;
 
-	print_test_name(type, str_assert, file, line);
+	print_file_line_assert(type, str_assert, file, line);
 	print_params_double(type, expected, actual, delta);
 	print_repeat(type, repeat_counter);
 }
@@ -250,7 +265,7 @@ void PCU_assert_op_double_impl(int passed_flag, double expected, double actual,
 	last_assertion = 0;
 	current_test->result.num_asserts_failed++;
 
-	print_test_name(type, str_assert, file, line);
+	print_file_line_assert(type, str_assert, file, line);
 	print_params_double(type, expected, actual, 0.0);
 	print_repeat(type, repeat_counter);
 }
@@ -259,7 +274,7 @@ void PCU_msg_impl(const char *msg,
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
 	current_test->result.num_msgs++;
-	print_test_name(type, str_assert, file, line);
+	print_file_line_assert(type, str_assert, file, line);
 	print_params(type, (PCU_size_t)(size_t) msg, 0);
 	print_repeat(type, repeat_counter);
 }
@@ -277,6 +292,11 @@ const char *PCU_test_name(void)
 int PCU_last_assertion(void)
 {
 	return last_assertion;
+}
+
+void PCU_set_verbose(int verbose_flag)
+{
+	is_verbose = verbose_flag;
 }
 
 static int is_first_print(PCU_Test *self)
@@ -297,13 +317,25 @@ static int is_first_print(PCU_Test *self)
 	return 0;
 }
 
-static void print_test_name(unsigned long type, const char *str_assert, const char *file, unsigned int line)
+static void print_test_name(void)
+{
+	PCU_puts("\nTest: ");
+	PCU_puts(PCU_test_name());
+	PCU_puts("\n");
+}
+
+static void print_result(const char *str)
+{
+	PCU_puts(" [");
+	PCU_puts(str);
+	PCU_puts("]\n");
+}
+
+static void print_file_line_assert(unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
 	unsigned long t;
-	if (is_first_print(current_test)) {
-		PCU_puts("\nTest: ");
-		PCU_puts(PCU_test_name());
-		PCU_puts("\n");
+	if (!is_verbose && is_first_print(current_test)) {
+		print_test_name();
 	}
 
 	t = PCU_get_assert_type(type);
