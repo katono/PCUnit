@@ -489,18 +489,28 @@ CLEANUP FAILED : -1
 Suite: FailTest
 
 Test: test_fail1
- FailTest.c:26: PCU_MESSAGE
-  test_message
- FailTest.c:27: PCU_FAIL
+ FailTest.c:26: PCU_FAIL
   test_fail
 
 Test: test_fail2
- FailTest.c:32: PCU_MESSAGE
-  test_message: 1,0x2, 3, 0004, 5, 0x00000006, +7, 8       ,-9,         10
- FailTest.c:33: PCU_FAIL
+ FailTest.c:31: PCU_FAIL
   test_fail: 1,0x2, 3, 0004, 5, 0x00000006, +7, 8       ,-9,         10
 
-2 Tests, 2 Failures, 0 Skipped
+Test: test_message1
+ FailTest.c:36: PCU_MESSAGE
+  test_message
+
+Test: test_message2
+ FailTest.c:41: PCU_MESSAGE
+  test_message: 1,0x2, 3, 0004, 5, 0x00000006, +7, 8       ,-9,         10
+
+Test: test_message_fail
+ FailTest.c:46: PCU_MESSAGE
+  test_message
+ FailTest.c:47: PCU_FAIL
+  test_fail
+
+5 Tests, 3 Failures, 0 Skipped
 
 
 Suite: InitializeTest
