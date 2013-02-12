@@ -5,27 +5,33 @@
 static FILE *fp_expected;
 static FILE *fp_actual;
 
+static const char * const file_map[][2] = {
+	{"assert_output_expected.txt"        , "assert_output_actual.txt"},
+	{"assert_output_verbose_expected.txt", "assert_output_verbose_actual.txt"},
+};
+
 static int initialize(void)
 {
-	fp_expected = fopen("assert_output_expected.txt", "r");
-	fp_actual   = fopen("assert_output_actual.txt", "r");
-	return !(fp_expected && fp_actual);
+	return 0;
 }
 
 static int cleanup(void)
 {
-	fclose(fp_expected);
-	fclose(fp_actual);
 	return 0;
 }
 
 static int setup(void)
 {
-	return 0;
+	int idx = !strcmp(PCU_test_name(), "test_output") ? 0 : 1;
+	fp_expected = fopen(file_map[idx][0], "r");
+	fp_actual   = fopen(file_map[idx][1], "r");
+	return !(fp_expected && fp_actual);
 }
 
 static int teardown(void)
 {
+	fclose(fp_expected);
+	fclose(fp_actual);
 	return 0;
 }
 
@@ -86,11 +92,17 @@ static void test_output(void)
 	output_test(fp_expected, fp_actual);
 }
 
+static void test_output_verbose(void)
+{
+	output_test(fp_expected, fp_actual);
+}
+
 
 PCU_Suite *AssertOutputTest_suite(void)
 {
 	static PCU_Test tests[] = {
 		PCU_TEST(test_output),
+		PCU_TEST(test_output_verbose),
 	};
 	static PCU_Suite suite = {
 		"AssertOutputTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
