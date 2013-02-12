@@ -184,6 +184,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 {
 	int i;
 	const PCU_SuiteMethod *method = suite_methods;
+	reset(suite_methods, num);
 	for (i = 0; i < num; i++, method++) {
 		PCU_Suite *p = (*method)();
 		print_before_test(p);
@@ -197,7 +198,6 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 
 int PCU_run(const PCU_SuiteMethod *suite_methods, int num)
 {
-	reset(suite_methods, num);
 	run_all(suite_methods, num);
 	return result.num_suites_failed > 0;
 }
