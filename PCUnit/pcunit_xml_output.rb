@@ -33,6 +33,8 @@ $testsuites.add_attribute("name", "")
 $current_msg = ""
 $testsuite = nil
 $testcase = nil
+$exists_testcase = false
+
 def parse_line(line)
 	line.chomp!
 	if line =~ /(\033\[\d*m)/
@@ -60,6 +62,7 @@ def parse_line(line)
 		$testcase.add_attribute("classname", String($testsuite.attributes["name"]))
 		$testcase.add_attribute("time", "0")
 		$testsuite.add_element($testcase)
+		$exists_testcase = true
 	elsif line =~ /^ \[(.*)\]/
 		if $1 == "PASSED"
 		elsif $1 == "SKIPPED"
@@ -119,6 +122,14 @@ end
 $testsuites.attributes["tests"]    = ($testsuites.attributes["tests"].to_i    + $testsuite.attributes["tests"].to_i).to_s
 $testsuites.attributes["failures"] = ($testsuites.attributes["failures"].to_i + $testsuite.attributes["failures"].to_i).to_s
 $testsuites.attributes["errors"]   = ($testsuites.attributes["errors"].to_i   + $testsuite.attributes["errors"].to_i).to_s
+if !$exists_testcase
+	# dummy
+	$testcase = REXML::Element.new("testcase") 
+	$testcase.add_attribute("name", "")
+	$testcase.add_attribute("classname", "")
+	$testcase.add_attribute("time", "0")
+	$testsuites.add_element($testcase)
+end
 
 str = ""
 doc.write(str, 2)
