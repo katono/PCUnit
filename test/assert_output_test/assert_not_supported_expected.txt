@@ -439,23 +439,29 @@ Suite: AssertTest
 
 Test: test_assert_FAIL
  AssertTest.c:31: PCU_ASSERT(0)
+  expr     : 0x00000000 (0)
 
 Test: test_assert_MSG
  AssertTest.c:40: PCU_ASSERT(a)
+  expr     : 0x00000000 (0)
   0
 
 Test: test_assert_true_FAIL
  AssertTest.c:52: PCU_ASSERT_TRUE(a)
+  expr     : 0x00000000 (0)
 
 Test: test_assert_true_MSG
  AssertTest.c:61: PCU_ASSERT_TRUE(a)
+  expr     : 0x00000000 (0)
   0
 
 Test: test_assert_false_FAIL
  AssertTest.c:73: PCU_ASSERT_FALSE(a)
+  expr     : 0x00000001 (1)
 
 Test: test_assert_false_MSG
  AssertTest.c:82: PCU_ASSERT_FALSE(a)
+  expr     : 0x00000001 (1)
   1
 
 9 Tests, 6 Failures, 0 Skipped
