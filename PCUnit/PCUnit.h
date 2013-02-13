@@ -180,22 +180,19 @@ const char *PCU_formatW(const void *format, ...);
  */
 
 #define PCU_ASSERT_AUX(expr, str_assert)\
-	PCU_assert_impl(((expr) != 0),\
-		0, 0,\
-		PCU_TYPE_NONE,\
+	PCU_assert_num_impl(0, (PCU_size_t) (expr),\
+		PCU_TYPE_NONE | PCU_TYPE_NOT,\
 		str_assert,\
-		__FILE__, __LINE__)\
+		__FILE__, __LINE__)
 
 #define PCU_ASSERT_TRUE_AUX(expr, str_assert)\
-	PCU_assert_impl(((expr) != 0),\
-		0, 0,\
-		PCU_TYPE_BOOL,\
+	PCU_assert_num_impl(0, (PCU_size_t) (expr),\
+		PCU_TYPE_BOOL | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_FALSE_AUX(expr, str_assert)\
-	PCU_assert_impl(((expr) == 0),\
-		0, 0,\
+	PCU_assert_num_impl(0, (PCU_size_t) (expr),\
 		PCU_TYPE_BOOL,\
 		str_assert,\
 		__FILE__, __LINE__)

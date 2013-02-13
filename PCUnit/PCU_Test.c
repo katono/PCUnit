@@ -383,6 +383,7 @@ static void print_repeat(unsigned long type, int repeat)
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
 {
 	const int width = (int) ((is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2);
+	if (!str) return;
 	PCU_puts("  ");
 	PCU_puts(str);
 	PCU_PRINTF3(PCU_LX_LD, width, value, value);
@@ -396,6 +397,7 @@ static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
 static void print_type_num_no_div32(const char *str, PCU_size_t value)
 {
+	if (!str) return;
 	PCU_puts("  ");
 	PCU_puts(str);
 	PCU_PRINTF2(" : 0x%0*x\n", sizeof(size_t) * 2, value);
@@ -527,6 +529,14 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	size_t len;
 
 	switch (PCU_get_assert_type(type)) {
+	case PCU_TYPE_NONE:
+	case PCU_TYPE_BOOL:
+#if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
+		print_expected_actual_no_div32(0, "expr    ", expected, actual);
+#else
+		print_expected_actual(0, "expr    ", expected, actual);
+#endif
+		break;
 	case PCU_TYPE_NUM:
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
 		print_expected_actual_no_div32(expected_str, actual_str, expected, actual);
