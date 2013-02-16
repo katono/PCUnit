@@ -176,7 +176,7 @@ const char *PCU_formatW(const void *format, ...);
 
 
 /* 
- * Assert Macros
+ * private
  */
 
 #define PCU_ASSERT_AUX(expr, str_assert)\
@@ -344,6 +344,10 @@ const char *PCU_formatW(const void *format, ...);
 		}\
 	} while (0)
 
+
+/* 
+ * Assertion Macros
+ */
 
 #define PCU_ASSERT(expr)\
 	do {\
