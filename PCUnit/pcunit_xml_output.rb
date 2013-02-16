@@ -6,12 +6,15 @@ require 'rexml/document'
 opt = OptionParser.new
 
 output_file_name = "test_results.xml"
+no_stdout = false
 
 opt.on('-o VAL') {|v| output_file_name = v }
+opt.on('-n') {|v| no_stdout = v }
 opt.on('-h', '--help') {
 	print <<-"EOB"
-Usage: pcunit_xml_output.rb [-o FILE]
+Usage: pcunit_xml_output.rb [-o FILE] [-n]
     -o FILE  output file name
+    -n       no stdout flag
 
 	EOB
 	exit
@@ -30,7 +33,7 @@ $testsuites.add_attribute("errors", "0")
 $testsuites.add_attribute("time", "0")
 $testsuites.add_attribute("name", "")
 
-$current_msg = ""
+$failure_message = ""
 $testsuite = nil
 $testcase = nil
 $exists_testcase = false
@@ -46,7 +49,7 @@ def parse_line(line)
 			$testsuites.attributes["failures"] = ($testsuites.attributes["failures"].to_i + $testsuite.attributes["failures"].to_i).to_s
 			$testsuites.attributes["errors"]   = ($testsuites.attributes["errors"].to_i   + $testsuite.attributes["errors"].to_i).to_s
 		end
-		$current_msg = ""
+		$failure_message = ""
 		$testcase = nil
 		$testsuite = REXML::Element.new("testsuite") 
 		$testsuite.add_attribute("name", $1)
@@ -70,11 +73,11 @@ def parse_line(line)
 			$testcase.add_element(skipped)
 		elsif $1 == "FAILED"
 			failure = REXML::Element.new("failure") 
-			failure.add_attribute("message", $current_msg)
+			failure.add_attribute("message", $failure_message)
 			failure.add_attribute("type", "")
 			$testcase.add_element(failure)
 		end
-		$current_msg = ""
+		$failure_message = ""
 		$testcase = nil
 	elsif line =~ /^(\d+) Tests, (\d+) Failures, (\d+) Skipped/
 		tests = $1.to_i
@@ -101,22 +104,24 @@ def parse_line(line)
 	elsif line == "OK"
 	elsif line == ""
 		if $testcase
-			if $current_msg =~ /(PCU_ASSERT|PCU_FAIL|SETUP FAILED|TEARDOWN FAILED)/
+			if $failure_message =~ /(PCU_ASSERT|PCU_FAIL|SETUP FAILED|TEARDOWN FAILED)/
 				failure = REXML::Element.new("failure") 
-				failure.add_attribute("message", $current_msg)
+				failure.add_attribute("message", $failure_message)
 				failure.add_attribute("type", "")
 				$testcase.add_element(failure)
 			end
-			$current_msg = ""
+			$failure_message = ""
 			$testcase = nil
 		end
 	else
-		$current_msg += line + "#x0A;\n"
+		$failure_message += line + "#x0A;\n"
 	end
 end
 
 while s = gets
-	puts s
+	if !no_stdout
+		puts s
+	end
 	parse_line s
 end
 $testsuites.attributes["tests"]    = ($testsuites.attributes["tests"].to_i    + $testsuite.attributes["tests"].to_i).to_s
@@ -124,16 +129,25 @@ $testsuites.attributes["failures"] = ($testsuites.attributes["failures"].to_i + 
 $testsuites.attributes["errors"]   = ($testsuites.attributes["errors"].to_i   + $testsuite.attributes["errors"].to_i).to_s
 if !$exists_testcase
 	# dummy
+	$testsuite = REXML::Element.new("testsuite") 
+	$testsuite.add_attribute("name", "")
+	$testsuite.add_attribute("tests", "0")
+	$testsuite.add_attribute("failures", "0")
+	$testsuite.add_attribute("skipped", "0")
+	$testsuite.add_attribute("errors", "0")
+	$testsuite.add_attribute("time", "0")
+	$testsuites.add_element($testsuite)
 	$testcase = REXML::Element.new("testcase") 
 	$testcase.add_attribute("name", "")
 	$testcase.add_attribute("classname", "")
 	$testcase.add_attribute("time", "0")
-	$testsuites.add_element($testcase)
+	$testsuite.add_element($testcase)
 end
 
 str = ""
 doc.write(str, 2)
 str.gsub!(/#x0A;/, '&#x0A;')
+str.gsub!(/message='/, "message='\n")
 File.open(output_file_name, "w") { |f|
 	f.write(str)
 }
