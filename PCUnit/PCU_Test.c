@@ -155,7 +155,17 @@ void PCU_assert_str_impl(const char *expected, const char *actual,
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
 	if (expected == 0 || actual == 0) {
-		PCU_assert_impl(0, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
+		int passed_flag = 0;
+		if (PCU_get_not_flag(type)) {
+			if (expected != actual) {
+				passed_flag = 1;
+			}
+		} else {
+			if (expected == actual) {
+				passed_flag = 1;
+			}
+		}
+		PCU_assert_impl(passed_flag, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
 				type, str_assert, file, line);
 		return;
 	}
@@ -184,7 +194,17 @@ void PCU_assert_strw_impl(const void *expected, const void *actual,
 {
 #ifdef PCU_USE_WCHAR
 	if (expected == 0 || actual == 0) {
-		PCU_assert_impl(0, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
+		int passed_flag = 0;
+		if (PCU_get_not_flag(type)) {
+			if (expected != actual) {
+				passed_flag = 1;
+			}
+		} else {
+			if (expected == actual) {
+				passed_flag = 1;
+			}
+		}
+		PCU_assert_impl(passed_flag, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
 				type, str_assert, file, line);
 		return;
 	}

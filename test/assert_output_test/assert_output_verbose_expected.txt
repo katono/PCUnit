@@ -315,10 +315,7 @@ Test: test_assert_str_equal_FAIL_actual_null
  [FAILED]
 
 Test: test_assert_str_equal_FAIL_null_null
- AssertStringTest.c:66: PCU_ASSERT_STRING_EQUAL(NULL, NULL)
-  expected : NULL
-  actual   : NULL
- [FAILED]
+ [PASSED]
 
 Test: test_assert_str_not_equal_OK
  [PASSED]
@@ -337,16 +334,10 @@ Test: test_assert_str_not_equal_MSG
  [FAILED]
 
 Test: test_assert_str_not_equal_FAIL_expect_null
- AssertStringTest.c:101: PCU_ASSERT_STRING_NOT_EQUAL(NULL, a)
-  expected : NULL
-  actual   : "hoge"
- [FAILED]
+ [PASSED]
 
 Test: test_assert_str_not_equal_FAIL_actual_null
- AssertStringTest.c:108: PCU_ASSERT_STRING_NOT_EQUAL(a, NULL)
-  expected : "hoge"
-  actual   : NULL
- [FAILED]
+ [PASSED]
 
 Test: test_assert_str_not_equal_FAIL_null_null
  AssertStringTest.c:113: PCU_ASSERT_STRING_NOT_EQUAL(NULL, NULL)
@@ -387,11 +378,7 @@ Test: test_assert_nstr_equal_FAIL_actual_null
  [FAILED]
 
 Test: test_assert_nstr_equal_FAIL_null_null
- AssertStringTest.c:165: PCU_ASSERT_NSTRING_EQUAL(NULL, NULL, 1)
-  expected : NULL
-  actual   : NULL
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstr_not_equal_OK
  [PASSED]
@@ -412,18 +399,10 @@ Test: test_assert_nstr_not_equal_MSG
  [FAILED]
 
 Test: test_assert_nstr_not_equal_FAIL_expect_null
- AssertStringTest.c:203: PCU_ASSERT_NSTRING_NOT_EQUAL(NULL, a, 1)
-  expected : NULL
-  actual   : "h"
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstr_not_equal_FAIL_actual_null
- AssertStringTest.c:210: PCU_ASSERT_NSTRING_NOT_EQUAL(a, NULL, 1)
-  expected : "h"
-  actual   : NULL
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstr_not_equal_FAIL_null_null
  AssertStringTest.c:215: PCU_ASSERT_NSTRING_NOT_EQUAL(NULL, NULL, 1)
@@ -432,7 +411,7 @@ Test: test_assert_nstr_not_equal_FAIL_null_null
   length   : 1
  [FAILED]
 
-24 Tests, 20 Failures, 0 Skipped
+24 Tests, 14 Failures, 0 Skipped
 
 
 Suite: AssertStringWTest
@@ -466,10 +445,7 @@ Test: test_assert_strw_equal_FAIL_actual_null
  [FAILED]
 
 Test: test_assert_strw_equal_FAIL_null_null
- AssertStringWTest.c:66: PCU_ASSERT_STRINGW_EQUAL(NULL, NULL)
-  expected : NULL
-  actual   : NULL
- [FAILED]
+ [PASSED]
 
 Test: test_assert_strw_not_equal_OK
  [PASSED]
@@ -488,16 +464,10 @@ Test: test_assert_strw_not_equal_MSG
  [FAILED]
 
 Test: test_assert_strw_not_equal_FAIL_expect_null
- AssertStringWTest.c:101: PCU_ASSERT_STRINGW_NOT_EQUAL(NULL, a)
-  expected : NULL
-  actual   : L"hoge"
- [FAILED]
+ [PASSED]
 
 Test: test_assert_strw_not_equal_FAIL_actual_null
- AssertStringWTest.c:108: PCU_ASSERT_STRINGW_NOT_EQUAL(a, NULL)
-  expected : L"hoge"
-  actual   : NULL
- [FAILED]
+ [PASSED]
 
 Test: test_assert_strw_not_equal_FAIL_null_null
  AssertStringWTest.c:113: PCU_ASSERT_STRINGW_NOT_EQUAL(NULL, NULL)
@@ -538,11 +508,7 @@ Test: test_assert_nstrw_equal_FAIL_actual_null
  [FAILED]
 
 Test: test_assert_nstrw_equal_FAIL_null_null
- AssertStringWTest.c:165: PCU_ASSERT_NSTRINGW_EQUAL(NULL, NULL, 1)
-  expected : NULL
-  actual   : NULL
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstrw_not_equal_OK
  [PASSED]
@@ -563,18 +529,10 @@ Test: test_assert_nstrw_not_equal_MSG
  [FAILED]
 
 Test: test_assert_nstrw_not_equal_FAIL_expect_null
- AssertStringWTest.c:203: PCU_ASSERT_NSTRINGW_NOT_EQUAL(NULL, a, 1)
-  expected : NULL
-  actual   : L"h"
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstrw_not_equal_FAIL_actual_null
- AssertStringWTest.c:210: PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, NULL, 1)
-  expected : L"h"
-  actual   : NULL
-  length   : 1
- [FAILED]
+ [PASSED]
 
 Test: test_assert_nstrw_not_equal_FAIL_null_null
  AssertStringWTest.c:215: PCU_ASSERT_NSTRINGW_NOT_EQUAL(NULL, NULL, 1)
@@ -583,7 +541,7 @@ Test: test_assert_nstrw_not_equal_FAIL_null_null
   length   : 1
  [FAILED]
 
-24 Tests, 20 Failures, 0 Skipped
+24 Tests, 14 Failures, 0 Skipped
 
 
 Suite: AssertTest
