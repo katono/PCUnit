@@ -7,13 +7,16 @@ opt = OptionParser.new
 
 output_file_name = "test_results.xml"
 no_stdout = false
+exit_code_flag = false
 
 opt.on('-o VAL') {|v| output_file_name = v }
+opt.on('-e') {|v| exit_code_flag = v }
 opt.on('-n') {|v| no_stdout = v }
 opt.on('-h', '--help') {
 	print <<-"EOB"
-Usage: pcunit_xml_output.rb [-o FILE] [-n]
+Usage: pcunit_xml_output.rb [-o FILE] [-e] [-n]
     -o FILE  output file name
+    -e       return non-zero exit code if tests failed
     -n       no stdout flag
 
 	EOB
@@ -152,4 +155,6 @@ File.open(output_file_name, "w") { |f|
 	f.write(str)
 }
 
-exit $exit_code
+if exit_code_flag
+	exit $exit_code
+end
