@@ -394,10 +394,13 @@ static void print_repeat(unsigned long type, int repeat)
 
 #ifdef PCU_DEFINED_LLONG
 #define PCU_LX_LD	" : 0x%0*llx (%lld)"
+#define PCU_LD	" (%lld)"
 #elif defined(PCU_DEFINED_WIN32_I64)
 #define PCU_LX_LD	" : 0x%0*I64x (%I64d)"
+#define PCU_LD	" (%I64d)"
 #else
 #define PCU_LX_LD	" : 0x%0*lx (%ld)"
+#define PCU_LD	" (%ld)"
 #endif
 
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
@@ -561,22 +564,31 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 {
 	const char * const expected_str = "expected";
 	const char * const actual_str   = "actual  ";
+	const char * const arg1_str = "arg1    ";
+	const char * const arg2_str = "arg2    ";
+	const char * s1 = expected_str;
+	const char * s2 = actual_str;
 	size_t len;
 
+	if (PCU_get_not_flag(type)) {
+		s1 = arg1_str;
+		s2 = arg2_str;
+	}
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_NONE:
 	case PCU_TYPE_BOOL:
-#if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
-		print_expected_actual_no_div32(0, "expr    ", expected, actual);
-#else
-		print_expected_actual(0, "expr    ", expected, actual);
+		PCU_PRINTF1("  expected : %s\n", PCU_get_not_flag(type) ? "TRUE" : "FALSE");
+		PCU_PRINTF1("  actual   : %s", PCU_get_not_flag(type) ? "FALSE" : "TRUE");
+#if !((defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32))
+		PCU_PRINTF1(PCU_LD, actual);
 #endif
+		PCU_puts("\n");
 		break;
 	case PCU_TYPE_NUM:
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
-		print_expected_actual_no_div32(expected_str, actual_str, expected, actual);
+		print_expected_actual_no_div32(s1, s2, expected, actual);
 #else
-		print_expected_actual(expected_str, actual_str, expected, actual);
+		print_expected_actual(s1, s2, expected, actual);
 #endif
 		break;
 	case PCU_TYPE_OP:
@@ -588,31 +600,32 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 #endif
 		break;
 	case PCU_TYPE_PTR:
-		print_type_ptr(expected_str, (const void *)(size_t) expected);
-		print_type_ptr(actual_str  , (const void *)(size_t) actual);
+		print_type_ptr(s1, (const void *)(size_t) expected);
+		print_type_ptr(s2  , (const void *)(size_t) actual);
 		break;
 	case PCU_TYPE_PTR_NULL:
-		print_type_ptr("value   ", (const void *)(size_t) actual);
+		PCU_PRINTF1("  expected : %sNULL\n", PCU_get_not_flag(type) ? "non-" : "");
+		print_type_ptr(actual_str, (const void *)(size_t) actual);
 		break;
 	case PCU_TYPE_STR:
-		print_type_str(expected_str, (const char *)(size_t) expected);
-		print_type_str(actual_str  , (const char *)(size_t) actual);
+		print_type_str(s1, (const char *)(size_t) expected);
+		print_type_str(s2  , (const char *)(size_t) actual);
 		break;
 	case PCU_TYPE_NSTR:
 		len = PCU_get_nstr_len(type);
-		print_type_nstr(expected_str, (const char *)(size_t) expected, len);
-		print_type_nstr(actual_str  , (const char *)(size_t) actual, len);
+		print_type_nstr(s1, (const char *)(size_t) expected, len);
+		print_type_nstr(s2  , (const char *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %d\n", len);
 		break;
 #ifdef PCU_USE_WCHAR
 	case PCU_TYPE_STRW:
-		print_type_strw(expected_str, (const wchar_t *)(size_t) expected);
-		print_type_strw(actual_str  , (const wchar_t *)(size_t) actual);
+		print_type_strw(s1, (const wchar_t *)(size_t) expected);
+		print_type_strw(s2  , (const wchar_t *)(size_t) actual);
 		break;
 	case PCU_TYPE_NSTRW:
 		len = PCU_get_nstr_len(type);
-		print_type_nstrw(expected_str, (const wchar_t *)(size_t) expected, len);
-		print_type_nstrw(actual_str  , (const wchar_t *)(size_t) actual, len);
+		print_type_nstrw(s1, (const wchar_t *)(size_t) expected, len);
+		print_type_nstrw(s2  , (const wchar_t *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %d\n", len);
 		break;
 #else
@@ -642,8 +655,9 @@ static void print_params_double(unsigned long type, double expected, double actu
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-		PCU_PRINTF1("  expected : %g\n", expected);
-		PCU_PRINTF1("  actual   : %g\n", actual);
+		PCU_PRINTF1("  expected : |arg1 - arg2| %s |delta|\n", PCU_get_not_flag(type) ? ">" : "<=");
+		PCU_PRINTF1("  arg1     : %g\n", expected);
+		PCU_PRINTF1("  arg2     : %g\n", actual);
 		PCU_PRINTF1("  delta    : %g\n", delta);
 #else
 		(void) expected;
