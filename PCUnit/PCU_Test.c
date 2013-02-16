@@ -454,16 +454,23 @@ static void print_null(const char *str)
 	PCU_puts(" : NULL\n");
 }
 
+static void print_p(const void *value)
+{
+#ifdef PCU_NO_STDARG
+	PCU_PRINTF1("%p", (size_t) value);
+#else
+	PCU_PRINTF1("%p", value);
+#endif
+}
+
 static void print_type_ptr(const char *str, const void *value)
 {
 	if (value) {
 		PCU_puts("  ");
 		PCU_puts(str);
-#ifdef PCU_NO_STDARG
-		PCU_PRINTF1(" : %p\n", (size_t) value);
-#else
-		PCU_PRINTF1(" : %p\n", value);
-#endif
+		PCU_puts(" : ");
+		print_p(value);
+		PCU_puts("\n");
 	} else {
 		print_null(str);
 	}
@@ -476,7 +483,9 @@ static void print_type_str(const char *str, const char *value)
 		PCU_puts(str);
 		PCU_puts(" : \"");
 		PCU_puts(value);
-		PCU_puts("\"\n");
+		PCU_puts("\" (");
+		print_p(value);
+		PCU_puts(")\n");
 	} else {
 		print_null(str);
 	}
@@ -492,7 +501,9 @@ static void print_type_nstr(const char *str, const char *value, size_t len)
 		for (i = 0; i < len; i++) {
 			PCU_PRINTF1("%c", value[i]);
 		}
-		PCU_puts("\"\n");
+		PCU_puts("\" (");
+		print_p(value);
+		PCU_puts(")\n");
 	} else {
 		print_null(str);
 	}
@@ -511,7 +522,9 @@ static void print_type_strw(const char *str, const wchar_t *value)
 		for (i = 0; i < len; i++) {
 			PCU_PRINTF1("%lc", value[i]);
 		}
-		PCU_puts("\"\n");
+		PCU_puts("\" (");
+		print_p(value);
+		PCU_puts(")\n");
 	} else {
 		print_null(str);
 	}
@@ -527,7 +540,9 @@ static void print_type_nstrw(const char *str, const wchar_t *value, size_t len)
 		for (i = 0; i < len; i++) {
 			PCU_PRINTF1("%lc", value[i]);
 		}
-		PCU_puts("\"\n");
+		PCU_puts("\" (");
+		print_p(value);
+		PCU_puts(")\n");
 	} else {
 		print_null(str);
 	}
