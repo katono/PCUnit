@@ -37,23 +37,30 @@ static int teardown(void)
 
 static void line_check(const char *expected, const char *actual, int line)
 {
-	static int ptr_test_state = 0;
+	static int state = 0;
 	const char *ptr_test_file = " AssertPtrTest.c";
-	if (!strncmp(ptr_test_file, expected, strlen(ptr_test_file))) {
-		ptr_test_state = 1;
-	}
-	if (ptr_test_state == 2 && !strcmp(expected, "")) {
-		ptr_test_state = 0;
+	const char *str_test_file = " AssertString";
+	if (!strncmp(ptr_test_file, expected, strlen(ptr_test_file)) || !strncmp(str_test_file, expected, strlen(str_test_file))) {
+		state = 1;
 	}
 
-	if (ptr_test_state == 2) {
-		PCU_ASSERT_NSTRING_EQUAL_MESSAGE(expected, actual, 2, PCU_format("line:%d", line));
+	if (state == 2 && !strcmp(expected, "")) {
+		state = 0;
+	}
+
+	if (state == 2) {
+		const char *p = strstr(expected, "0x");
+		if (p) {
+			PCU_ASSERT_NSTRING_EQUAL_MESSAGE(expected, actual, p - expected, PCU_format("line:%d", line));
+		} else {
+			PCU_ASSERT_STRING_EQUAL_MESSAGE(expected, actual, PCU_format("line:%d", line));
+		}
 	} else {
 		PCU_ASSERT_STRING_EQUAL_MESSAGE(expected, actual, PCU_format("line:%d", line));
 	}
 
-	if (ptr_test_state == 1) {
-		ptr_test_state = 2;
+	if (state == 1) {
+		state = 2;
 	}
 }
 
