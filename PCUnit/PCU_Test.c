@@ -567,9 +567,9 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	case PCU_TYPE_OP:
 	case PCU_TYPE_OP_INT:
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
-		print_expected_actual_no_div32("lhs     ", "rhs     ", expected, actual);
+		print_expected_actual_no_div32("arg1    ", "arg2    ", expected, actual);
 #else
-		print_expected_actual("lhs     ", "rhs     ", expected, actual);
+		print_expected_actual("arg1    ", "arg2    ", expected, actual);
 #endif
 		break;
 	case PCU_TYPE_PTR:
@@ -638,8 +638,8 @@ static void print_params_double(unsigned long type, double expected, double actu
 		break;
 	case PCU_TYPE_OP_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-		PCU_PRINTF1("  lhs      : %g\n", expected);
-		PCU_PRINTF1("  rhs      : %g\n", actual);
+		PCU_PRINTF1("  arg1     : %g\n", expected);
+		PCU_PRINTF1("  arg2     : %g\n", actual);
 #endif
 		break;
 	default:

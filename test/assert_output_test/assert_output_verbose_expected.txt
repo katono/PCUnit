@@ -108,44 +108,44 @@ Test: test_assert_operator_OK
 
 Test: test_assert_operator_FAIL1
  AssertOperatorTest.c:42: PCU_ASSERT_OPERATOR((-1) < (1))
-  lhs      : 0xffffffffffffffff (-1)
-  rhs      : 0x0000000000000001 (1)
+  arg1     : 0xffffffffffffffff (-1)
+  arg2     : 0x0000000000000001 (1)
  [FAILED]
 
 Test: test_assert_operator_FAIL2
  AssertOperatorTest.c:50: PCU_ASSERT_OPERATOR((a) ^ (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000100 (256)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000100 (256)
  [FAILED]
 
 Test: test_assert_operator_FAIL3
  AssertOperatorTest.c:58: PCU_ASSERT_OPERATOR((a) & (~b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0xfffffeff (4294967039)
+  arg1     : 0x00000100 (256)
+  arg2     : 0xfffffeff (4294967039)
  [FAILED]
 
 Test: test_assert_operator_FAIL4
  AssertOperatorTest.c:66: PCU_ASSERT_OPERATOR((a) == (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000101 (257)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000101 (257)
  [FAILED]
 
 Test: test_assert_operator_FAIL5
  AssertOperatorTest.c:73: PCU_ASSERT_OPERATOR((0x10 <= a) && (a < 0x100))
-  lhs      : 0x00000001 (1)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000001 (1)
+  arg2     : 0x00000000 (0)
  [FAILED]
 
 Test: test_assert_operator_FAIL6
  AssertOperatorTest.c:80: PCU_ASSERT_OPERATOR((a < 0x10) || (0x100 < a))
-  lhs      : 0x00000000 (0)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000000 (0)
+  arg2     : 0x00000000 (0)
  [FAILED]
 
 Test: test_assert_operator_MSG
  AssertOperatorTest.c:90: PCU_ASSERT_OPERATOR((a) == (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000000 (0)
   256, 0
  [FAILED]
 
@@ -154,44 +154,44 @@ Test: test_assert_operator_int_OK
 
 Test: test_assert_operator_int_FAIL1
  AssertOperatorTest.c:112: PCU_ASSERT_OPERATOR_INT((-1) > (1))
-  lhs      : 0xffffffffffffffff (-1)
-  rhs      : 0x0000000000000001 (1)
+  arg1     : 0xffffffffffffffff (-1)
+  arg2     : 0x0000000000000001 (1)
  [FAILED]
 
 Test: test_assert_operator_int_FAIL2
  AssertOperatorTest.c:120: PCU_ASSERT_OPERATOR_INT((a) ^ (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000100 (256)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000100 (256)
  [FAILED]
 
 Test: test_assert_operator_int_FAIL3
  AssertOperatorTest.c:128: PCU_ASSERT_OPERATOR_INT((a) & (~b))
-  lhs      : 0x0000000000000100 (256)
-  rhs      : 0xfffffffffffffeff (-257)
+  arg1     : 0x0000000000000100 (256)
+  arg2     : 0xfffffffffffffeff (-257)
  [FAILED]
 
 Test: test_assert_operator_int_FAIL4
  AssertOperatorTest.c:136: PCU_ASSERT_OPERATOR_INT((a) == (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000101 (257)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000101 (257)
  [FAILED]
 
 Test: test_assert_operator_int_FAIL5
  AssertOperatorTest.c:143: PCU_ASSERT_OPERATOR_INT((0x10 <= a) && (a < 0x100))
-  lhs      : 0x00000001 (1)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000001 (1)
+  arg2     : 0x00000000 (0)
  [FAILED]
 
 Test: test_assert_operator_int_FAIL6
  AssertOperatorTest.c:150: PCU_ASSERT_OPERATOR_INT((a < 0x10) || (0x100 < a))
-  lhs      : 0x00000000 (0)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000000 (0)
+  arg2     : 0x00000000 (0)
  [FAILED]
 
 Test: test_assert_operator_int_MSG
  AssertOperatorTest.c:160: PCU_ASSERT_OPERATOR_INT((a) == (b))
-  lhs      : 0x00000100 (256)
-  rhs      : 0x00000000 (0)
+  arg1     : 0x00000100 (256)
+  arg2     : 0x00000000 (0)
   256, 0
  [FAILED]
 
@@ -200,20 +200,20 @@ Test: test_assert_operator_dbl_OK
 
 Test: test_assert_operator_dbl_FAIL1
  AssertOperatorTest.c:182: PCU_ASSERT_OPERATOR_DOUBLE((0) > (1))
-  lhs      : 0
-  rhs      : 1
+  arg1     : 0
+  arg2     : 1
  [FAILED]
 
 Test: test_assert_operator_dbl_FAIL2
  AssertOperatorTest.c:190: PCU_ASSERT_OPERATOR_DOUBLE((a) < (b))
-  lhs      : 100
-  rhs      : 100
+  arg1     : 100
+  arg2     : 100
  [FAILED]
 
 Test: test_assert_operator_dbl_FAIL3
  AssertOperatorTest.c:198: PCU_ASSERT_OPERATOR_DOUBLE((a) == (b))
-  lhs      : 100
-  rhs      : 100.1
+  arg1     : 100
+  arg2     : 100.1
  [FAILED]
 
 20 Tests, 17 Failures, 0 Skipped
