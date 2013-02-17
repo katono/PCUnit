@@ -3,7 +3,6 @@
 #include "PCU_Libc.h"
 
 static PCU_Suite *current_suite;
-static PCU_TestResult test_result;
 
 static void PCU_Suite_clear_result(PCU_Suite *self)
 {
@@ -53,18 +52,19 @@ void PCU_Suite_run(PCU_Suite *self)
 		return;
 	}
 	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
+		const PCU_TestResult *test_result;
 		PCU_Test_run(p);
-		PCU_Test_get_result(p, &test_result);
-		self->result.test_result.num_asserts         += test_result.num_asserts;
-		self->result.test_result.num_asserts_ran     += test_result.num_asserts_ran;
-		self->result.test_result.num_asserts_failed  += test_result.num_asserts_failed;
-		self->result.test_result.num_errors_setup    += test_result.num_errors_setup;
-		self->result.test_result.num_errors_teardown += test_result.num_errors_teardown;
+		test_result = PCU_Test_get_result(p);
+		self->result.test_result.num_asserts         += test_result->num_asserts;
+		self->result.test_result.num_asserts_ran     += test_result->num_asserts_ran;
+		self->result.test_result.num_asserts_failed  += test_result->num_asserts_failed;
+		self->result.test_result.num_errors_setup    += test_result->num_errors_setup;
+		self->result.test_result.num_errors_teardown += test_result->num_errors_teardown;
 		if (!PCU_Test_is_skipped(p)) {
 			self->result.num_tests_ran++;
 		}
-		if (test_result.num_asserts_failed > 0 || 
-				test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
+		if (test_result->num_asserts_failed > 0 || 
+				test_result->num_errors_setup > 0 || test_result->num_errors_teardown > 0) {
 			self->result.num_tests_failed++;
 		}
 	}
@@ -78,6 +78,7 @@ void PCU_Suite_run(PCU_Suite *self)
 #ifndef PCU_NO_CONSOLE_RUN
 void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
+	const PCU_TestResult *test_result;
 	current_suite = self;
 
 	self->initialize_error = PCU_Suite_initialize(self);
@@ -86,17 +87,17 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 		return;
 	}
 	PCU_Test_run(&self->tests[idx]);
-	PCU_Test_get_result(&self->tests[idx], &test_result);
-	self->result.test_result.num_asserts         += test_result.num_asserts;
-	self->result.test_result.num_asserts_ran     += test_result.num_asserts_ran;
-	self->result.test_result.num_asserts_failed  += test_result.num_asserts_failed;
-	self->result.test_result.num_errors_setup    += test_result.num_errors_setup;
-	self->result.test_result.num_errors_teardown += test_result.num_errors_teardown;
+	test_result = PCU_Test_get_result(&self->tests[idx]);
+	self->result.test_result.num_asserts         += test_result->num_asserts;
+	self->result.test_result.num_asserts_ran     += test_result->num_asserts_ran;
+	self->result.test_result.num_asserts_failed  += test_result->num_asserts_failed;
+	self->result.test_result.num_errors_setup    += test_result->num_errors_setup;
+	self->result.test_result.num_errors_teardown += test_result->num_errors_teardown;
 	if (!PCU_Test_is_skipped(&self->tests[idx])) {
 		self->result.num_tests_ran++;
 	}
-	if (test_result.num_asserts_failed > 0 || 
-			test_result.num_errors_setup > 0 || test_result.num_errors_teardown > 0) {
+	if (test_result->num_asserts_failed > 0 || 
+			test_result->num_errors_setup > 0 || test_result->num_errors_teardown > 0) {
 		self->result.num_tests_failed++;
 	}
 	self->cleanup_error = PCU_Suite_cleanup(self);
@@ -107,9 +108,9 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 }
 #endif
 
-void PCU_Suite_get_result(PCU_Suite *self, PCU_SuiteResult *result)
+const PCU_SuiteResult *PCU_Suite_get_result(PCU_Suite *self)
 {
-	PCU_MEMCPY(result, &self->result, sizeof *result);
+	return &self->result;
 }
 
 const char *PCU_suite_name(void)

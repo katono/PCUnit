@@ -89,9 +89,9 @@ void PCU_Test_run(PCU_Test *self)
 	}
 }
 
-void PCU_Test_get_result(PCU_Test *self, PCU_TestResult *result)
+const PCU_TestResult *PCU_Test_get_result(PCU_Test *self)
 {
-	PCU_MEMCPY(result, &self->result, sizeof *result);
+	return &self->result;
 }
 
 int PCU_Test_is_skipped(PCU_Test *self)
