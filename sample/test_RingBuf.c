@@ -10,14 +10,14 @@ static unsigned char rb_buffer[RB_BUF_SIZE];
 static int initialize(void)
 {
 	/* Suiteの最初に呼ばれる */
-	printf("initialize: %s\n", PCU_suite_name());
+	/* printf("initialize: %s\n", PCU_suite_name()); */
 	return 0;
 }
 
 static int cleanup(void)
 {
 	/* Suiteの最後に呼ばれる */
-	printf("cleanup   : %s\n", PCU_suite_name());
+	/* printf("cleanup   : %s\n", PCU_suite_name()); */
 	return 0;
 }
 
@@ -25,14 +25,14 @@ static int setup(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
 	RingBuf_init(rb, rb_buffer, sizeof rb_buffer);
-	printf("  setup   : %s\n", PCU_test_name());
+	/* printf("  setup   : %s\n", PCU_test_name()); */
 	return 0;
 }
 
 static int teardown(void)
 {
 	/* test_rb_xxx毎に呼ばれる */
-	printf("  teardown: %s\n", PCU_test_name());
+	/* printf("  teardown: %s\n", PCU_test_name()); */
 	return 0;
 }
 

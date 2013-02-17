@@ -64,7 +64,7 @@ $(TARGET_NOT_SUPPORTED): $(OBJS)
 	cd ../../PCUnit && $(MAKE) clean
 
 test:
-	./$(TARGET)
+	./$(TARGET) nocolor verbose | ruby ../../PCUnit/pcunit_xml_output.rb
 
 console:
 	./$(TARGET) console
@@ -72,7 +72,7 @@ console:
 
 .PHONY: clean
 clean:
-	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET_NOT_SUPPORTED) $(TARGET).txt $(TARGET_NO_SETJMP).txt
+	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET_NOT_SUPPORTED) $(TARGET).txt $(TARGET_NO_SETJMP).txt *.xml
 
 
 main.o: ../../PCUnit/PCUnit.h

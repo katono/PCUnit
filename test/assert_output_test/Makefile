@@ -32,12 +32,12 @@ pcunit_register:
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
-	./$(TARGET)
+	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb
 
 test:
-	./$(TARGET)
+	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb
 
 clean:
 	cd ../assert_test && $(MAKE) clean
-	rm -f *.o $(TARGET) assert_output_actual.txt assert_output_verbose_actual.txt assert_not_supported_actual.txt
+	rm -f *.o $(TARGET) assert_output_actual.txt assert_output_verbose_actual.txt assert_not_supported_actual.txt *.xml
 

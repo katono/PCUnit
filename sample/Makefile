@@ -30,7 +30,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
 test:
-	./$(TARGET)
+	./$(TARGET) | ruby ../PCUnit/pcunit_xml_output.rb
 
 clean:
 	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)

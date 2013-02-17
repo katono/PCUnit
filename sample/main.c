@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	PCU_set_putchar(putchar);
 	PCU_set_getchar(getchar);
 	PCU_enable_color();
-/*    PCU_disable_color();*/
+	PCU_set_verbose(1);
 	if (argc >= 2) {
 		PCU_console_run(suites, sizeof suites / sizeof suites[0]);
 	} else {
