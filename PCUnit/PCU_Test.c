@@ -406,7 +406,6 @@ static void print_repeat(unsigned long type, int repeat)
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
 {
 	const int width = (int) ((is_64bit_width ? sizeof(PCU_size_t) : sizeof(size_t)) * 2);
-	if (!str) return;
 	PCU_puts("  ");
 	PCU_puts(str);
 	PCU_PRINTF3(PCU_LX_LD, width, value, value);
@@ -420,7 +419,6 @@ static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
 static void print_type_num_no_div32(const char *str, PCU_size_t value)
 {
-	if (!str) return;
 	PCU_puts("  ");
 	PCU_puts(str);
 	PCU_PRINTF2(" : 0x%0*x\n", sizeof(size_t) * 2, value);
