@@ -112,7 +112,7 @@ size_t PCU_get_nstr_len(unsigned long type)
 
 int PCU_get_not_flag(unsigned long type)
 {
-	return (int) (type & PCU_TYPE_NOT);
+	return (type & PCU_TYPE_NOT) ? 1 : 0;
 }
 
 static void print_before_test(PCU_Suite *suite)
