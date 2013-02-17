@@ -613,7 +613,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		len = PCU_get_nstr_len(type);
 		print_type_nstr(s1, (const char *)(size_t) expected, len);
 		print_type_nstr(s2  , (const char *)(size_t) actual, len);
-		PCU_PRINTF1("  length   : %d\n", len);
+		PCU_PRINTF1("  length   : %u\n", (unsigned int) len);
 		break;
 #ifdef PCU_USE_WCHAR
 	case PCU_TYPE_STRW:
@@ -624,7 +624,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		len = PCU_get_nstr_len(type);
 		print_type_nstrw(s1, (const wchar_t *)(size_t) expected, len);
 		print_type_nstrw(s2  , (const wchar_t *)(size_t) actual, len);
-		PCU_PRINTF1("  length   : %d\n", len);
+		PCU_PRINTF1("  length   : %u\n", (unsigned int) len);
 		break;
 #else
 	case PCU_TYPE_STRW:
