@@ -105,13 +105,16 @@ def create_alltests()
 #include <stdio.h>
 
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	const PCU_SuiteMethod suites[] = {
 	};
 	PCU_set_putchar(putchar);
 	PCU_set_getchar(getchar);
 	PCU_enable_color();
+	if (argc >= 2) {
+		PCU_set_verbose(1);
+	}
 	return PCU_run(suites, sizeof suites / sizeof suites[0]);
 }
 
@@ -150,6 +153,9 @@ $(TARGET): $(OBJS)
 
 test:
 	./$(TARGET)
+
+xml: pcunit_register $(TARGET)
+	./$(TARGET) verbose | ruby PCUnit/pcunit_xml_output.rb
 
 clean:
 	cd PCUnit && $(MAKE) clean
@@ -191,6 +197,9 @@ $(TARGET): $(OBJS)
 
 test:
 	./$(TARGET)
+
+xml: pcunit_register $(TARGET)
+	./$(TARGET) verbose | ruby $(INSTALLDIR)/bin/pcunit_xml_output.rb
 
 clean:
 	rm -f *.o $(TARGET)
