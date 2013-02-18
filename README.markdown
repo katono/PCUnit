@@ -4,8 +4,8 @@
 
 ## 概要
 
-PCUnitは組み込み開発でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
-ポータブルなC言語/C++言語用ユニットテストフレームワークです。
+PCUnitはC言語/C++言語でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
+ポータブルなユニットテストフレームワークです。
 
 PCUnitは以下のような特長があります。
 
@@ -18,7 +18,8 @@ PCUnitは以下のような特長があります。
     * ディスプレイやキーボードがないターゲット上でテストするために、ユーザー定義の入出力関数を設定できます。
     * 実行するテストをインタラクティブに選択できるコンソールモードをサポートします。
     * ターミナルが対応していればテスト結果のカラー表示ができます。
-    * ユーティリティを使用すればテスト関数の雛形生成や自動登録ができます。
+    * テスト関数の雛形生成や自動登録ができます。
+    * テスト結果をXMLファイルで出力することができます。
 
 * 移植性
 
@@ -249,9 +250,8 @@ main関数は次のように定義します。
      9         AddSubTest_suite,
     10     };
     11     PCU_set_putchar(putchar);
-    12     PCU_run(suites, sizeof suites / sizeof suites[0]);
-    13     return 0;
-    14 }
+    12     return PCU_run(suites, sizeof suites / sizeof suites[0]);
+    13 }
 
 main関数がテストを実装したソースと別ファイルの場合はスイートメソッドのプロトタイプ宣言をしてください。
 
@@ -260,7 +260,7 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
 
     typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 
-ここではAddSubTest_suiteだけで初期化しています。
+ここでは`AddSubTest_suite`だけで初期化しています。
 後で新しいテストスイートを追加したい場合は、新しいテストスイートに対応するスイートメソッドをこの配列の初期化に追加してください。
 (`pcunit_register.rb`ユーティリティを使用すればスイートメソッド登録を自動化できます。)
 
@@ -270,6 +270,7 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
 
 最後に、テスト実行関数である`PCU_run`関数を呼び出します。
 `PCU_run`の最初の引数は`PCU_SuiteMethod`型の配列で、2番目の引数はその配列の要素数です。
+`PCU_run`の戻り値は、失敗がなければ0、1つでも失敗があれば非0です。
 
 これでテストコードの準備は整いました。
 
@@ -325,7 +326,7 @@ main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
     OK
 
 全てのテストにパスすると、OKのメッセージが表示されます。
-パスしたテストケースの情報は表示されません。
+`PCU_set_verbose`で出力が冗長モードになっていなければ、パスしたテストケースの情報は表示されません。
 
 OKのメッセージは1つのテストスイートにつき1つ表示されます。
 この例ではテストスイートは1つでしたが、テストスイートが複数の場合、
@@ -368,9 +369,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_NOT_EQUAL(expected, actual)`**
+* **`PCU_ASSERT_NOT_EQUAL(arg1, arg2)`**
 
-    expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
+    arg1とarg2が整数である前提で、arg1とarg2が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -380,9 +381,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)`**
+* **`PCU_ASSERT_PTR_NOT_EQUAL(arg1, arg2)`**
 
-    expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しくないかどうかチェックします。
+    arg1とarg2がポインタである前提で、arg1とarg2のポインタの値が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -404,9 +405,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)`**
+* **`PCU_ASSERT_STRING_NOT_EQUAL(arg1, arg2)`**
 
-    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
+    arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -416,9 +417,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRING_NOT_EQUAL(arg1, arg2, n)`**
 
-    expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
+    arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -430,9 +431,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
-* **`PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)`**
+* **`PCU_ASSERT_STRINGW_NOT_EQUAL(arg1, arg2)`**
 
-    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
+    arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
@@ -446,9 +447,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
-* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(arg1, arg2, n)`**
 
-    expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
+    arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
@@ -460,7 +461,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     そうでない場合は`PCU_ASSERT_STRING_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_STRINGT_NOT_EQUAL(expected, actual)`**
+* **`PCU_ASSERT_STRINGT_NOT_EQUAL(arg1, arg2)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
@@ -472,29 +473,29 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     そうでない場合は`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(expected, actual, n)`**
+* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(arg1, arg2, n)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)`**
+* **`PCU_ASSERT_DOUBLE_EQUAL(arg1, arg2, delta)`**
 
-    expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が真かどうかチェックします。
+    arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| <= |delta|が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
-* **`PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)`**
+* **`PCU_ASSERT_DOUBLE_NOT_EQUAL(arg1, arg2, delta)`**
 
-    expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| <= |delta|が偽かどうかチェックします。
-    真ならば失敗を出力し、テスト関数から抜けます。
+    arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| > |delta|が真かどうかチェックします。
+    偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
-* **`PCU_ASSERT_OPERATOR(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR(arg1, op, arg2)`**
 
-    lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    arg1とarg2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
@@ -502,18 +503,18 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     * `PCU_ASSERT_OPERATOR(x, &, 0x01);` xの最下位ビットが立っているかチェック
 
 
-* **`PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_INT(arg1, op, arg2)`**
 
-    lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    arg1とarg2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
 
 
-* **`PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)`**
+* **`PCU_ASSERT_OPERATOR_DOUBLE(arg1, op, arg2)`**
 
-    lhsとrhsが浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+    arg1とarg2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -551,10 +552,11 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 ## API
 
-* **`void PCU_run(const PCU_SuiteMethod *suite_methods, int num)`**
+* **`int PCU_run(const PCU_SuiteMethod *suite_methods, int num)`**
 
     `PCU_SuiteMethod`の配列`suite_methods`から導かれる全テストを実行します。
     `num`には`suite_methods`の要素数を指定します。
+    全テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。
 
 
 * **`void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)`**
@@ -577,6 +579,12 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     入力した1文字を取得する関数を設定します。
     `PCU_Getchar`型はgetcharと同じ`int(*)(void)`型のtypedefです。
     `PCU_console_run`の前に必ず設定してください。
+
+
+* **`void PCU_set_verbose(int verbose_flag)`**
+
+    `verbose_flag`が非0なら、パスしたテストやスキップしたテストもテスト結果に出力する冗長モードに移行します。
+    `verbose_flag`が0なら、出力を通常モードに戻します。
 
 
 * **`void PCU_enable_color(void)`**
@@ -671,7 +679,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 ## ユーティリティ
 
-### pcunit_template.rb
+### `pcunit_template.rb`
 
 `pcunit_template.rb`はPCUnit用のソースファイルの雛形を生成するRubyスクリプトです。
 書式は次の通りです。
@@ -715,7 +723,7 @@ setup関数・テスト関数等の雛形が定義されています。
     生成するファイルと同じ名前のファイルが既に存在している場合でも上書きします。
 
 
-### pcunit_register.rb
+### `pcunit_register.rb`
 
 `pcunit_register.rb`はテスト関数を自動登録するRubyスクリプトです。
 書式は次の通りです。
@@ -751,10 +759,45 @@ setup関数・テスト関数等の雛形が定義されています。
     更新前ファイルのバックアップをしなくなります。
 
 
+### `pcunit_xml_output.rb`
+
+`pcunit_xml_output.rb`はテスト結果をXMLファイルで出力するRubyスクリプトです。
+書式は次の通りです。
+
+    pcunit_xml_output.rb [-o FILE] [-e] [-n]
+
+`pcunit_xml_output.rb`は、テストプログラムが標準出力へ出力したテスト結果を標準入力から読み取り、XMLファイルに変換して出力します。
+また、標準入力をそのまま標準出力にも出力します。
+全てのテスト結果を集計したい場合は、テストプログラムの出力を`PCU_set_verbose`で冗長モードにしてください。
+
+次のようにパイプを利用して、テストプログラムの標準出力を入力として使用します。
+
+    $ ./alltests | pcunit_xml_output.rb
+
+既にテキストファイルに保存したテスト結果をリダイレクトを利用して変換することもできます。
+
+    $ pcunit_xml_output.rb < test_results.txt
+
+#### オプション
+
+* `-o FILE`
+
+    `FILE`に出力するXMLファイル名を指定してください。
+    このオプションを省略した場合、`test_results.xml`を指定したと見なします。
+
+* `-e`
+
+    1つでもテスト結果に失敗があれば非0を終了コードとして返すようになります。
+
+* `-n`
+
+    テスト結果を標準出力に出力しなくなります。
+
+
 ## ライセンス
 
 PCUnitはzlibライセンスに従って配布されます。
 ライセンスの詳細は、COPYINGファイル(日本語参考訳はCOPYING.jaファイル)をご覧ください。
 
 
-<!-- vim:set ts=4 sts=4 sw=4 et ft=mkd: -->
+<!-- vim:set ts=4 sts=4 sw=4 et: -->

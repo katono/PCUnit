@@ -4,8 +4,8 @@
 
 <h2>概要</h2>
 
-<p>PCUnitは組み込み開発でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
-ポータブルなC言語/C++言語用ユニットテストフレームワークです。</p>
+<p>PCUnitはC言語/C++言語でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
+ポータブルなユニットテストフレームワークです。</p>
 
 <p>PCUnitは以下のような特長があります。</p>
 
@@ -20,7 +20,8 @@
 <li>ディスプレイやキーボードがないターゲット上でテストするために、ユーザー定義の入出力関数を設定できます。</li>
 <li>実行するテストをインタラクティブに選択できるコンソールモードをサポートします。</li>
 <li>ターミナルが対応していればテスト結果のカラー表示ができます。</li>
-<li>ユーティリティを使用すればテスト関数の雛形生成や自動登録ができます。</li>
+<li>テスト関数の雛形生成や自動登録ができます。</li>
+<li>テスト結果をXMLファイルで出力することができます。</li>
 </ul></li>
 <li><p>移植性</p>
 
@@ -272,9 +273,8 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
  9         AddSubTest_suite,
 10     };
 11     PCU_set_putchar(putchar);
-12     PCU_run(suites, sizeof suites / sizeof suites[0]);
-13     return 0;
-14 }
+12     return PCU_run(suites, sizeof suites / sizeof suites[0]);
+13 }
 </code></pre>
 
 <p>main関数がテストを実装したソースと別ファイルの場合はスイートメソッドのプロトタイプ宣言をしてください。</p>
@@ -285,7 +285,7 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
 <pre><code>typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 </code></pre>
 
-<p>ここではAddSubTest_suiteだけで初期化しています。
+<p>ここでは<code>AddSubTest_suite</code>だけで初期化しています。
 後で新しいテストスイートを追加したい場合は、新しいテストスイートに対応するスイートメソッドをこの配列の初期化に追加してください。
 (<code>pcunit_register.rb</code>ユーティリティを使用すればスイートメソッド登録を自動化できます。)</p>
 
@@ -294,7 +294,8 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
 例えばターゲット上で動作させる時はシリアル出力関数などを指定するとよいでしょう。</p>
 
 <p>最後に、テスト実行関数である<code>PCU_run</code>関数を呼び出します。
-<code>PCU_run</code>の最初の引数は<code>PCU_SuiteMethod</code>型の配列で、2番目の引数はその配列の要素数です。</p>
+<code>PCU_run</code>の最初の引数は<code>PCU_SuiteMethod</code>型の配列で、2番目の引数はその配列の要素数です。
+<code>PCU_run</code>の戻り値は、失敗がなければ0、1つでも失敗があれば非0です。</p>
 
 <p>これでテストコードの準備は整いました。</p>
 
@@ -353,7 +354,7 @@ OK
 </code></pre>
 
 <p>全てのテストにパスすると、OKのメッセージが表示されます。
-パスしたテストケースの情報は表示されません。</p>
+<code>PCU_set_verbose</code>で出力が冗長モードになっていなければ、パスしたテストケースの情報は表示されません。</p>
 
 <p>OKのメッセージは1つのテストスイートにつき1つ表示されます。
 この例ではテストスイートは1つでしたが、テストスイートが複数の場合、
@@ -388,17 +389,17 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NOT_EQUAL(expected, actual)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NOT_EQUAL(arg1, arg2)</code></strong></p>
 
-<p>expectedとactualが整数である前提で、expectedとactualが等しくないかどうかチェックします。
+<p>arg1とarg2が整数である前提で、arg1とarg2が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_PTR_NOT_EQUAL(expected, actual)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_PTR_NOT_EQUAL(arg1, arg2)</code></strong></p>
 
-<p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しくないかどうかチェックします。
+<p>arg1とarg2がポインタである前提で、arg1とarg2のポインタの値が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_NULL(value)</code></strong></p>
 
@@ -412,17 +413,17 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRING_NOT_EQUAL(expected, actual)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRING_NOT_EQUAL(arg1, arg2)</code></strong></p>
 
-<p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しくないかどうかチェックします。
+<p>arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL(expected, actual, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
 
-<p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しくないかどうかチェックします。
+<p>arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列の先頭からn文字が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGW_EQUAL(expected, actual)</code></strong></p>
 
@@ -430,9 +431,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 等しくないならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(expected, actual)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(arg1, arg2)</code></strong></p>
 
-<p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列が等しくないかどうかチェックします。
+<p>arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
@@ -442,9 +443,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 等しくないならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(expected, actual, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
 
-<p>expectedとactualがワイド文字列(const wchar_t *)である前提で、expectedとactualのワイド文字列の先頭からn文字が等しくないかどうかチェックします。
+<p>arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
@@ -452,7 +453,7 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_STRING_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL(expected, actual)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL(arg1, arg2)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_NOT_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_STRING_NOT_EQUAL</code>に展開されます。</p></li>
@@ -460,23 +461,23 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_NSTRING_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL(expected, actual, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_NOT_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(arg1, arg2, delta)</code></strong></p>
 
-<p>expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| &lt;= |delta|が真かどうかチェックします。
+<p>arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| &lt;= |delta|が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
-<li><p><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL(expected, actual, delta)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL(arg1, arg2, delta)</code></strong></p>
 
-<p>expectedとactualとdeltaが浮動小数点数である前提で、|expected - actual| &lt;= |delta|が偽かどうかチェックします。
-真ならば失敗を出力し、テスト関数から抜けます。
+<p>arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| > |delta|が真かどうかチェックします。
+偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR(lhs, op, rhs)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR(arg1, op, arg2)</code></strong></p>
 
-<p>lhsとrhsが符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+<p>arg1とarg2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。</p>
 
 <p>例:</p>
@@ -485,9 +486,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><code>PCU_ASSERT_OPERATOR(x &lt; 0, ||, 100 &lt;= x);</code> xが0未満または100以上かチェック</li>
 <li><code>PCU_ASSERT_OPERATOR(x, &amp;, 0x01);</code> xの最下位ビットが立っているかチェック</li>
 </ul></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR_INT(lhs, op, rhs)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR_INT(arg1, op, arg2)</code></strong></p>
 
-<p>lhsとrhsが符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+<p>arg1とarg2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。</p>
 
 <p>例:</p>
@@ -495,9 +496,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 <ul>
 <li><code>PCU_ASSERT_OPERATOR_INT(x, &lt;, -1);</code> xが-1より小さい値かチェック</li>
 </ul></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(lhs, op, rhs)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(arg1, op, arg2)</code></strong></p>
 
-<p>lhsとrhsが浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((lhs) op (rhs)) が真かどうかチェックします。
+<p>arg1とarg2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p>
 
@@ -536,10 +537,11 @@ msgの型は<code>const char *</code>です。
 <h2>API</h2>
 
 <ul>
-<li><p><strong><code>void PCU_run(const PCU_SuiteMethod *suite_methods, int num)</code></strong></p>
+<li><p><strong><code>int PCU_run(const PCU_SuiteMethod *suite_methods, int num)</code></strong></p>
 
 <p><code>PCU_SuiteMethod</code>の配列<code>suite_methods</code>から導かれる全テストを実行します。
-<code>num</code>には<code>suite_methods</code>の要素数を指定します。</p></li>
+<code>num</code>には<code>suite_methods</code>の要素数を指定します。
+全テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。</p></li>
 <li><p><strong><code>void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)</code></strong></p>
 
 <p>コンソールモードでテストを実行します。
@@ -556,6 +558,10 @@ msgの型は<code>const char *</code>です。
 <p>入力した1文字を取得する関数を設定します。
 <code>PCU_Getchar</code>型はgetcharと同じ<code>int(*)(void)</code>型のtypedefです。
 <code>PCU_console_run</code>の前に必ず設定してください。</p></li>
+<li><p><strong><code>void PCU_set_verbose(int verbose_flag)</code></strong></p>
+
+<p><code>verbose_flag</code>が非0なら、パスしたテストやスキップしたテストもテスト結果に出力する冗長モードに移行します。
+<code>verbose_flag</code>が0なら、出力を通常モードに戻します。</p></li>
 <li><p><strong><code>void PCU_enable_color(void)</code></strong></p>
 
 <p>ターミナルがカラー表示に対応していれば、テスト結果のカラー表示を有効にします。</p></li>
@@ -646,7 +652,7 @@ msgの型は<code>const char *</code>です。
 
 <h2>ユーティリティ</h2>
 
-<h3>pcunit_template.rb</h3>
+<h3><code>pcunit_template.rb</code></h3>
 
 <p><code>pcunit_template.rb</code>はPCUnit用のソースファイルの雛形を生成するRubyスクリプトです。
 書式は次の通りです。</p>
@@ -688,7 +694,7 @@ setup関数・テスト関数等の雛形が定義されています。
 <p>生成するファイルと同じ名前のファイルが既に存在している場合でも上書きします。</p></li>
 </ul>
 
-<h3>pcunit_register.rb</h3>
+<h3><code>pcunit_register.rb</code></h3>
 
 <p><code>pcunit_register.rb</code>はテスト関数を自動登録するRubyスクリプトです。
 書式は次の通りです。</p>
@@ -726,9 +732,46 @@ setup関数・テスト関数等の雛形が定義されています。
 <p>更新前ファイルのバックアップをしなくなります。</p></li>
 </ul>
 
+<h3><code>pcunit_xml_output.rb</code></h3>
+
+<p><code>pcunit_xml_output.rb</code>はテスト結果をXMLファイルで出力するRubyスクリプトです。
+書式は次の通りです。</p>
+
+<pre><code>pcunit_xml_output.rb [-o FILE] [-e] [-n]
+</code></pre>
+
+<p><code>pcunit_xml_output.rb</code>は、テストプログラムが標準出力へ出力したテスト結果を標準入力から読み取り、XMLファイルに変換して出力します。
+また、標準入力をそのまま標準出力にも出力します。
+全てのテスト結果を集計したい場合は、テストプログラムの出力を<code>PCU_set_verbose</code>で冗長モードにしてください。</p>
+
+<p>次のようにパイプを利用して、テストプログラムの標準出力を入力として使用します。</p>
+
+<pre><code>$ ./alltests | pcunit_xml_output.rb
+</code></pre>
+
+<p>既にテキストファイルに保存したテスト結果をリダイレクトを利用して変換することもできます。</p>
+
+<pre><code>$ pcunit_xml_output.rb &lt; test_results.txt
+</code></pre>
+
+<h4>オプション</h4>
+
+<ul>
+<li><p><code>-o FILE</code></p>
+
+<p><code>FILE</code>に出力するXMLファイル名を指定してください。
+このオプションを省略した場合、<code>test_results.xml</code>を指定したと見なします。</p></li>
+<li><p><code>-e</code></p>
+
+<p>1つでもテスト結果に失敗があれば非0を終了コードとして返すようになります。</p></li>
+<li><p><code>-n</code></p>
+
+<p>テスト結果を標準出力に出力しなくなります。</p></li>
+</ul>
+
 <h2>ライセンス</h2>
 
 <p>PCUnitはzlibライセンスに従って配布されます。
 ライセンスの詳細は、COPYINGファイル(日本語参考訳はCOPYING.jaファイル)をご覧ください。</p>
 
-<!-- vim:set ts=4 sts=4 sw=4 et ft=mkd: -->
+<!-- vim:set ts=4 sts=4 sw=4 et: -->
