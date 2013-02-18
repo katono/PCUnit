@@ -151,6 +151,7 @@ str = ""
 doc.write(str, 2)
 str.gsub!(/#x0A;/, '&#x0A;')
 str.gsub!(/message='/, "message='\n")
+str += "\n"
 File.open(output_file_name, "w") { |f|
 	f.write(str)
 }
