@@ -562,15 +562,15 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 {
 	const char * const expected_str = "expected";
 	const char * const actual_str   = "actual  ";
-	const char * const arg1_str = "arg1    ";
-	const char * const arg2_str = "arg2    ";
+	const char * const value1_str = "value1  ";
+	const char * const value2_str = "value2  ";
 	const char * s1 = expected_str;
 	const char * s2 = actual_str;
 	size_t len;
 
 	if (PCU_get_not_flag(type)) {
-		s1 = arg1_str;
-		s2 = arg2_str;
+		s1 = value1_str;
+		s2 = value2_str;
 	}
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_NONE:
@@ -592,9 +592,9 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	case PCU_TYPE_OP:
 	case PCU_TYPE_OP_INT:
 #if (defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32)
-		print_expected_actual_no_div32("arg1    ", "arg2    ", expected, actual);
+		print_expected_actual_no_div32("value1  ", "value2  ", expected, actual);
 #else
-		print_expected_actual("arg1    ", "arg2    ", expected, actual);
+		print_expected_actual("value1  ", "value2  ", expected, actual);
 #endif
 		break;
 	case PCU_TYPE_PTR:
@@ -653,9 +653,9 @@ static void print_params_double(unsigned long type, double expected, double actu
 	switch (PCU_get_assert_type(type)) {
 	case PCU_TYPE_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-		PCU_PRINTF1("  expected : |arg1 - arg2| %s |delta|\n", PCU_get_not_flag(type) ? ">" : "<=");
-		PCU_PRINTF1("  arg1     : %g\n", expected);
-		PCU_PRINTF1("  arg2     : %g\n", actual);
+		PCU_PRINTF1("  expected : |value1 - value2| %s |delta|\n", PCU_get_not_flag(type) ? ">" : "<=");
+		PCU_PRINTF1("  value1   : %g\n", expected);
+		PCU_PRINTF1("  value2   : %g\n", actual);
 		PCU_PRINTF1("  delta    : %g\n", delta);
 #else
 		(void) expected;
@@ -665,8 +665,8 @@ static void print_params_double(unsigned long type, double expected, double actu
 		break;
 	case PCU_TYPE_OP_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-		PCU_PRINTF1("  arg1     : %g\n", expected);
-		PCU_PRINTF1("  arg2     : %g\n", actual);
+		PCU_PRINTF1("  value1   : %g\n", expected);
+		PCU_PRINTF1("  value2   : %g\n", actual);
 #endif
 		break;
 	default:

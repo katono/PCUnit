@@ -293,34 +293,34 @@ const char *PCU_formatW(const void *format, ...);
 		str_assert,\
 		__FILE__, __LINE__)
 
-#define PCU_ASSERT_OPERATOR_DOUBLE_AUX(arg1, op, arg2, str_assert)\
+#define PCU_ASSERT_OPERATOR_DOUBLE_AUX(value1, op, value2, str_assert)\
 	do {\
-		const double pcu_assert_operator_aux_arg1 = (double) (arg1);\
-		const double pcu_assert_operator_aux_arg2 = (double) (arg2);\
-		PCU_assert_op_double_impl((pcu_assert_operator_aux_arg1 op pcu_assert_operator_aux_arg2) != 0,\
-			pcu_assert_operator_aux_arg1, pcu_assert_operator_aux_arg2,\
+		const double pcu_assert_operator_aux_value1 = (double) (value1);\
+		const double pcu_assert_operator_aux_value2 = (double) (value2);\
+		PCU_assert_op_double_impl((pcu_assert_operator_aux_value1 op pcu_assert_operator_aux_value2) != 0,\
+			pcu_assert_operator_aux_value1, pcu_assert_operator_aux_value2,\
 			PCU_TYPE_OP_DBL,\
 			str_assert,\
 			__FILE__, __LINE__);\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_AUX(arg1, op, arg2, str_assert)\
+#define PCU_ASSERT_OPERATOR_AUX(value1, op, value2, str_assert)\
 	do {\
-		const PCU_size_t pcu_assert_operator_aux_arg1 = (PCU_size_t) (arg1);\
-		const PCU_size_t pcu_assert_operator_aux_arg2 = (PCU_size_t) (arg2);\
-		PCU_assert_impl((pcu_assert_operator_aux_arg1 op pcu_assert_operator_aux_arg2) != 0,\
-			pcu_assert_operator_aux_arg1, pcu_assert_operator_aux_arg2,\
+		const PCU_size_t pcu_assert_operator_aux_value1 = (PCU_size_t) (value1);\
+		const PCU_size_t pcu_assert_operator_aux_value2 = (PCU_size_t) (value2);\
+		PCU_assert_impl((pcu_assert_operator_aux_value1 op pcu_assert_operator_aux_value2) != 0,\
+			pcu_assert_operator_aux_value1, pcu_assert_operator_aux_value2,\
 			PCU_TYPE_OP,\
 			str_assert,\
 			__FILE__, __LINE__);\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_INT_AUX(arg1, op, arg2, str_assert)\
+#define PCU_ASSERT_OPERATOR_INT_AUX(value1, op, value2, str_assert)\
 	do {\
-		const PCU_ssize_t pcu_assert_operator_aux_arg1 = (PCU_ssize_t) (arg1);\
-		const PCU_ssize_t pcu_assert_operator_aux_arg2 = (PCU_ssize_t) (arg2);\
-		PCU_assert_impl((pcu_assert_operator_aux_arg1 op pcu_assert_operator_aux_arg2) != 0,\
-			(PCU_size_t) pcu_assert_operator_aux_arg1, (PCU_size_t) pcu_assert_operator_aux_arg2,\
+		const PCU_ssize_t pcu_assert_operator_aux_value1 = (PCU_ssize_t) (value1);\
+		const PCU_ssize_t pcu_assert_operator_aux_value2 = (PCU_ssize_t) (value2);\
+		PCU_assert_impl((pcu_assert_operator_aux_value1 op pcu_assert_operator_aux_value2) != 0,\
+			(PCU_size_t) pcu_assert_operator_aux_value1, (PCU_size_t) pcu_assert_operator_aux_value2,\
 			PCU_TYPE_OP_INT,\
 			str_assert,\
 			__FILE__, __LINE__);\
@@ -482,24 +482,24 @@ const char *PCU_formatW(const void *format, ...);
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_DOUBLE(arg1, op, arg2)\
+#define PCU_ASSERT_OPERATOR_DOUBLE(value1, op, value2)\
 	do {\
-		PCU_ASSERT_OPERATOR_DOUBLE_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR_DOUBLE((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_DOUBLE_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR_DOUBLE((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR(arg1, op, arg2)\
+#define PCU_ASSERT_OPERATOR(value1, op, value2)\
 	do {\
-		PCU_ASSERT_OPERATOR_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_INT(arg1, op, arg2)\
+#define PCU_ASSERT_OPERATOR_INT(value1, op, value2)\
 	do {\
-		PCU_ASSERT_OPERATOR_INT_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR_INT((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_INT_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR_INT((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
@@ -637,24 +637,24 @@ const char *PCU_formatW(const void *format, ...);
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_DOUBLE_MESSAGE(arg1, op, arg2, msg)\
+#define PCU_ASSERT_OPERATOR_DOUBLE_MESSAGE(value1, op, value2, msg)\
 	do {\
-		PCU_ASSERT_OPERATOR_DOUBLE_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR_DOUBLE((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_DOUBLE_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR_DOUBLE((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_MESSAGE(arg1, op, arg2, msg)\
+#define PCU_ASSERT_OPERATOR_MESSAGE(value1, op, value2, msg)\
 	do {\
-		PCU_ASSERT_OPERATOR_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
-#define PCU_ASSERT_OPERATOR_INT_MESSAGE(arg1, op, arg2, msg)\
+#define PCU_ASSERT_OPERATOR_INT_MESSAGE(value1, op, value2, msg)\
 	do {\
-		PCU_ASSERT_OPERATOR_INT_AUX(arg1, op, arg2,\
-			"PCU_ASSERT_OPERATOR_INT((" #arg1 ") " #op " (" #arg2 "))");\
+		PCU_ASSERT_OPERATOR_INT_AUX(value1, op, value2,\
+			"PCU_ASSERT_OPERATOR_INT((" #value1 ") " #op " (" #value2 "))");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 
