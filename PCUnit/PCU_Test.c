@@ -132,100 +132,46 @@ void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual,
 void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
-	if (PCU_get_not_flag(type)) {
-		PCU_assert_impl((expected != actual), expected, actual, type, str_assert, file, line);
-	} else {
-		PCU_assert_impl((expected == actual), expected, actual, type, str_assert, file, line);
-	}
+	PCU_assert_impl(PCU_get_not_flag(type) ? (expected != actual) : (expected == actual), 
+			expected, actual, type, str_assert, file, line);
 }
 
 void PCU_assert_ptr_impl(const void *expected, const void *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
-	if (PCU_get_not_flag(type)) {
-		PCU_assert_impl((expected != actual), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
-				type, str_assert, file, line);
-	} else {
-		PCU_assert_impl((expected == actual), (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
-				type, str_assert, file, line);
-	}
+	PCU_assert_impl(PCU_get_not_flag(type) ? (expected != actual) : (expected == actual), 
+			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 }
 
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
+	int cmp;
 	if (expected == 0 || actual == 0) {
-		int passed_flag = 0;
-		if (PCU_get_not_flag(type)) {
-			if (expected != actual) {
-				passed_flag = 1;
-			}
-		} else {
-			if (expected == actual) {
-				passed_flag = 1;
-			}
-		}
-		PCU_assert_impl(passed_flag, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
-				type, str_assert, file, line);
-		return;
-	}
-	if (PCU_get_assert_type(type) == PCU_TYPE_NSTR) {
-		size_t len = PCU_get_nstr_len(type);
-		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) != 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		} else {
-			PCU_assert_impl((PCU_STRNCMP(expected, actual, len) == 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		}
+		cmp = (expected != actual);
+	} else if (PCU_get_assert_type(type) == PCU_TYPE_NSTR) {
+		cmp = PCU_STRNCMP(expected, actual, PCU_get_nstr_len(type));
 	} else {
-		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_STRCMP(expected, actual) != 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		} else {
-			PCU_assert_impl((PCU_STRCMP(expected, actual) == 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		}
+		cmp = PCU_STRCMP(expected, actual);
 	}
+	PCU_assert_impl(PCU_get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
+			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 }
 
 void PCU_assert_strw_impl(const void *expected, const void *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
 #ifdef PCU_USE_WCHAR
+	int cmp;
 	if (expected == 0 || actual == 0) {
-		int passed_flag = 0;
-		if (PCU_get_not_flag(type)) {
-			if (expected != actual) {
-				passed_flag = 1;
-			}
-		} else {
-			if (expected == actual) {
-				passed_flag = 1;
-			}
-		}
-		PCU_assert_impl(passed_flag, (PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, 
-				type, str_assert, file, line);
-		return;
-	}
-	if (PCU_get_assert_type(type) == PCU_TYPE_NSTRW) {
-		size_t len = PCU_get_nstr_len(type);
-		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, len) != 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		} else {
-			PCU_assert_impl((PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, len) == 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		}
+		cmp = (expected != actual);
+	} else if (PCU_get_assert_type(type) == PCU_TYPE_NSTRW) {
+		cmp = PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, PCU_get_nstr_len(type));
 	} else {
-		if (PCU_get_not_flag(type)) {
-			PCU_assert_impl((PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual) != 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		} else {
-			PCU_assert_impl((PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual) == 0), 
-					(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-		}
+		cmp = PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual);
 	}
+	PCU_assert_impl(PCU_get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
+			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 #else
 	PCU_assert_impl(0, 
 			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
