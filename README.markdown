@@ -5,7 +5,7 @@
 ## 概要
 
 PCUnitはC言語/C++言語でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
-ポータブルなユニットテストフレームワークです。
+ポータブルでコンパクトなユニットテストフレームワークです。
 
 PCUnitは以下のような特長があります。
 
@@ -369,9 +369,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_NOT_EQUAL(arg1, arg2)`**
+* **`PCU_ASSERT_NOT_EQUAL(value1, value2)`**
 
-    arg1とarg2が整数である前提で、arg1とarg2が等しくないかどうかチェックします。
+    value1とvalue2が整数である前提で、value1とvalue2が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -381,9 +381,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_PTR_NOT_EQUAL(arg1, arg2)`**
+* **`PCU_ASSERT_PTR_NOT_EQUAL(value1, value2)`**
 
-    arg1とarg2がポインタである前提で、arg1とarg2のポインタの値が等しくないかどうかチェックします。
+    value1とvalue2がポインタである前提で、value1とvalue2のポインタの値が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -405,9 +405,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_STRING_NOT_EQUAL(arg1, arg2)`**
+* **`PCU_ASSERT_STRING_NOT_EQUAL(value1, value2)`**
 
-    arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列が等しくないかどうかチェックします。
+    value1とvalue2が文字列(const char *)である前提で、value1とvalue2の文字列が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -417,9 +417,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     等しくないならば失敗を出力し、テスト関数から抜けます。
 
 
-* **`PCU_ASSERT_NSTRING_NOT_EQUAL(arg1, arg2, n)`**
+* **`PCU_ASSERT_NSTRING_NOT_EQUAL(value1, value2, n)`**
 
-    arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列の先頭からn文字が等しくないかどうかチェックします。
+    value1とvalue2が文字列(const char *)である前提で、value1とvalue2の文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
 
 
@@ -431,9 +431,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
-* **`PCU_ASSERT_STRINGW_NOT_EQUAL(arg1, arg2)`**
+* **`PCU_ASSERT_STRINGW_NOT_EQUAL(value1, value2)`**
 
-    arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列が等しくないかどうかチェックします。
+    value1とvalue2がワイド文字列(const wchar_t *)である前提で、value1とvalue2のワイド文字列が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
@@ -447,9 +447,9 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
 
 
-* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(arg1, arg2, n)`**
+* **`PCU_ASSERT_NSTRINGW_NOT_EQUAL(value1, value2, n)`**
 
-    arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
+    value1とvalue2がワイド文字列(const wchar_t *)である前提で、value1とvalue2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
     等しいならば失敗を出力し、テスト関数から抜けます。
     失敗時の引数の文字列表示は、現在のロケールの`LC_CTYPE`カテゴリに依存します。
     なお、このマクロを使用するためにはPCUnitが`PCU_USE_WCHAR`マクロが定義済みでビルドされている必要があります。
@@ -461,7 +461,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     そうでない場合は`PCU_ASSERT_STRING_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_STRINGT_NOT_EQUAL(arg1, arg2)`**
+* **`PCU_ASSERT_STRINGT_NOT_EQUAL(value1, value2)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_STRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_STRING_NOT_EQUAL`に展開されます。
@@ -473,29 +473,29 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     そうでない場合は`PCU_ASSERT_NSTRING_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(arg1, arg2, n)`**
+* **`PCU_ASSERT_NSTRINGT_NOT_EQUAL(value1, value2, n)`**
 
     `_UNICODE`マクロまたは`UNICODE`マクロが定義されている場合は`PCU_ASSERT_NSTRINGW_NOT_EQUAL`に展開され、
     そうでない場合は`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
 
 
-* **`PCU_ASSERT_DOUBLE_EQUAL(arg1, arg2, delta)`**
+* **`PCU_ASSERT_DOUBLE_EQUAL(value1, value2, delta)`**
 
-    arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| <= |delta|が真かどうかチェックします。
+    value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| <= |delta|が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
-* **`PCU_ASSERT_DOUBLE_NOT_EQUAL(arg1, arg2, delta)`**
+* **`PCU_ASSERT_DOUBLE_NOT_EQUAL(value1, value2, delta)`**
 
-    arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| > |delta|が真かどうかチェックします。
+    value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| > |delta|が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
 
-* **`PCU_ASSERT_OPERATOR(arg1, op, arg2)`**
+* **`PCU_ASSERT_OPERATOR(value1, op, value2)`**
 
-    arg1とarg2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+    value1とvalue2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
@@ -503,18 +503,18 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     * `PCU_ASSERT_OPERATOR(x, &, 0x01);` xの最下位ビットが立っているかチェック
 
 
-* **`PCU_ASSERT_OPERATOR_INT(arg1, op, arg2)`**
+* **`PCU_ASSERT_OPERATOR_INT(value1, op, value2)`**
 
-    arg1とarg2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+    value1とvalue2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
 
     例:
     * `PCU_ASSERT_OPERATOR_INT(x, <, -1);` xが-1より小さい値かチェック
 
 
-* **`PCU_ASSERT_OPERATOR_DOUBLE(arg1, op, arg2)`**
+* **`PCU_ASSERT_OPERATOR_DOUBLE(value1, op, value2)`**
 
-    arg1とarg2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+    value1とvalue2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 

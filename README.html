@@ -5,7 +5,7 @@
 <h2>概要</h2>
 
 <p>PCUnitはC言語/C++言語でテスト駆動開発(Test-Driven Development; TDD)や単体テストをするための
-ポータブルなユニットテストフレームワークです。</p>
+ポータブルでコンパクトなユニットテストフレームワークです。</p>
 
 <p>PCUnitは以下のような特長があります。</p>
 
@@ -389,17 +389,17 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 <p>expectedとactualが整数である前提で、expectedとactualが等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NOT_EQUAL(arg1, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NOT_EQUAL(value1, value2)</code></strong></p>
 
-<p>arg1とarg2が整数である前提で、arg1とarg2が等しくないかどうかチェックします。
+<p>value1とvalue2が整数である前提で、value1とvalue2が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_EQUAL(expected, actual)</code></strong></p>
 
 <p>expectedとactualがポインタである前提で、expectedとactualのポインタの値が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_PTR_NOT_EQUAL(arg1, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_PTR_NOT_EQUAL(value1, value2)</code></strong></p>
 
-<p>arg1とarg2がポインタである前提で、arg1とarg2のポインタの値が等しくないかどうかチェックします。
+<p>value1とvalue2がポインタである前提で、value1とvalue2のポインタの値が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_PTR_NULL(value)</code></strong></p>
 
@@ -413,17 +413,17 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRING_NOT_EQUAL(arg1, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRING_NOT_EQUAL(value1, value2)</code></strong></p>
 
-<p>arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列が等しくないかどうかチェックします。
+<p>value1とvalue2が文字列(const char *)である前提で、value1とvalue2の文字列が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_NSTRING_EQUAL(expected, actual, n)</code></strong></p>
 
 <p>expectedとactualが文字列(const char *)である前提で、expectedとactualの文字列の先頭からn文字が等しいかどうかチェックします。
 等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRING_NOT_EQUAL(value1, value2, n)</code></strong></p>
 
-<p>arg1とarg2が文字列(const char *)である前提で、arg1とarg2の文字列の先頭からn文字が等しくないかどうかチェックします。
+<p>value1とvalue2が文字列(const char *)である前提で、value1とvalue2の文字列の先頭からn文字が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_STRINGW_EQUAL(expected, actual)</code></strong></p>
 
@@ -431,9 +431,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 等しくないならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(arg1, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRINGW_NOT_EQUAL(value1, value2)</code></strong></p>
 
-<p>arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列が等しくないかどうかチェックします。
+<p>value1とvalue2がワイド文字列(const wchar_t *)である前提で、value1とvalue2のワイド文字列が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
@@ -443,9 +443,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 等しくないならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRINGW_NOT_EQUAL(value1, value2, n)</code></strong></p>
 
-<p>arg1とarg2がワイド文字列(const wchar_t *)である前提で、arg1とarg2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
+<p>value1とvalue2がワイド文字列(const wchar_t *)である前提で、value1とvalue2のワイド文字列の先頭からn文字が等しくないかどうかチェックします。
 等しいならば失敗を出力し、テスト関数から抜けます。
 失敗時の引数の文字列表示は、現在のロケールの<code>LC_CTYPE</code>カテゴリに依存します。
 なお、このマクロを使用するためにはPCUnitが<code>PCU_USE_WCHAR</code>マクロが定義済みでビルドされている必要があります。</p></li>
@@ -453,7 +453,7 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_STRING_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL(arg1, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_STRINGT_NOT_EQUAL(value1, value2)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_STRINGW_NOT_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_STRING_NOT_EQUAL</code>に展開されます。</p></li>
@@ -461,23 +461,23 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_NSTRING_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL(arg1, arg2, n)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_NSTRINGT_NOT_EQUAL(value1, value2, n)</code></strong></p>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_NOT_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。</p></li>
-<li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(arg1, arg2, delta)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(value1, value2, delta)</code></strong></p>
 
-<p>arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| &lt;= |delta|が真かどうかチェックします。
+<p>value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| &lt;= |delta|が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
-<li><p><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL(arg1, arg2, delta)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_DOUBLE_NOT_EQUAL(value1, value2, delta)</code></strong></p>
 
-<p>arg1とarg2とdeltaが浮動小数点数である前提で、|arg1 - arg2| > |delta|が真かどうかチェックします。
+<p>value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| > |delta|が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR(arg1, op, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR(value1, op, value2)</code></strong></p>
 
-<p>arg1とarg2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+<p>value1とvalue2が符号無し整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。</p>
 
 <p>例:</p>
@@ -486,9 +486,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><code>PCU_ASSERT_OPERATOR(x &lt; 0, ||, 100 &lt;= x);</code> xが0未満または100以上かチェック</li>
 <li><code>PCU_ASSERT_OPERATOR(x, &amp;, 0x01);</code> xの最下位ビットが立っているかチェック</li>
 </ul></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR_INT(arg1, op, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR_INT(value1, op, value2)</code></strong></p>
 
-<p>arg1とarg2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+<p>value1とvalue2が符号付き整数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。</p>
 
 <p>例:</p>
@@ -496,9 +496,9 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 <ul>
 <li><code>PCU_ASSERT_OPERATOR_INT(x, &lt;, -1);</code> xが-1より小さい値かチェック</li>
 </ul></li>
-<li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(arg1, op, arg2)</code></strong></p>
+<li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(value1, op, value2)</code></strong></p>
 
-<p>arg1とarg2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((arg1) op (arg2)) が真かどうかチェックします。
+<p>value1とvalue2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p>
 
