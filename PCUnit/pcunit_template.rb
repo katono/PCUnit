@@ -137,7 +137,7 @@ OBJS = main.o
 
 .PHONY: all clean pcunit_register test
 
-all: pcunit_register $(TARGET) test
+all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby PCUnit/pcunit_register.rb
@@ -151,11 +151,11 @@ $(TARGET): $(OBJS)
 	cd PCUnit && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
-test:
+test: all
 	./$(TARGET)
 
-xml: pcunit_register $(TARGET)
-	./$(TARGET) verbose | ruby PCUnit/pcunit_xml_output.rb
+xml: all
+	./$(TARGET) verbose | ruby PCUnit/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	cd PCUnit && $(MAKE) clean
@@ -182,7 +182,7 @@ OBJS = main.o
 
 .PHONY: all clean pcunit_register test
 
-all: pcunit_register $(TARGET) test
+all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby $(INSTALLDIR)/bin/pcunit_register.rb
@@ -195,11 +195,11 @@ pcunit_register:
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
-test:
+test: all
 	./$(TARGET)
 
-xml: pcunit_register $(TARGET)
-	./$(TARGET) verbose | ruby $(INSTALLDIR)/bin/pcunit_xml_output.rb
+xml: all
+	./$(TARGET) verbose | ruby $(INSTALLDIR)/bin/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	rm -f *.o $(TARGET)
