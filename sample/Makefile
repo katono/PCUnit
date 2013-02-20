@@ -13,7 +13,7 @@ OBJS += $(LIBPCUNIT)
 
 .PHONY: all clean pcunit_register test
 
-all: pcunit_register $(TARGET) test
+all: pcunit_register $(TARGET)
 
 pcunit_register:
 	ruby ../PCUnit/pcunit_register.rb
@@ -29,8 +29,8 @@ $(LIBPCUNIT):
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
-test:
-	./$(TARGET) | ruby ../PCUnit/pcunit_xml_output.rb
+test: all
+	./$(TARGET) | ruby ../PCUnit/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)
