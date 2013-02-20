@@ -737,12 +737,15 @@ setup関数・テスト関数等の雛形が定義されています。
 <p><code>pcunit_xml_output.rb</code>はテスト結果をXMLファイルで出力するRubyスクリプトです。
 書式は次の通りです。</p>
 
-<pre><code>pcunit_xml_output.rb [-o FILE] [-e] [-n]
+<pre><code>pcunit_xml_output.rb [output_file] [-e] [-n]
 </code></pre>
 
 <p><code>pcunit_xml_output.rb</code>は、テストプログラムが標準出力へ出力したテスト結果を標準入力から読み取り、XMLファイルに変換して出力します。
 また、標準入力をそのまま標準出力にも出力します。
-全てのテスト結果を集計したい場合は、テストプログラムの出力を<code>PCU_set_verbose</code>で冗長モードにしてください。</p>
+<code>output_file</code>に出力するXMLファイル名を指定します。
+<code>output_file</code>を省略した場合、XMLファイル名は<code>test_results.xml</code>になります。</p>
+
+<p>全てのテスト結果を集計したい場合は、テストプログラムの出力を<code>PCU_set_verbose</code>で冗長モードにしてください。</p>
 
 <p>次のようにパイプを利用して、テストプログラムの標準出力を入力として使用します。</p>
 
@@ -757,10 +760,6 @@ setup関数・テスト関数等の雛形が定義されています。
 <h4>オプション</h4>
 
 <ul>
-<li><p><code>-o FILE</code></p>
-
-<p><code>FILE</code>に出力するXMLファイル名を指定してください。
-このオプションを省略した場合、<code>test_results.xml</code>を指定したと見なします。</p></li>
 <li><p><code>-e</code></p>
 
 <p>1つでもテスト結果に失敗があれば非0を終了コードとして返すようになります。</p></li>

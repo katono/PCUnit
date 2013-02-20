@@ -764,10 +764,13 @@ setup関数・テスト関数等の雛形が定義されています。
 `pcunit_xml_output.rb`はテスト結果をXMLファイルで出力するRubyスクリプトです。
 書式は次の通りです。
 
-    pcunit_xml_output.rb [-o FILE] [-e] [-n]
+    pcunit_xml_output.rb [output_file] [-e] [-n]
 
 `pcunit_xml_output.rb`は、テストプログラムが標準出力へ出力したテスト結果を標準入力から読み取り、XMLファイルに変換して出力します。
 また、標準入力をそのまま標準出力にも出力します。
+`output_file`に出力するXMLファイル名を指定します。
+`output_file`を省略した場合、XMLファイル名は`test_results.xml`になります。
+
 全てのテスト結果を集計したい場合は、テストプログラムの出力を`PCU_set_verbose`で冗長モードにしてください。
 
 次のようにパイプを利用して、テストプログラムの標準出力を入力として使用します。
@@ -779,11 +782,6 @@ setup関数・テスト関数等の雛形が定義されています。
     $ pcunit_xml_output.rb < test_results.txt
 
 #### オプション
-
-* `-o FILE`
-
-    `FILE`に出力するXMLファイル名を指定してください。
-    このオプションを省略した場合、`test_results.xml`を指定したと見なします。
 
 * `-e`
 
