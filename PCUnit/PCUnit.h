@@ -53,8 +53,6 @@ void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual,
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
-void PCU_assert_ptr_impl(const void *expected, const void *actual, 
-		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_strw_impl(const void *expected, const void *actual, 
@@ -210,25 +208,25 @@ const char *PCU_formatW(const void *format, ...);
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_PTR_EQUAL_AUX(expected, actual, str_assert)\
-	PCU_assert_ptr_impl((const void *) (expected), (const void *) (actual),\
+	PCU_assert_num_impl((PCU_size_t)(size_t) (expected), (PCU_size_t)(size_t) (actual),\
 		PCU_TYPE_PTR,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_PTR_NOT_EQUAL_AUX(expected, actual, str_assert)\
-	PCU_assert_ptr_impl((const void *) (expected), (const void *) (actual),\
+	PCU_assert_num_impl((PCU_size_t)(size_t) (expected), (PCU_size_t)(size_t) (actual),\
 		PCU_TYPE_PTR | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_PTR_NULL_AUX(value, str_assert)\
-	PCU_assert_ptr_impl(0, (const void *) (value),\
+	PCU_assert_num_impl(0, (PCU_size_t)(size_t) (value),\
 		PCU_TYPE_PTR_NULL,\
 		str_assert,\
 		__FILE__, __LINE__)
 
 #define PCU_ASSERT_PTR_NOT_NULL_AUX(value, str_assert)\
-	PCU_assert_ptr_impl(0, (const void *) (value),\
+	PCU_assert_num_impl(0, (PCU_size_t)(size_t) (value),\
 		PCU_TYPE_PTR_NULL | PCU_TYPE_NOT,\
 		str_assert,\
 		__FILE__, __LINE__)

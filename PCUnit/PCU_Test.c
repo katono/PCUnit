@@ -136,13 +136,6 @@ void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual,
 			expected, actual, type, str_assert, file, line);
 }
 
-void PCU_assert_ptr_impl(const void *expected, const void *actual, 
-		unsigned long type, const char *str_assert, const char *file, unsigned int line)
-{
-	PCU_assert_impl(PCU_get_not_flag(type) ? (expected != actual) : (expected == actual), 
-			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-}
-
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
