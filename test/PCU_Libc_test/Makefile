@@ -18,13 +18,12 @@ pcunit_register:
 
 
 PCU_LIBC_DEFINE = -DPCU_NO_LIBC -DPCU_NO_STDARG
+PCU_LIBC_DEFINE += -DPCU_FORMAT_BUFSIZE=256
 PCU_LIBC_DEFINE += -DPCU_set_putchar=PCU_set_putchar_dummy
 PCU_LIBC_DEFINE += -DPCU_set_getchar=PCU_set_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_getchar=PCU_getchar_dummy
 PCU_LIBC_DEFINE += -DPCU_puts=PCU_puts_dummy
 PCU_LIBC_DEFINE += -DPCU_formatW=PCU_formatW_dummy
-PCU_LIBC_DEFINE += -DPCU_format_buf=PCU_format_buf_dummy
-PCU_LIBC_DEFINE += -DPCU_printf_buf=PCU_printf_buf_dummy
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 	$(CC) $(CFLAGS) $(PCU_LIBC_DEFINE) -c $<

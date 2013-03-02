@@ -5,11 +5,7 @@
 #include "PCU_Libc.h"
 
 #ifndef PCU_FORMAT_BUFSIZE
-#if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
 #define PCU_FORMAT_BUFSIZE	512
-#else
-#define PCU_FORMAT_BUFSIZE	256
-#endif
 #endif
 
 #if PCU_FORMAT_BUFSIZE <= 0
@@ -18,9 +14,11 @@
 #endif
 
 static char format_buf[PCU_FORMAT_BUFSIZE];
-PCU_FormatBuf PCU_format_buf = { format_buf, sizeof format_buf / sizeof format_buf[0] };
 static char printf_buf[64];
+#ifdef PCU_NO_STDARG
+PCU_FormatBuf PCU_format_buf = { format_buf, sizeof format_buf / sizeof format_buf[0] };
 PCU_FormatBuf PCU_printf_buf = { printf_buf, sizeof printf_buf / sizeof printf_buf[0] };
+#endif
 
 static PCU_Putchar putchar_func;
 static PCU_Getchar getchar_func;
