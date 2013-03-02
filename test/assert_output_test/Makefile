@@ -41,3 +41,7 @@ clean:
 	cd ../assert_test && $(MAKE) clean
 	rm -f *.o $(TARGET) assert_output_actual.txt assert_output_verbose_actual.txt assert_not_supported_actual.txt *.xml
 
+
+main.o: ../../PCUnit/PCUnit.h
+AssertOutputTest.o: ../../PCUnit/PCUnit.h
+AssertNotSupportedTest.o: ../../PCUnit/PCUnit.h
