@@ -69,11 +69,8 @@ int PCU_last_assertion(void);
 
 
 typedef struct {
-	int num_asserts;
-	int num_asserts_ran;
 	int num_asserts_failed;
-	int num_errors_setup;
-	int num_errors_teardown;
+	int num_errors;
 	int num_msgs;
 } PCU_TestResult;
 
@@ -81,17 +78,8 @@ typedef struct {
 	int num_tests;
 	int num_tests_ran;
 	int num_tests_failed;
-	int num_errors_initialize;
-	int num_errors_cleanup;
 	PCU_TestResult test_result;
 } PCU_SuiteResult;
-
-typedef struct {
-	int num_suites;
-	int num_suites_ran;
-	int num_suites_failed;
-	PCU_SuiteResult suite_result;
-} PCU_Result;
 
 typedef struct {
 	char * const buf;

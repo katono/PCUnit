@@ -60,7 +60,7 @@ void PCU_Test_run(PCU_Test *self)
 		int err;
 		err = PCU_Test_setup(self);
 		if (err) {
-			self->result.num_errors_setup++;
+			self->result.num_errors++;
 			print_file_line_assert(PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1);
 			print_params(PCU_TYPE_SETUP, 0, (PCU_size_t) err);
 			print_repeat(PCU_TYPE_SETUP, repeat_counter);
@@ -71,7 +71,7 @@ void PCU_Test_run(PCU_Test *self)
 		}
 		err = PCU_Test_teardown(self);
 		if (err) {
-			self->result.num_errors_teardown++;
+			self->result.num_errors++;
 			print_file_line_assert(PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1);
 			print_params(PCU_TYPE_SETUP, 0, (PCU_size_t) err);
 			print_repeat(PCU_TYPE_SETUP, repeat_counter);
@@ -101,8 +101,7 @@ int PCU_Test_is_skipped(PCU_Test *self)
 
 int PCU_Test_is_failed(PCU_Test *self)
 {
-	return (self->result.num_asserts_failed > 0 || 
-			self->result.num_errors_setup > 0 || self->result.num_errors_teardown > 0);
+	return (self->result.num_asserts_failed > 0 || self->result.num_errors > 0);
 }
 
 void PCU_leave_test_func(void)
@@ -113,9 +112,6 @@ void PCU_leave_test_func(void)
 void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
-	current_test->result.num_asserts++;
-	current_test->result.num_asserts_ran++;
-
 	if (passed_flag) {
 		last_assertion = 1;
 		return;
@@ -177,9 +173,6 @@ void PCU_assert_double_impl(double expected, double actual, double delta,
 #ifndef PCU_NO_FLOATINGPOINT
 	double dlt = delta;
 	int not_flag;
-	current_test->result.num_asserts++;
-	current_test->result.num_asserts_ran++;
-
 	not_flag = PCU_get_not_flag(type);
 	if (dlt < 0) {
 		dlt = -dlt;
@@ -213,9 +206,6 @@ void PCU_assert_double_impl(double expected, double actual, double delta,
 void PCU_assert_op_double_impl(int passed_flag, double expected, double actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
-	current_test->result.num_asserts++;
-	current_test->result.num_asserts_ran++;
-
 	if (passed_flag) {
 		last_assertion = 1;
 		return;
@@ -261,16 +251,13 @@ void PCU_set_verbose(int verbose_flag)
 static int is_first_print(PCU_Test *self)
 {
 	if (self->result.num_asserts_failed == 1 && self->result.num_msgs == 0 && 
-			self->result.num_errors_setup == 0 && self->result.num_errors_teardown == 0) {
+			self->result.num_errors == 0) {
 		return 1;
 	} else if (self->result.num_asserts_failed == 0 && self->result.num_msgs == 1 && 
-			self->result.num_errors_setup == 0 && self->result.num_errors_teardown == 0) {
+			self->result.num_errors == 0) {
 		return 1;
 	} else if (self->result.num_asserts_failed == 0 && self->result.num_msgs == 0 && 
-			self->result.num_errors_setup == 1 && self->result.num_errors_teardown == 0) {
-		return 1;
-	} else if (self->result.num_asserts_failed == 0 && self->result.num_msgs == 0 && 
-			self->result.num_errors_setup == 0 && self->result.num_errors_teardown == 1) {
+			self->result.num_errors == 1) {
 		return 1;
 	}
 	return 0;

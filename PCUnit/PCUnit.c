@@ -4,6 +4,15 @@
 #include "PCU_Libc.h"
 
 static int enable_color;
+
+typedef struct {
+	int num_suites;
+	int num_suites_ran;
+	int num_suites_failed;
+	int num_tests;
+	int num_tests_ran;
+	int num_tests_failed;
+} PCU_Result;
 static PCU_Result result;
 
 static void reset(const PCU_SuiteMethod *suite_methods, int num)
@@ -17,7 +26,7 @@ static void reset(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_Suite_reset(p);
 		suite_result = PCU_Suite_get_result(p);
 		result.num_suites++;
-		result.suite_result.num_tests += suite_result->num_tests;
+		result.num_tests += suite_result->num_tests;
 	}
 }
 
@@ -164,15 +173,8 @@ static void print_after_test(PCU_Suite *suite)
 
 static void add_result(const PCU_SuiteResult *suite_result)
 {
-	result.suite_result.num_tests_ran         += suite_result->num_tests_ran;
-	result.suite_result.num_tests_failed      += suite_result->num_tests_failed;
-	result.suite_result.num_errors_initialize += suite_result->num_errors_initialize;
-	result.suite_result.num_errors_cleanup    += suite_result->num_errors_cleanup;
-	result.suite_result.test_result.num_asserts         += suite_result->test_result.num_asserts;
-	result.suite_result.test_result.num_asserts_ran     += suite_result->test_result.num_asserts_ran;
-	result.suite_result.test_result.num_asserts_failed  += suite_result->test_result.num_asserts_failed;
-	result.suite_result.test_result.num_errors_setup    += suite_result->test_result.num_errors_setup;
-	result.suite_result.test_result.num_errors_teardown += suite_result->test_result.num_errors_teardown;
+	result.num_tests_ran    += suite_result->num_tests_ran;
+	result.num_tests_failed += suite_result->num_tests_failed;
 	result.num_suites_ran++;
 	if (suite_result->num_tests_failed > 0) {
 		result.num_suites_failed++;
