@@ -51,11 +51,7 @@ void PCU_Suite_run(PCU_Suite *self)
 		return;
 	}
 	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
-		const PCU_TestResult *test_result;
 		PCU_Test_run(p);
-		test_result = PCU_Test_get_result(p);
-		self->result.test_result.num_asserts_failed  += test_result->num_asserts_failed;
-		self->result.test_result.num_errors          += test_result->num_errors;
 		if (!PCU_Test_is_skipped(p)) {
 			self->result.num_tests_ran++;
 		}
@@ -69,7 +65,6 @@ void PCU_Suite_run(PCU_Suite *self)
 #ifndef PCU_NO_CONSOLE_RUN
 void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
-	const PCU_TestResult *test_result;
 	PCU_Test *p = self->tests + idx;
 	current_suite = self;
 
@@ -78,9 +73,6 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 		return;
 	}
 	PCU_Test_run(p);
-	test_result = PCU_Test_get_result(p);
-	self->result.test_result.num_asserts_failed  += test_result->num_asserts_failed;
-	self->result.test_result.num_errors          += test_result->num_errors;
 	if (!PCU_Test_is_skipped(p)) {
 		self->result.num_tests_ran++;
 	}

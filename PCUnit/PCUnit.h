@@ -78,7 +78,6 @@ typedef struct {
 	int num_tests;
 	int num_tests_ran;
 	int num_tests_failed;
-	PCU_TestResult test_result;
 } PCU_SuiteResult;
 
 typedef struct {

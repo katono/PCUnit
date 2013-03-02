@@ -89,11 +89,6 @@ void PCU_Test_run(PCU_Test *self)
 	}
 }
 
-const PCU_TestResult *PCU_Test_get_result(PCU_Test *self)
-{
-	return &self->result;
-}
-
 int PCU_Test_is_skipped(PCU_Test *self)
 {
 	return (self->ntimes < 0);
