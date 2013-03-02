@@ -130,7 +130,7 @@ static void print_before_test(PCU_Suite *suite)
 static void print_initialize_error(PCU_Suite *suite)
 {
 	set_color(COLOR_RED);
-	PCU_PRINTF1("INITIALIZE FAILED : %d\n", suite->initialize_error);
+	PCU_PRINTF1("INITIALIZE FAILED : %d\n", suite->result.initialize_error);
 	reset_color();
 	PCU_puts("\n");
 }
@@ -138,14 +138,14 @@ static void print_initialize_error(PCU_Suite *suite)
 static void print_cleanup_error(PCU_Suite *suite)
 {
 	set_color(COLOR_RED);
-	PCU_PRINTF1("CLEANUP FAILED : %d\n", suite->cleanup_error);
+	PCU_PRINTF1("CLEANUP FAILED : %d\n", suite->result.cleanup_error);
 	reset_color();
 	PCU_puts("\n");
 }
 
 static void print_after_test(PCU_Suite *suite)
 {
-	if (suite->initialize_error) {
+	if (suite->result.initialize_error) {
 		print_initialize_error(suite);
 		return;
 	}
@@ -162,7 +162,7 @@ static void print_after_test(PCU_Suite *suite)
 	}
 	reset_color();
 	PCU_puts("\n");
-	if (suite->cleanup_error) {
+	if (suite->result.cleanup_error) {
 		print_cleanup_error(suite);
 	}
 }
@@ -172,10 +172,10 @@ static void add_result(PCU_Suite *suite)
 	const PCU_SuiteResult *suite_result = PCU_Suite_get_result(suite);
 	result.num_tests_ran    += suite_result->num_tests_ran;
 	result.num_tests_failed += suite_result->num_tests_failed;
-	if (suite->initialize_error) {
+	if (suite_result->initialize_error) {
 		result.num_tests_failed++;
 	}
-	if (suite->cleanup_error) {
+	if (suite_result->cleanup_error) {
 		result.num_tests_failed++;
 	}
 }
@@ -207,7 +207,7 @@ static char input_buf[64];
 static void print_result_selected(PCU_Suite *suite, int idx)
 {
 	PCU_Test *test = &suite->tests[idx];
-	if (suite->initialize_error) {
+	if (suite->result.initialize_error) {
 		print_initialize_error(suite);
 		return;
 	}
@@ -231,7 +231,7 @@ static void print_result_selected(PCU_Suite *suite, int idx)
 		reset_color();
 		PCU_puts("\n");
 	}
-	if (suite->cleanup_error) {
+	if (suite->result.cleanup_error) {
 		print_cleanup_error(suite);
 	}
 }

@@ -6,8 +6,6 @@ static PCU_Suite *current_suite;
 
 static void PCU_Suite_clear_result(PCU_Suite *self)
 {
-	self->initialize_error = 0;
-	self->cleanup_error = 0;
 	PCU_MEMSET(&self->result, 0, sizeof(self->result));
 }
 
@@ -64,8 +62,8 @@ void PCU_Suite_run(PCU_Suite *self)
 	PCU_Test *p;
 	current_suite = self;
 
-	self->initialize_error = PCU_Suite_initialize(self);
-	if (self->initialize_error) {
+	self->result.initialize_error = PCU_Suite_initialize(self);
+	if (self->result.initialize_error) {
 		return;
 	}
 	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
@@ -77,7 +75,7 @@ void PCU_Suite_run(PCU_Suite *self)
 			self->result.num_tests_failed++;
 		}
 	}
-	self->cleanup_error = PCU_Suite_cleanup(self);
+	self->result.cleanup_error = PCU_Suite_cleanup(self);
 }
 
 #ifndef PCU_NO_CONSOLE_RUN
@@ -86,8 +84,8 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 	PCU_Test *p = self->tests + idx;
 	current_suite = self;
 
-	self->initialize_error = PCU_Suite_initialize(self);
-	if (self->initialize_error) {
+	self->result.initialize_error = PCU_Suite_initialize(self);
+	if (self->result.initialize_error) {
 		return;
 	}
 	PCU_Test_run(p);
@@ -97,7 +95,7 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 	if (PCU_Test_is_failed(p)) {
 		self->result.num_tests_failed++;
 	}
-	self->cleanup_error = PCU_Suite_cleanup(self);
+	self->result.cleanup_error = PCU_Suite_cleanup(self);
 }
 #endif
 

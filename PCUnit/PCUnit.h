@@ -78,6 +78,8 @@ typedef struct {
 	int num_tests;
 	int num_tests_ran;
 	int num_tests_failed;
+	int initialize_error;
+	int cleanup_error;
 } PCU_SuiteResult;
 
 typedef struct {
@@ -122,8 +124,6 @@ struct PCU_Suite {
 	int (*initialize)(void);
 	int (*cleanup)(void);
 	/* private */
-	int initialize_error;
-	int cleanup_error;
 	PCU_SuiteResult result;
 };
 
