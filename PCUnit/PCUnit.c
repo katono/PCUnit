@@ -6,9 +6,6 @@
 static int enable_color;
 
 typedef struct {
-	int num_suites;
-	int num_suites_ran;
-	int num_suites_failed;
 	int num_tests;
 	int num_tests_ran;
 	int num_tests_failed;
@@ -25,7 +22,6 @@ static void reset(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_Suite *p = (*method)();
 		PCU_Suite_reset(p);
 		suite_result = PCU_Suite_get_result(p);
-		result.num_suites++;
 		result.num_tests += suite_result->num_tests;
 	}
 }
@@ -171,13 +167,16 @@ static void print_after_test(PCU_Suite *suite)
 	}
 }
 
-static void add_result(const PCU_SuiteResult *suite_result)
+static void add_result(PCU_Suite *suite)
 {
+	const PCU_SuiteResult *suite_result = PCU_Suite_get_result(suite);
 	result.num_tests_ran    += suite_result->num_tests_ran;
 	result.num_tests_failed += suite_result->num_tests_failed;
-	result.num_suites_ran++;
-	if (suite_result->num_tests_failed > 0) {
-		result.num_suites_failed++;
+	if (suite->initialize_error) {
+		result.num_tests_failed++;
+	}
+	if (suite->cleanup_error) {
+		result.num_tests_failed++;
 	}
 }
 
@@ -190,7 +189,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 		PCU_Suite *p = (*method)();
 		print_before_test(p);
 		PCU_Suite_run(p);
-		add_result(PCU_Suite_get_result(p));
+		add_result(p);
 		PCU_puts("\n");
 		print_after_test(p);
 	}
@@ -199,7 +198,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 int PCU_run(const PCU_SuiteMethod *suite_methods, int num)
 {
 	run_all(suite_methods, num);
-	return result.num_suites_failed > 0;
+	return result.num_tests_failed > 0;
 }
 
 #ifndef PCU_NO_CONSOLE_RUN
@@ -243,7 +242,7 @@ static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, in
 	reset(suite_methods, num);
 	print_before_test(p);
 	PCU_Suite_run(p);
-	add_result(PCU_Suite_get_result(p));
+	add_result(p);
 	PCU_puts("\n");
 	print_after_test(p);
 }
@@ -253,7 +252,7 @@ static void run_selected_test(const PCU_SuiteMethod *suite_methods, int num, int
 	PCU_Suite *p = (suite_methods[suite_idx])();
 	reset(suite_methods, num);
 	PCU_Suite_run_selected(p, test_idx);
-	add_result(PCU_Suite_get_result(p));
+	add_result(p);
 	print_result_selected(p, test_idx);
 }
 
