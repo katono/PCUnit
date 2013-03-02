@@ -18,11 +18,9 @@ static void reset(const PCU_SuiteMethod *suite_methods, int num)
 	const PCU_SuiteMethod *method = suite_methods;
 	PCU_MEMSET(&result, 0, sizeof(result));
 	for (i = 0; i < num; i++, method++) {
-		const PCU_SuiteResult *suite_result;
 		PCU_Suite *p = (*method)();
 		PCU_Suite_reset(p);
-		suite_result = PCU_Suite_get_result(p);
-		result.num_tests += suite_result->num_tests;
+		result.num_tests += p->result.num_tests;
 	}
 }
 
@@ -169,13 +167,12 @@ static void print_after_test(PCU_Suite *suite)
 
 static void add_result(PCU_Suite *suite)
 {
-	const PCU_SuiteResult *suite_result = PCU_Suite_get_result(suite);
-	result.num_tests_ran    += suite_result->num_tests_ran;
-	result.num_tests_failed += suite_result->num_tests_failed;
-	if (suite_result->initialize_error) {
+	result.num_tests_ran    += suite->result.num_tests_ran;
+	result.num_tests_failed += suite->result.num_tests_failed;
+	if (suite->result.initialize_error) {
 		result.num_tests_failed++;
 	}
-	if (suite_result->cleanup_error) {
+	if (suite->result.cleanup_error) {
 		result.num_tests_failed++;
 	}
 }

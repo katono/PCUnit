@@ -99,11 +99,6 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 }
 #endif
 
-const PCU_SuiteResult *PCU_Suite_get_result(PCU_Suite *self)
-{
-	return &self->result;
-}
-
 const char *PCU_suite_name(void)
 {
 	return current_suite->name;
