@@ -15,12 +15,10 @@ void PCU_puts(const char *str);
 # define PCU_STRCMP		PCU_strcmp
 # define PCU_STRNCMP	PCU_strncmp
 # define PCU_MEMSET		PCU_memset
-# define PCU_MEMCPY		PCU_memcpy
 # define PCU_ATOI		PCU_atoi
 int PCU_strcmp(const char *s1, const char *s2);
 int PCU_strncmp(const char *s1, const char *s2, size_t len);
 void *PCU_memset(void *b, int c, size_t len);
-void *PCU_memcpy(void *dst, const void *src, size_t len);
 long PCU_strtol(const char *s, char **endptr, int base);
 unsigned long PCU_strtoul(const char *s, char **endptr, int base);
 int PCU_atoi(const char *s);
@@ -30,7 +28,6 @@ int PCU_atoi(const char *s);
 # define PCU_STRCMP		strcmp
 # define PCU_STRNCMP	strncmp
 # define PCU_MEMSET		memset
-# define PCU_MEMCPY		memcpy
 # define PCU_ATOI		atoi
 #endif
 

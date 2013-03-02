@@ -734,16 +734,6 @@ void *PCU_memset(void *b, int c, size_t len)
 	return b;
 }
 
-void *PCU_memcpy(void *dst, const void *src, size_t len)
-{
-	char *p = (char *) dst;
-	const char *q = (const char *) src;
-	for (; len > 0; len--) {
-		*(p++) = *(q++);
-	}
-	return dst;
-}
-
 #ifndef PCU_NO_CONSOLE_RUN
 static int ascii2hex(char c)
 {
