@@ -1,5 +1,9 @@
 #!/usr/bin/ruby
 
+if RUBY_VERSION >= '1.9'
+	Encoding.default_external = "ASCII-8BIT"
+end
+
 require 'optparse'
 
 opt = OptionParser.new
