@@ -7,6 +7,8 @@ void PCU_Suite_reset(PCU_Suite *self);
 void PCU_Suite_run(PCU_Suite *self);
 void PCU_Suite_run_selected(PCU_Suite *self, int idx);
 const PCU_SuiteResult *PCU_Suite_get_result(PCU_Suite *self);
+int PCU_Suite_setup(void);
+int PCU_Suite_teardown(void);
 
 
 #endif /* PCU_SUITE_H_INCLUDED */

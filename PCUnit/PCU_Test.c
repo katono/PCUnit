@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include "PCU_Suite.h"
 #include "PCU_Test.h"
 #include "PCU_Libc.h"
 
@@ -23,28 +24,9 @@ static void PCU_Test_clear_result(PCU_Test *self)
 	PCU_MEMSET(&self->result, 0, sizeof(self->result));
 }
 
-void PCU_Test_reset(PCU_Test *self, const PCU_Suite *suite)
+void PCU_Test_reset(PCU_Test *self)
 {
-	self->suite = suite;
 	PCU_Test_clear_result(self);
-}
-
-static int PCU_Test_setup(const PCU_Test *self)
-{
-	int ret = 0;
-	if (self->suite->setup) {
-		ret = self->suite->setup();
-	}
-	return ret;
-}
-
-static int PCU_Test_teardown(const PCU_Test *self)
-{
-	int ret = 0;
-	if (self->suite->teardown) {
-		ret = self->suite->teardown();
-	}
-	return ret;
 }
 
 void PCU_Test_run(PCU_Test *self)
@@ -58,7 +40,7 @@ void PCU_Test_run(PCU_Test *self)
 	repeat = (self->ntimes != 0) ? self->ntimes : 1;
 	for (repeat_counter = 0; repeat_counter < repeat; repeat_counter++) {
 		int err;
-		err = PCU_Test_setup(self);
+		err = PCU_Suite_setup();
 		if (err) {
 			self->result.num_errors++;
 			print_file_line_assert(PCU_TYPE_SETUP, "SETUP FAILED", "", (unsigned int) -1);
@@ -69,7 +51,7 @@ void PCU_Test_run(PCU_Test *self)
 		if (PCU_SETJMP(fatal_jmp) == 0) {
 			self->test();
 		}
-		err = PCU_Test_teardown(self);
+		err = PCU_Suite_teardown();
 		if (err) {
 			self->result.num_errors++;
 			print_file_line_assert(PCU_TYPE_SETUP, "TEARDOWN FAILED", "", (unsigned int) -1);

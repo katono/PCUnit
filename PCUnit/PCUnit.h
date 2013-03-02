@@ -109,7 +109,6 @@ struct PCU_Test {
 	void (*test)(void);
 	int ntimes;
 	/* private */
-	const PCU_Suite *suite;
 	PCU_TestResult result;
 };
 

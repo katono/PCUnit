@@ -50,6 +50,6 @@ clean:
 	rm -f *.o *.a
 
 PCUnit.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h Makefile
-PCU_Test.o: PCU_Test.h PCU_Libc.h PCUnit.h Makefile
+PCU_Test.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h Makefile
 PCU_Suite.o: PCU_Test.h PCU_Suite.h PCU_Libc.h PCUnit.h Makefile
 PCU_Libc.o: PCU_Libc.h PCUnit.h Makefile
