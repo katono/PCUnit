@@ -123,6 +123,9 @@ while s = STDIN.gets
 	if !no_stdout
 		puts s
 	end
+	if RUBY_VERSION >= '1.9'
+		s = s.encode("UTF-8")
+	end
 	parse_line s
 end
 $testsuites.attributes["tests"]    = ($testsuites.attributes["tests"].to_i    + $testsuite.attributes["tests"].to_i).to_s
