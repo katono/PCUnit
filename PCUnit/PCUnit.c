@@ -94,29 +94,6 @@ static void reset_color(void)
 #endif
 }
 
-#define PCU_TYPE_NOT_NSTR	(~(PCU_TYPE_NSTR | PCU_TYPE_NSTRW | PCU_TYPE_NOT))
-
-unsigned long PCU_get_assert_type(unsigned long type)
-{
-	if (type & PCU_TYPE_NSTR) {
-		return PCU_TYPE_NSTR;
-	} else if (type & PCU_TYPE_NSTRW) {
-		return PCU_TYPE_NSTRW;
-	} else {
-		return (type & PCU_TYPE_NOT_NSTR);
-	}
-}
-
-size_t PCU_get_nstr_len(unsigned long type)
-{
-	return (size_t) (type & PCU_TYPE_NOT_NSTR);
-}
-
-int PCU_get_not_flag(unsigned long type)
-{
-	return (type & PCU_TYPE_NOT) ? 1 : 0;
-}
-
 static void print_before_test(PCU_Suite *suite)
 {
 	PCU_puts("\n");

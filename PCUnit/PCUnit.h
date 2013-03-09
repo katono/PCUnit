@@ -46,9 +46,6 @@ typedef ptrdiff_t PCU_ssize_t;
 #define PCU_TYPE_NSTRW     0x40000000
 #define PCU_TYPE_NOT       0x80000000
 
-unsigned long PCU_get_assert_type(unsigned long type);
-size_t PCU_get_nstr_len(unsigned long type);
-int PCU_get_not_flag(unsigned long type);
 void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, 

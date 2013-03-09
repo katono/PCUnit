@@ -19,6 +19,29 @@ static void print_repeat(unsigned long type, int repeat);
 static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t actual);
 static void print_params_double(unsigned long type, double expected, double actual, double delta);
 
+#define PCU_TYPE_NOT_NSTR	(~(PCU_TYPE_NSTR | PCU_TYPE_NSTRW | PCU_TYPE_NOT))
+
+static unsigned long get_assert_type(unsigned long type)
+{
+	if (type & PCU_TYPE_NSTR) {
+		return PCU_TYPE_NSTR;
+	} else if (type & PCU_TYPE_NSTRW) {
+		return PCU_TYPE_NSTRW;
+	} else {
+		return (type & PCU_TYPE_NOT_NSTR);
+	}
+}
+
+static size_t get_nstr_len(unsigned long type)
+{
+	return (size_t) (type & PCU_TYPE_NOT_NSTR);
+}
+
+static int get_not_flag(unsigned long type)
+{
+	return (type & PCU_TYPE_NOT) ? 1 : 0;
+}
+
 static void PCU_Test_clear_result(PCU_Test *self)
 {
 	PCU_MEMSET(&self->result, 0, sizeof(self->result));
@@ -105,7 +128,7 @@ void PCU_assert_impl(int passed_flag, PCU_size_t expected, PCU_size_t actual,
 void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line)
 {
-	PCU_assert_impl(PCU_get_not_flag(type) ? (expected != actual) : (expected == actual), 
+	PCU_assert_impl(get_not_flag(type) ? (expected != actual) : (expected == actual), 
 			expected, actual, type, str_assert, file, line);
 }
 
@@ -115,12 +138,12 @@ void PCU_assert_str_impl(const char *expected, const char *actual,
 	int cmp;
 	if (expected == 0 || actual == 0) {
 		cmp = (expected != actual);
-	} else if (PCU_get_assert_type(type) == PCU_TYPE_NSTR) {
-		cmp = PCU_STRNCMP(expected, actual, PCU_get_nstr_len(type));
+	} else if (get_assert_type(type) == PCU_TYPE_NSTR) {
+		cmp = PCU_STRNCMP(expected, actual, get_nstr_len(type));
 	} else {
 		cmp = PCU_STRCMP(expected, actual);
 	}
-	PCU_assert_impl(PCU_get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
+	PCU_assert_impl(get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
 			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 }
 
@@ -131,12 +154,12 @@ void PCU_assert_strw_impl(const void *expected, const void *actual,
 	int cmp;
 	if (expected == 0 || actual == 0) {
 		cmp = (expected != actual);
-	} else if (PCU_get_assert_type(type) == PCU_TYPE_NSTRW) {
-		cmp = PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, PCU_get_nstr_len(type));
+	} else if (get_assert_type(type) == PCU_TYPE_NSTRW) {
+		cmp = PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, get_nstr_len(type));
 	} else {
 		cmp = PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual);
 	}
-	PCU_assert_impl(PCU_get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
+	PCU_assert_impl(get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
 			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 #else
 	PCU_assert_impl(0, 
@@ -150,7 +173,7 @@ void PCU_assert_double_impl(double expected, double actual, double delta,
 #ifndef PCU_NO_FLOATINGPOINT
 	double dlt = delta;
 	int not_flag;
-	not_flag = PCU_get_not_flag(type);
+	not_flag = get_not_flag(type);
 	if (dlt < 0) {
 		dlt = -dlt;
 	}
@@ -261,7 +284,7 @@ static void print_file_line_assert(unsigned long type, const char *str_assert, c
 		print_test_name();
 	}
 
-	t = PCU_get_assert_type(type);
+	t = get_assert_type(type);
 	if (t == PCU_TYPE_SETUP) {
 		PCU_puts(" ");
 		PCU_puts(PCU_test_name());
@@ -288,7 +311,7 @@ static int is_repeated_test(PCU_Test *self)
 
 static void print_repeat(unsigned long type, int repeat)
 {
-	if (is_repeated_test(current_test) && PCU_get_assert_type(type) != PCU_TYPE_ADDMSG) {
+	if (is_repeated_test(current_test) && get_assert_type(type) != PCU_TYPE_ADDMSG) {
 		PCU_PRINTF1("  repeat   : %d\n", repeat);
 	}
 }
@@ -471,15 +494,15 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	const char * s2 = actual_str;
 	size_t len;
 
-	if (PCU_get_not_flag(type)) {
+	if (get_not_flag(type)) {
 		s1 = value1_str;
 		s2 = value2_str;
 	}
-	switch (PCU_get_assert_type(type)) {
+	switch (get_assert_type(type)) {
 	case PCU_TYPE_NONE:
 	case PCU_TYPE_BOOL:
-		PCU_PRINTF1("  expected : %s\n", PCU_get_not_flag(type) ? "TRUE" : "FALSE");
-		PCU_PRINTF1("  actual   : %s", PCU_get_not_flag(type) ? "FALSE" : "TRUE");
+		PCU_PRINTF1("  expected : %s\n", get_not_flag(type) ? "TRUE" : "FALSE");
+		PCU_PRINTF1("  actual   : %s", get_not_flag(type) ? "FALSE" : "TRUE");
 #if !((defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32))
 		PCU_PRINTF1(PCU_LD, actual);
 #endif
@@ -505,7 +528,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		print_type_ptr(s2  , (const void *)(size_t) actual);
 		break;
 	case PCU_TYPE_PTR_NULL:
-		PCU_PRINTF1("  expected : %sNULL\n", PCU_get_not_flag(type) ? "non-" : "");
+		PCU_PRINTF1("  expected : %sNULL\n", get_not_flag(type) ? "non-" : "");
 		print_type_ptr(actual_str, (const void *)(size_t) actual);
 		break;
 	case PCU_TYPE_STR:
@@ -513,7 +536,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		print_type_str(s2  , (const char *)(size_t) actual);
 		break;
 	case PCU_TYPE_NSTR:
-		len = PCU_get_nstr_len(type);
+		len = get_nstr_len(type);
 		print_type_nstr(s1, (const char *)(size_t) expected, len);
 		print_type_nstr(s2  , (const char *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %u\n", (unsigned int) len);
@@ -524,7 +547,7 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 		print_type_strw(s2  , (const wchar_t *)(size_t) actual);
 		break;
 	case PCU_TYPE_NSTRW:
-		len = PCU_get_nstr_len(type);
+		len = get_nstr_len(type);
 		print_type_nstrw(s1, (const wchar_t *)(size_t) expected, len);
 		print_type_nstrw(s2  , (const wchar_t *)(size_t) actual, len);
 		PCU_PRINTF1("  length   : %u\n", (unsigned int) len);
@@ -553,10 +576,10 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 static void print_params_double(unsigned long type, double expected, double actual, double delta)
 {
 #ifndef PCU_NO_FLOATINGPOINT
-	switch (PCU_get_assert_type(type)) {
+	switch (get_assert_type(type)) {
 	case PCU_TYPE_DBL:
 #if !defined(PCU_NO_VSPRINTF) && !defined(PCU_NO_LIBC)
-		PCU_PRINTF1("  expected : |value1 - value2| %s |delta|\n", PCU_get_not_flag(type) ? ">" : "<=");
+		PCU_PRINTF1("  expected : |value1 - value2| %s |delta|\n", get_not_flag(type) ? ">" : "<=");
 		PCU_PRINTF1("  value1   : %g\n", expected);
 		PCU_PRINTF1("  value2   : %g\n", actual);
 		PCU_PRINTF1("  delta    : %g\n", delta);
