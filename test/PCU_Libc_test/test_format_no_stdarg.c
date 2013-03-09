@@ -153,26 +153,18 @@ void test_format_shorten(void)
 	snprintf(sp_buf, sizeof sp_buf, STR_0);
 	bufp = PCU_format4(STR_0, 0, 0, 0, 0);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
-	PCU_MESSAGE(sp_buf);
-	PCU_MESSAGE(bufp);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_S, "xy");
 	bufp = PCU_format4(STR_S, "xy", 0, 0, 0);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
-	PCU_MESSAGE(sp_buf);
-	PCU_MESSAGE(bufp);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_D, 12);
 	bufp = PCU_format4(STR_D, 12, 0, 0, 0);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
-	PCU_MESSAGE(sp_buf);
-	PCU_MESSAGE(bufp);
 
 	snprintf(sp_buf, sizeof sp_buf, STR_X, 0xab);
 	bufp = PCU_format4(STR_X, 0xab, 0, 0, 0);
 	PCU_ASSERT_STRING_EQUAL(sp_buf, bufp);
-	PCU_MESSAGE(sp_buf);
-	PCU_MESSAGE(bufp);
 
 }
 
