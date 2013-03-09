@@ -32,10 +32,9 @@ pcunit_register:
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
-	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb
 
 test:
-	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb
+	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb $(TARGET)_results.xml
 
 clean:
 	cd ../assert_test && $(MAKE) clean

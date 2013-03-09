@@ -38,16 +38,15 @@ PCU_Libc.o: ../../PCUnit/PCU_Libc.c
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
-	./$(TARGET)
 	cd ../../PCUnit && $(MAKE) clean
 
 test:
-	./$(TARGET)
+	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb $(TARGET)_results.xml
 
 
 .PHONY: clean
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o $(TARGET) *.xml
 
 
 PCU_Libc.o: ../../PCUnit/PCU_Libc.h ../../PCUnit/PCUnit.h
