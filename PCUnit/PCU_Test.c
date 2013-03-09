@@ -94,12 +94,12 @@ void PCU_Test_run(PCU_Test *self)
 	}
 }
 
-int PCU_Test_is_skipped(PCU_Test *self)
+int PCU_Test_is_skipped(const PCU_Test *self)
 {
 	return (self->ntimes < 0);
 }
 
-int PCU_Test_is_failed(PCU_Test *self)
+int PCU_Test_is_failed(const PCU_Test *self)
 {
 	return (self->result.num_asserts_failed > 0 || self->result.num_errors > 0);
 }
@@ -248,7 +248,7 @@ void PCU_set_verbose(int verbose_flag)
 	is_verbose = verbose_flag;
 }
 
-static int is_first_print(PCU_Test *self)
+static int is_first_print(const PCU_Test *self)
 {
 	if (self->result.num_asserts_failed == 1 && self->result.num_msgs == 0 && 
 			self->result.num_errors == 0) {
@@ -304,7 +304,7 @@ static void print_file_line_assert(unsigned long type, const char *str_assert, c
 	}
 }
 
-static int is_repeated_test(PCU_Test *self)
+static int is_repeated_test(const PCU_Test *self)
 {
 	return (self->ntimes > 1);
 }
