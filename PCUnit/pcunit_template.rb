@@ -135,12 +135,12 @@ TARGET = alltests
 OBJS = main.o
 #{objs}
 
-.PHONY: all clean pcunit_register test
+.PHONY: all clean pcunit_register test xml
 
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby PCUnit/pcunit_register.rb
+	-ruby PCUnit/pcunit_register.rb
 
 .SUFFIXES: #{ext} .o
 
@@ -180,12 +180,12 @@ TARGET = alltests
 OBJS = main.o
 #{objs}
 
-.PHONY: all clean pcunit_register test
+.PHONY: all clean pcunit_register test xml
 
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby $(INSTALLDIR)/bin/pcunit_register.rb
+	-ruby $(INSTALLDIR)/bin/pcunit_register.rb
 
 .SUFFIXES: #{ext} .o
 
