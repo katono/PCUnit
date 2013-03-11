@@ -9,12 +9,12 @@ OBJS += AssertOutputTest.o
 OBJS += AssertNotSupportedTest.o
 
 
-.PHONY: all clean pcunit_register test
+.PHONY: all clean pcunit_register test xml
 
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby ../../PCUnit/pcunit_register.rb
+	-ruby ../../PCUnit/pcunit_register.rb
 	cd ../assert_test && $(MAKE)
 	- ../assert_test/assert_test nocolor > assert_output_actual.txt
 	- ../assert_test/assert_test nocolor verbose > assert_output_verbose_actual.txt
@@ -34,6 +34,9 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 
 test:
+	./$(TARGET)
+
+xml:
 	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb $(TARGET)_results.xml
 
 clean:

@@ -11,12 +11,12 @@ OBJS += RingBuf.o test_RingBuf.o
 OBJS += StrToken.o test_StrToken.o
 OBJS += $(LIBPCUNIT)
 
-.PHONY: all clean pcunit_register test
+.PHONY: all clean pcunit_register test xml
 
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby ../PCUnit/pcunit_register.rb
+	-ruby ../PCUnit/pcunit_register.rb
 
 .SUFFIXES: .c .o
 
@@ -30,6 +30,9 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
 test: all
+	./$(TARGET)
+
+xml: all
 	./$(TARGET) | ruby ../PCUnit/pcunit_xml_output.rb $(OUTPUT)
 
 clean:

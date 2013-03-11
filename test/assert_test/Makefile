@@ -21,6 +21,8 @@ OBJS += SetupTest.o
 OBJS += InitializeTest.o
 OBJS += CleanupTest.o
 
+.PHONY: all clean pcunit_register test xml no_setjmp not_supported console
+
 all: pcunit_register $(LIBPCUNIT) $(TARGET)
 
 no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
@@ -32,7 +34,7 @@ no_setjmp: pcunit_register $(LIBPCUNIT_NO_SETJMP) $(TARGET_NO_SETJMP)
 not_supported: pcunit_register $(LIBPCUNIT_NOT_SUPPORTED) $(TARGET_NOT_SUPPORTED)
 
 pcunit_register:
-	ruby ../../PCUnit/pcunit_register.rb
+	-ruby ../../PCUnit/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
 
 
@@ -64,13 +66,14 @@ $(TARGET_NOT_SUPPORTED): $(OBJS)
 	cd ../../PCUnit && $(MAKE) clean
 
 test:
+	./$(TARGET) nocolor verbose
+
+xml:
 	./$(TARGET) nocolor verbose | ruby ../../PCUnit/pcunit_xml_output.rb
 
 console:
 	./$(TARGET) console
 
-
-.PHONY: clean
 clean:
 	rm -f *.o *.i $(TARGET) $(TARGET_NO_SETJMP) $(TARGET_NOT_SUPPORTED) $(TARGET).txt $(TARGET_NO_SETJMP).txt *.xml
 

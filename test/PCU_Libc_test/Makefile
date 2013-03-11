@@ -9,10 +9,12 @@ OBJS += test_string.o
 OBJS += test_strtol.o
 OBJS += ../../PCUnit/libpcunit.a
 
+.PHONY: all clean pcunit_register test xml
+
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	ruby ../../PCUnit/pcunit_register.rb
+	-ruby ../../PCUnit/pcunit_register.rb
 	cd ../../PCUnit && $(MAKE) clean
 	cd ../../PCUnit && $(MAKE) CFLAGS="-Wall -W -std=c99 -DPCU_USE_WCHAR -g -DPCU_FORMAT_BUFSIZE=256"
 
@@ -40,10 +42,11 @@ $(TARGET): $(OBJS)
 	cd ../../PCUnit && $(MAKE) clean
 
 test:
+	./$(TARGET)
+
+xml:
 	./$(TARGET) | ruby ../../PCUnit/pcunit_xml_output.rb $(TARGET)_results.xml
 
-
-.PHONY: clean
 clean:
 	rm -f *.o $(TARGET) *.xml
 
