@@ -308,11 +308,17 @@ const char *PCU_formatW(const void *format, ...);
 	} while (0)
 
 
+#if defined(PCU_NO_SETJMP) || defined(PCU_NO_LIBC)
+#define PCU_RETURN_TEST_FUNC	return
+#else
+#define PCU_RETURN_TEST_FUNC
+#endif
+
 #define PCU_LEAVE_TEST_FUNC_IF_FAILED()	\
 	do {\
 		if (!PCU_last_assertion()) {\
 			PCU_leave_test_func();\
-			return;\
+			PCU_RETURN_TEST_FUNC;\
 		}\
 	} while (0)
 
@@ -321,7 +327,7 @@ const char *PCU_formatW(const void *format, ...);
 		if (!PCU_last_assertion()) {\
 			PCU_msg_impl(msg, PCU_TYPE_ADDMSG , "", "", 0);\
 			PCU_leave_test_func();\
-			return;\
+			PCU_RETURN_TEST_FUNC;\
 		}\
 	} while (0)
 
