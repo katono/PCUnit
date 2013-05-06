@@ -10,14 +10,17 @@ opt = OptionParser.new
 OPTS = {}
 
 OPTS[:d] = "."
+excluded = Array.new
 
 opt.on('-d VAL') {|v| OPTS[:d] = v }
+opt.on('-e VAL') {|v| excluded.push v }
 opt.on('-n') {|v| OPTS[:n] = v }
 opt.on('-h', '--help') {
 	print <<-"EOB"
-Usage: pcunit_register.rb [-d DIR] [-n]
-    -d DIR  source code directory
-    -n      no backup flag
+Usage: pcunit_register.rb [-d DIR] [-e PATTERN] [-n]
+    -d DIR      source code directory
+    -e PATTERN  excluded file pattern
+    -n          no backup flag
 
 	EOB
 	exit
@@ -150,7 +153,16 @@ end
 
 Dir.chdir(OPTS[:d])
 Dir.glob("**/*.{c{,pp,c,xx},C{,PP,C,XX}}") {|fname|
-	register_tests(fname)
+	excluded_flag = false
+	excluded.each {|ex|
+		if fname =~ Regexp.new(ex)
+			excluded_flag = true
+			break
+		end
+	}
+	if !excluded_flag
+		register_tests(fname)
+	end
 }
 if $main_file
 	register_suite_methods($main_file)
