@@ -10,6 +10,7 @@ static PCU_Test *current_test;
 static int repeat_counter;
 static PCU_jmp_buf fatal_jmp;
 static int last_assertion;
+static int leave_is_enabled;
 static int is_verbose;
 
 static void print_test_name(void);
@@ -63,6 +64,7 @@ void PCU_Test_run(PCU_Test *self)
 	repeat = (self->ntimes != 0) ? self->ntimes : 1;
 	for (repeat_counter = 0; repeat_counter < repeat; repeat_counter++) {
 		int err;
+		leave_is_enabled = 0;
 		err = PCU_Suite_setup();
 		if (err) {
 			self->result.num_errors++;
@@ -71,9 +73,11 @@ void PCU_Test_run(PCU_Test *self)
 			print_repeat(PCU_TYPE_SETUP, repeat_counter);
 			continue;
 		}
+		leave_is_enabled = 1;
 		if (PCU_SETJMP(fatal_jmp) == 0) {
 			self->test();
 		}
+		leave_is_enabled = 0;
 		err = PCU_Suite_teardown();
 		if (err) {
 			self->result.num_errors++;
@@ -241,6 +245,11 @@ const char *PCU_test_name(void)
 int PCU_last_assertion(void)
 {
 	return last_assertion;
+}
+
+int PCU_leave_is_enabled(void)
+{
+	return leave_is_enabled;
 }
 
 void PCU_set_verbose(int verbose_flag)
