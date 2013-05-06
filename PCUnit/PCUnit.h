@@ -34,14 +34,15 @@ typedef ptrdiff_t PCU_ssize_t;
 #define PCU_TYPE_PTR_NULL  0x00000004
 #define PCU_TYPE_STR       0x00000005
 #define PCU_TYPE_STRW      0x00000006
-#define PCU_TYPE_DBL       0x00000007
-#define PCU_TYPE_OP        0x00000008
-#define PCU_TYPE_OP_INT    0x00000009
-#define PCU_TYPE_OP_DBL    0x0000000a
-#define PCU_TYPE_MSG       0x0000000b
-#define PCU_TYPE_ADDMSG    0x0000000c
-#define PCU_TYPE_FAIL      0x0000000d
-#define PCU_TYPE_SETUP     0x0000000e
+#define PCU_TYPE_MEM       0x00000007
+#define PCU_TYPE_DBL       0x00000008
+#define PCU_TYPE_OP        0x00000009
+#define PCU_TYPE_OP_INT    0x0000000a
+#define PCU_TYPE_OP_DBL    0x0000000b
+#define PCU_TYPE_MSG       0x0000000c
+#define PCU_TYPE_ADDMSG    0x0000000d
+#define PCU_TYPE_FAIL      0x0000000e
+#define PCU_TYPE_SETUP     0x0000000f
 #define PCU_TYPE_NSTR      0x20000000
 #define PCU_TYPE_NSTRW     0x40000000
 #define PCU_TYPE_NOT       0x80000000
@@ -53,6 +54,8 @@ void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual,
 void PCU_assert_str_impl(const char *expected, const char *actual, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_strw_impl(const void *expected, const void *actual, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line);
+void PCU_assert_mem_impl(const void *expected, const void *actual, size_t size, size_t n, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
 void PCU_assert_double_impl(double expected, double actual, double delta, 
 		unsigned long type, const char *str_assert, const char *file, unsigned int line);
@@ -263,6 +266,18 @@ const char *PCU_formatW(const void *format, ...);
 		str_assert,\
 		__FILE__, __LINE__)
 
+#define PCU_ASSERT_MEMORY_EQUAL_AUX(expected, actual, size, n, str_assert)\
+	PCU_assert_mem_impl((const void *) (expected), (const void *) (actual), (size_t) (size), (size_t) (n),\
+		PCU_TYPE_MEM,\
+		str_assert,\
+		__FILE__, __LINE__)
+
+#define PCU_ASSERT_MEMORY_NOT_EQUAL_AUX(expected, actual, size, n, str_assert)\
+	PCU_assert_mem_impl((const void *) (expected), (const void *) (actual), (size_t) (size), (size_t) (n),\
+		PCU_TYPE_MEM | PCU_TYPE_NOT,\
+		str_assert,\
+		__FILE__, __LINE__)
+
 #define PCU_ASSERT_DOUBLE_EQUAL_AUX(expected, actual, delta, str_assert)\
 	PCU_assert_double_impl((expected), (actual), (delta),\
 		PCU_TYPE_DBL,\
@@ -456,6 +471,20 @@ const char *PCU_formatW(const void *format, ...);
 		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
 	} while (0)
 
+#define PCU_ASSERT_MEMORY_EQUAL(expected, actual, size, n)\
+	do {\
+		PCU_ASSERT_MEMORY_EQUAL_AUX(expected, actual, size, n,\
+			"PCU_ASSERT_MEMORY_EQUAL(" #expected ", " #actual ", " #size ", " #n ")");\
+		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
+	} while (0)
+
+#define PCU_ASSERT_MEMORY_NOT_EQUAL(expected, actual, size, n)\
+	do {\
+		PCU_ASSERT_MEMORY_NOT_EQUAL_AUX(expected, actual, size, n,\
+			"PCU_ASSERT_MEMORY_NOT_EQUAL(" #expected ", " #actual ", " #size ", " #n ")");\
+		PCU_LEAVE_TEST_FUNC_IF_FAILED();\
+	} while (0)
+
 #define PCU_ASSERT_DOUBLE_EQUAL(expected, actual, delta)\
 	do {\
 		PCU_ASSERT_DOUBLE_EQUAL_AUX(expected, actual, delta,\
@@ -608,6 +637,20 @@ const char *PCU_formatW(const void *format, ...);
 	do {\
 		PCU_ASSERT_NSTRINGW_NOT_EQUAL_AUX(expected, actual, n,\
 			"PCU_ASSERT_NSTRINGW_NOT_EQUAL(" #expected ", " #actual ", " #n ")");\
+		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
+	} while (0)
+
+#define PCU_ASSERT_MEMORY_EQUAL_MESSAGE(expected, actual, size, n, msg)\
+	do {\
+		PCU_ASSERT_MEMORY_EQUAL_AUX(expected, actual, size, n,\
+			"PCU_ASSERT_MEMORY_EQUAL(" #expected ", " #actual ", " #size ", " #n ")");\
+		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
+	} while (0)
+
+#define PCU_ASSERT_MEMORY_NOT_EQUAL_MESSAGE(expected, actual, size, n, msg)\
+	do {\
+		PCU_ASSERT_MEMORY_NOT_EQUAL_AUX(expected, actual, size, n,\
+			"PCU_ASSERT_MEMORY_NOT_EQUAL(" #expected ", " #actual ", " #size ", " #n ")");\
 		PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg);\
 	} while (0)
 

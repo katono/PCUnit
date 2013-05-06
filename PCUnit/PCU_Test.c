@@ -12,6 +12,11 @@ static PCU_jmp_buf fatal_jmp;
 static int last_assertion;
 static int leave_is_enabled;
 static int is_verbose;
+static struct {
+	size_t size;
+	size_t n;
+	size_t idx;
+} assert_mem;
 
 static void print_test_name(void);
 static void print_result(const char *str);
@@ -169,6 +174,54 @@ void PCU_assert_strw_impl(const void *expected, const void *actual,
 	PCU_assert_impl(0, 
 			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 #endif
+}
+
+static size_t mem_compare(const void *m1, const void *m2, size_t size, size_t n)
+{
+	const unsigned char *p1 = (const unsigned char *) m1;
+	const unsigned char *p2 = (const unsigned char *) m2;
+	size_t len = size * n;
+	size_t s = size;
+	size_t idx = 0;
+	if (len) {
+		do {
+			if (*p1 != *p2) {
+				return idx;
+			}
+			p1++;
+			p2++;
+			len--;
+			s--;
+			if (s == 0) {
+				idx++;
+				s = size;
+			}
+		} while (len);
+	}
+	return (size_t) -1;
+}
+
+void PCU_assert_mem_impl(const void *expected, const void *actual, size_t size, size_t n, 
+		unsigned long type, const char *str_assert, const char *file, unsigned int line)
+{
+	int cmp;
+	assert_mem.size = size;
+	assert_mem.n = n;
+	assert_mem.idx = 0;
+	if (expected == 0 || actual == 0) {
+		cmp = (expected != actual);
+	} else {
+		size_t idx;
+		idx = mem_compare(expected, actual, size, n);
+		if (idx == (size_t) -1) {
+			cmp = 0;
+		} else {
+			cmp = 1;
+			assert_mem.idx = idx;
+		}
+	}
+	PCU_assert_impl(get_not_flag(type) ? (cmp != 0) : (cmp == 0), 
+			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
 }
 
 void PCU_assert_double_impl(double expected, double actual, double delta, 
@@ -330,12 +383,15 @@ static void print_repeat(unsigned long type, int repeat)
 #ifdef PCU_DEFINED_LLONG
 #define PCU_LX_LD	" : 0x%0*llx (%lld)"
 #define PCU_LD	" (%lld)"
+#define PCU_LD_LU	" (signed:%lld unsigned:%llu)"
 #elif defined(PCU_DEFINED_WIN32_I64)
 #define PCU_LX_LD	" : 0x%0*I64x (%I64d)"
 #define PCU_LD	" (%I64d)"
+#define PCU_LD_LU	" (signed:%I64d unsigned:%I64u)"
 #else
 #define PCU_LX_LD	" : 0x%0*lx (%ld)"
 #define PCU_LD	" (%ld)"
+#define PCU_LD_LU	" (signed:%ld unsigned:%lu)"
 #endif
 
 static void print_type_num(const char *str, PCU_size_t value, int is_64bit_width)
@@ -493,6 +549,58 @@ static void print_not_supported(void)
 }
 #endif
 
+static void print_hex(const void *buf, size_t size)
+{
+	size_t i;
+	const unsigned char *p = (const unsigned char *) buf;
+	for (i = 0; i < size; i++, p++) {
+		PCU_PRINTF1("%02x ", *p);
+	}
+}
+
+static void print_type_mem(const char *str, const unsigned char *value, size_t size, size_t idx)
+{
+	if (value) {
+		const void *p = value + size * idx;
+		PCU_puts("  ");
+		PCU_puts(str);
+		PCU_puts(" : ");
+		print_hex(p, size);
+		do {
+			PCU_ssize_t s_val;
+			PCU_size_t  u_val;
+			if (size == sizeof(char)) {
+				s_val = (PCU_ssize_t) *(const signed char *)p;
+				u_val = (PCU_size_t ) *(const unsigned char *)p;
+			} else if (size == sizeof(short)) {
+				s_val = (PCU_ssize_t) *(const short *)p;
+				u_val = (PCU_size_t ) *(const unsigned short *)p;
+			} else if (size == sizeof(int)) {
+				s_val = (PCU_ssize_t) *(const int *)p;
+				u_val = (PCU_size_t ) *(const unsigned int *)p;
+#if !((defined(PCU_NO_VSPRINTF) || defined(PCU_NO_LIBC)) && defined(PCU_NO_DIV32))
+			} else if (size == sizeof(long)) {
+				s_val = (PCU_ssize_t) *(const long *)p;
+				u_val = (PCU_size_t ) *(const unsigned long *)p;
+			} else if (size == sizeof(PCU_size_t)) {
+				s_val = (PCU_ssize_t) *(const PCU_ssize_t *)p;
+				u_val = (PCU_size_t ) *(const PCU_size_t *)p;
+#endif
+			} else {
+				break;
+			}
+			if (s_val < 0) {
+				PCU_PRINTF2(PCU_LD_LU, s_val, u_val);
+			} else {
+				PCU_PRINTF1(PCU_LD, s_val);
+			}
+		} while (0);
+		PCU_puts("\n");
+	} else {
+		print_null(str);
+	}
+}
+
 static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t actual)
 {
 	const char * const expected_str = "expected";
@@ -543,6 +651,14 @@ static void print_params(unsigned long type, PCU_size_t expected, PCU_size_t act
 	case PCU_TYPE_STR:
 		print_type_str(s1, (const char *)(size_t) expected);
 		print_type_str(s2  , (const char *)(size_t) actual);
+		break;
+	case PCU_TYPE_MEM:
+		if (assert_mem.n > 1) {
+			PCU_PRINTF1("  nth      : %u\n", (unsigned int) assert_mem.idx);
+		}
+		print_type_mem(s1, (const unsigned char *)(size_t) expected, assert_mem.size, assert_mem.idx);
+		print_type_mem(s2, (const unsigned char *)(size_t) actual, assert_mem.size, assert_mem.idx);
+		PCU_PRINTF1("  size     : %u\n", (unsigned int) assert_mem.size);
 		break;
 	case PCU_TYPE_NSTR:
 		len = get_nstr_len(type);
