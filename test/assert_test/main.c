@@ -4,6 +4,7 @@
 
 PCU_Suite *AssertDoubleTest_suite(void);
 PCU_Suite *AssertEqualTest_suite(void);
+PCU_Suite *AssertMemoryTest_suite(void);
 PCU_Suite *AssertOperatorTest_suite(void);
 PCU_Suite *AssertPtrTest_suite(void);
 PCU_Suite *AssertStringTest_suite(void);
@@ -19,6 +20,7 @@ int main(int argc, char **argv)
 	const PCU_SuiteMethod suites[] = {
 		AssertDoubleTest_suite,
 		AssertEqualTest_suite,
+		AssertMemoryTest_suite,
 		AssertOperatorTest_suite,
 		AssertPtrTest_suite,
 		AssertStringTest_suite,

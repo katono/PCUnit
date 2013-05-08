@@ -14,6 +14,7 @@ OBJS += AssertEqualTest.o
 OBJS += AssertPtrTest.o
 OBJS += AssertStringTest.o
 OBJS += AssertStringWTest.o
+OBJS += AssertMemoryTest.o
 OBJS += AssertDoubleTest.o
 OBJS += AssertOperatorTest.o
 OBJS += FailTest.o
@@ -41,7 +42,7 @@ pcunit_register:
 .SUFFIXES: .c .o
 
 .c.o:
-#     $(CC) $(CFLAGS) -E $< > $<.i
+	#  $(CC) $(CFLAGS) -E $< > $<.i
 	$(CC) $(CFLAGS) -c $<
 
 $(LIBPCUNIT):
