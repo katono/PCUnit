@@ -61,7 +61,7 @@ static void test_assert_strw_equal_FAIL_actual_null(void)
 	PCU_ASSERT_STRINGW_EQUAL(a, NULL);
 }
 
-static void test_assert_strw_equal_FAIL_null_null(void)
+static void test_assert_strw_equal_OK_null_null(void)
 {
 	PCU_ASSERT_STRINGW_EQUAL(NULL, NULL);
 }
@@ -94,14 +94,14 @@ static void test_assert_strw_not_equal_MSG(void)
 	PCU_ASSERT_STRINGW_NOT_EQUAL_MESSAGE(a, b, PCU_formatW(L"%ls, %ls", a, b));
 }
 
-static void test_assert_strw_not_equal_FAIL_expect_null(void)
+static void test_assert_strw_not_equal_OK_expect_null(void)
 {
 	const wchar_t *a;
 	a = L"hoge";
 	PCU_ASSERT_STRINGW_NOT_EQUAL(NULL, a);
 }
 
-static void test_assert_strw_not_equal_FAIL_actual_null(void)
+static void test_assert_strw_not_equal_OK_actual_null(void)
 {
 	const wchar_t *a;
 	a = L"hoge";
@@ -160,7 +160,7 @@ static void test_assert_nstrw_equal_FAIL_actual_null(void)
 	PCU_ASSERT_NSTRINGW_EQUAL(a, NULL, 1);
 }
 
-static void test_assert_nstrw_equal_FAIL_null_null(void)
+static void test_assert_nstrw_equal_OK_null_null(void)
 {
 	PCU_ASSERT_NSTRINGW_EQUAL(NULL, NULL, 1);
 }
@@ -196,14 +196,14 @@ static void test_assert_nstrw_not_equal_MSG(void)
 	PCU_ASSERT_NSTRINGW_NOT_EQUAL_MESSAGE(a, b, 3, PCU_formatW(L"%ls, %ls", a, b));
 }
 
-static void test_assert_nstrw_not_equal_FAIL_expect_null(void)
+static void test_assert_nstrw_not_equal_OK_expect_null(void)
 {
 	const wchar_t *a;
 	a = L"hogu";
 	PCU_ASSERT_NSTRINGW_NOT_EQUAL(NULL, a, 1);
 }
 
-static void test_assert_nstrw_not_equal_FAIL_actual_null(void)
+static void test_assert_nstrw_not_equal_OK_actual_null(void)
 {
 	const wchar_t *a;
 	a = L"hogu";
@@ -223,24 +223,24 @@ static PCU_Test tests[] = {
 	PCU_TEST(test_assert_strw_equal_MSG),
 	PCU_TEST(test_assert_strw_equal_FAIL_expect_null),
 	PCU_TEST(test_assert_strw_equal_FAIL_actual_null),
-	PCU_TEST(test_assert_strw_equal_FAIL_null_null),
+	PCU_TEST(test_assert_strw_equal_OK_null_null),
 	PCU_TEST(test_assert_strw_not_equal_OK),
 	PCU_TEST(test_assert_strw_not_equal_FAIL),
 	PCU_TEST(test_assert_strw_not_equal_MSG),
-	PCU_TEST(test_assert_strw_not_equal_FAIL_expect_null),
-	PCU_TEST(test_assert_strw_not_equal_FAIL_actual_null),
+	PCU_TEST(test_assert_strw_not_equal_OK_expect_null),
+	PCU_TEST(test_assert_strw_not_equal_OK_actual_null),
 	PCU_TEST(test_assert_strw_not_equal_FAIL_null_null),
 	PCU_TEST(test_assert_nstrw_equal_OK),
 	PCU_TEST(test_assert_nstrw_equal_FAIL),
 	PCU_TEST(test_assert_nstrw_equal_MSG),
 	PCU_TEST(test_assert_nstrw_equal_FAIL_expect_null),
 	PCU_TEST(test_assert_nstrw_equal_FAIL_actual_null),
-	PCU_TEST(test_assert_nstrw_equal_FAIL_null_null),
+	PCU_TEST(test_assert_nstrw_equal_OK_null_null),
 	PCU_TEST(test_assert_nstrw_not_equal_OK),
 	PCU_TEST(test_assert_nstrw_not_equal_FAIL),
 	PCU_TEST(test_assert_nstrw_not_equal_MSG),
-	PCU_TEST(test_assert_nstrw_not_equal_FAIL_expect_null),
-	PCU_TEST(test_assert_nstrw_not_equal_FAIL_actual_null),
+	PCU_TEST(test_assert_nstrw_not_equal_OK_expect_null),
+	PCU_TEST(test_assert_nstrw_not_equal_OK_actual_null),
 	PCU_TEST(test_assert_nstrw_not_equal_FAIL_null_null),
 };
 
