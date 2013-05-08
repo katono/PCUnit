@@ -81,6 +81,59 @@ Test: test_assert_not_equal_MSG
 10 Tests, 8 Failures, 0 Skipped
 
 
+Suite: AssertMemoryTest
+
+Test: test_assert_mem_equal_FAIL
+ AssertMemoryTest.c:58: PCU_ASSERT_MEMORY_EQUAL(&a[0], &b[0], sizeof a[0], 2)
+  nth      : 1
+  expected : 03 00 00 00 04 00 00 00  (XXXXXXXX)
+  actual   : 03 00 00 00 05 00 00 00  (XXXXXXXX)
+  size     : 8
+
+Test: test_assert_mem_equal_MSG
+ AssertMemoryTest.c:69: PCU_ASSERT_MEMORY_EQUAL(&a[0], &b[0], sizeof a[0], 2)
+  nth      : 1
+  expected : 03 00 00 00 04 00 00 00  (XXXXXXXX)
+  actual   : 03 00 00 00 05 00 00 00  (XXXXXXXX)
+  size     : 8
+  3, 5
+
+Test: test_assert_mem_equal_FAIL_expect_null
+ AssertMemoryTest.c:79: PCU_ASSERT_MEMORY_EQUAL(NULL, &b[0], sizeof a[0], 1)
+  expected : NULL
+  actual   : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  size     : 8
+
+Test: test_assert_mem_equal_FAIL_actual_null
+ AssertMemoryTest.c:89: PCU_ASSERT_MEMORY_EQUAL(&a[0], NULL, sizeof a[0], 1)
+  expected : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  actual   : NULL
+  size     : 8
+
+Test: test_assert_mem_not_equal_FAIL
+ AssertMemoryTest.c:128: PCU_ASSERT_MEMORY_NOT_EQUAL(&a[0], &b[0], sizeof a[0], 2)
+  nth      : 0
+  value1   : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  value2   : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  size     : 8
+
+Test: test_assert_mem_not_equal_MSG
+ AssertMemoryTest.c:139: PCU_ASSERT_MEMORY_NOT_EQUAL(&a[0], &b[0], sizeof a[0], 1)
+  value1   : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  value2   : 01 00 00 00 02 00 00 00  (XXXXXXXX)
+  size     : 8
+  1, 2
+
+Test: test_assert_mem_not_equal_FAIL_null_null
+ AssertMemoryTest.c:165: PCU_ASSERT_MEMORY_NOT_EQUAL(NULL, NULL, 1, 4)
+  nth      : 0
+  value1   : NULL
+  value2   : NULL
+  size     : 1
+
+14 Tests, 7 Failures, 0 Skipped
+
+
 Suite: AssertOperatorTest
 
 Test: test_assert_operator_FAIL1

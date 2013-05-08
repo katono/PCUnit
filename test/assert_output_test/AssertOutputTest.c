@@ -40,7 +40,10 @@ static void line_check(const char *expected, const char *actual, int line)
 	static int state = 0;
 	const char *ptr_test_file = " AssertPtrTest.c";
 	const char *str_test_file = " AssertString";
-	if (!strncmp(ptr_test_file, expected, strlen(ptr_test_file)) || !strncmp(str_test_file, expected, strlen(str_test_file))) {
+	const char *mem_test_file = " AssertMemoryTest.c";
+	if (!strncmp(ptr_test_file, expected, strlen(ptr_test_file)) || 
+			!strncmp(str_test_file, expected, strlen(str_test_file)) || 
+			!strncmp(mem_test_file, expected, strlen(mem_test_file))) {
 		state = 1;
 	}
 
@@ -50,6 +53,9 @@ static void line_check(const char *expected, const char *actual, int line)
 
 	if (state == 2) {
 		const char *p = strstr(expected, "0x");
+		if (!p) {
+			p = strstr(expected, "(");
+		}
 		if (p) {
 			PCU_ASSERT_NSTRING_EQUAL_MESSAGE(expected, actual, p - expected, PCU_format("line:%d", line));
 		} else {
