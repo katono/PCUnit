@@ -35,7 +35,6 @@ static void test_assert_strw_equal_FAIL(void)
 	a = L"hoge";
 	b = L"piyo";
 	PCU_ASSERT_STRINGW_EQUAL(a, b);
-	PCU_ASSERT_STRINGW_EQUAL(a, b);
 }
 
 static void test_assert_strw_equal_MSG(void)
@@ -80,7 +79,6 @@ static void test_assert_strw_not_equal_FAIL(void)
 {
 	const wchar_t *a, *b;
 	a = b = L"hoge";
-	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
 	PCU_ASSERT_STRINGW_NOT_EQUAL(a, b);
 }
 
@@ -134,7 +132,6 @@ static void test_assert_nstrw_equal_FAIL(void)
 	a = L"hogu";
 	b = L"hogehoge";
 	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 4);
-	PCU_ASSERT_NSTRINGW_EQUAL(a, b, 5);
 }
 
 static void test_assert_nstrw_equal_MSG(void)
@@ -184,7 +181,6 @@ static void test_assert_nstrw_not_equal_FAIL(void)
 	a = L"hoge";
 	b = L"hogehoge";
 	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 4);
-	PCU_ASSERT_NSTRINGW_NOT_EQUAL(a, b, 3);
 }
 
 static void test_assert_nstrw_not_equal_MSG(void)
