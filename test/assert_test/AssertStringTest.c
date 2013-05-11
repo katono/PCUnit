@@ -35,7 +35,6 @@ static void test_assert_str_equal_FAIL(void)
 	a = "hoge";
 	b = "piyo";
 	PCU_ASSERT_STRING_EQUAL(a, b);
-	PCU_ASSERT_STRING_EQUAL(a, b);
 }
 
 static void test_assert_str_equal_MSG(void)
@@ -80,7 +79,6 @@ static void test_assert_str_not_equal_FAIL(void)
 {
 	const char *a, *b;
 	a = b = "hoge";
-	PCU_ASSERT_STRING_NOT_EQUAL(a, b);
 	PCU_ASSERT_STRING_NOT_EQUAL(a, b);
 }
 
@@ -134,7 +132,6 @@ static void test_assert_nstr_equal_FAIL(void)
 	a = "hogu";
 	b = "hogehoge";
 	PCU_ASSERT_NSTRING_EQUAL(a, b, 4);
-	PCU_ASSERT_NSTRING_EQUAL(a, b, 5);
 }
 
 static void test_assert_nstr_equal_MSG(void)
@@ -184,7 +181,6 @@ static void test_assert_nstr_not_equal_FAIL(void)
 	a = "hoge";
 	b = "hogehoge";
 	PCU_ASSERT_NSTRING_NOT_EQUAL(a, b, 4);
-	PCU_ASSERT_NSTRING_NOT_EQUAL(a, b, 3);
 }
 
 static void test_assert_nstr_not_equal_MSG(void)
