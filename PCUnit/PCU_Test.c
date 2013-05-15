@@ -123,45 +123,32 @@ void PCU_assert_num_impl(PCU_size_t expected, PCU_size_t actual,
 			expected, actual, type, str_assert, file, line);
 }
 
-void PCU_assert_str_impl(const char *expected, const char *actual, size_t n, 
+void PCU_assert_str_impl(const void *expected, const void *actual, size_t n, 
 		enum PCU_Type type, int not_flag, const char *str_assert, const char *file, unsigned int line)
 {
-	int cmp;
+	int cmp = 0;
 	assert_not_flag = not_flag;
 	assert_nstr.n = n;
 	if (expected == 0 || actual == 0) {
 		cmp = (expected != actual);
+	} else if (type == PCU_TYPE_STR) {
+		cmp = PCU_STRCMP((const char *) expected, (const char *) actual);
 	} else if (type == PCU_TYPE_NSTR) {
-		cmp = PCU_STRNCMP(expected, actual, n);
-	} else {
-		cmp = PCU_STRCMP(expected, actual);
+		cmp = PCU_STRNCMP((const char *) expected, (const char *) actual, n);
 	}
-	PCU_assert_impl(not_flag ? (cmp != 0) : (cmp == 0), 
-			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-}
-
-void PCU_assert_strw_impl(const void *expected, const void *actual, size_t n, 
-		enum PCU_Type type, int not_flag, const char *str_assert, const char *file, unsigned int line)
-{
 #ifdef PCU_USE_WCHAR
-	int cmp;
-	assert_not_flag = not_flag;
-	assert_nstr.n = n;
-	if (expected == 0 || actual == 0) {
-		cmp = (expected != actual);
-	} else if (type == PCU_TYPE_NSTRW) {
-		cmp = PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, n);
-	} else {
+	else if (type == PCU_TYPE_STRW) {
 		cmp = PCU_WCSCMP((const wchar_t *) expected, (const wchar_t *) actual);
+	} else {
+		cmp = PCU_WCSNCMP((const wchar_t *) expected, (const wchar_t *) actual, n);
 	}
+#else
+	if (type == PCU_TYPE_STRW || type == PCU_TYPE_NSTRW) {
+		cmp = !not_flag;
+	}
+#endif
 	PCU_assert_impl(not_flag ? (cmp != 0) : (cmp == 0), 
 			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-#else
-	(void) n;
-	(void) not_flag;
-	PCU_assert_impl(0, 
-			(PCU_size_t)(size_t) expected, (PCU_size_t)(size_t) actual, type, str_assert, file, line);
-#endif
 }
 
 static size_t mem_compare(const void *m1, const void *m2, size_t size, size_t n)
