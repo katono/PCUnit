@@ -61,6 +61,14 @@ static void line_check(const char *expected, const char *actual, int line)
 		} else {
 			PCU_ASSERT_STRING_EQUAL_MESSAGE(expected, actual, PCU_format("line:%d", line));
 		}
+	} else if (strstr(expected, "Test.c:")) {
+		const char *p = strchr(expected, ':');
+		const char *q;
+		p++;
+		PCU_ASSERT_NSTRING_EQUAL_MESSAGE(expected, actual, p - expected, PCU_format("line:%d", line));
+		p = strrchr(expected, ':');
+		q = strrchr(actual, ':');
+		PCU_ASSERT_STRING_EQUAL_MESSAGE(p, q, PCU_format("line:%d", line));
 	} else {
 		PCU_ASSERT_STRING_EQUAL_MESSAGE(expected, actual, PCU_format("line:%d", line));
 	}
