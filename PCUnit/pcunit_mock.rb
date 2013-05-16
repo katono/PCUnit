@@ -423,6 +423,20 @@ class MockGen
 			f.puts '}'
 			f.puts
 			f.puts
+			def get_local_var_name(fd, base, idx)
+				begin
+					exit_flag = true
+					name = base[0, idx]
+					fd.params.each { |param|
+						if param[1] == name
+							idx += 1
+							exit_flag = false
+							break
+						end
+					}
+				end until exit_flag
+				return name
+			end
 			@func_decl_list.each { |fd|
 				s = "("
 				fd.params.each { |param|
@@ -437,64 +451,49 @@ class MockGen
 				f.puts fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + fd.name + s
 				f.puts "{"
 				if fd.ret_type != "void"
-					f.puts "	" + fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + "ret;"
+					local_ret = get_local_var_name(fd, "retval_retval", 3)
+					f.puts "	" + fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + "#{local_ret};"
 				end
 				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_num_expectations > 0) {"
-				def get_local_var_name(fd)
-					idx = 1
-					exp = "expectation"
-					begin
-						exit_flag = true
-						name = exp[0, idx]
-						fd.params.each { |param|
-							if param[1] == name
-								idx += 1
-								exit_flag = false
-								break
-							end
-						}
-					end until exit_flag
-					return name
-				end
-				local_var_name = get_local_var_name(fd)
-				f.puts "		const #{fd.name}_Expectation *#{local_var_name};"
+				local_expectation = get_local_var_name(fd, "expectation", 1)
+				f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
 				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_num_expectations, >, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
-				f.puts "		#{local_var_name} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_num_calls;"
+				f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_num_calls;"
 				if !(fd.params.size == 0 || fd.params[0][0] == "void")
 					fd.params.each { |param|
 						if param.size >= 3 && param[2][/\[\s*\]/]
 							next
 						end
 						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_num_calls, ordinal(#{@mock_basename}.#{fd.name}_num_calls))"
-						f.puts "		if (!#{local_var_name}->ignored.#{param[1]}) {"
+						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
 						if param[0] =~ /\b((un)?signed\s+)?\b(u?char|_*u?int(8|16|32|64|128)?(_t)?|u?short|u?long|^size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/
-							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /\b(float|double)$/i
-							f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
+							f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
 						elsif param[0] =~ /\bchar\s*\*$/
-							f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /\bwchar_t\s*\*$/
-							f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/
-							f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /\*/
-							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /funcptr\d+_t/
-							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /array\d+_t/
-							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(#{local_var_name}->expected.#{param[1]}, #{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
 						else
-							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(&#{local_var_name}->expected.#{param[1]}, &#{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(&#{local_expectation}->expected.#{param[1]}, &#{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
 						end
 						f.puts "		}"
 					}
 				end
 				if fd.ret_type != "void"
-					f.puts "		ret = #{local_var_name}->retval;"
+					f.puts "		#{local_ret} = #{local_expectation}->retval;"
 				end
 				f.puts "	} else if (#{@mock_basename}.#{fd.name}_funcptr) {"
 				if fd.ret_type != "void"
-					s = "		ret = "
+					s = "		#{local_ret} = "
 				else
 					s = "		"
 				end
@@ -513,7 +512,7 @@ class MockGen
 				f.puts "	}"
 				f.puts "	#{@mock_basename}.#{fd.name}_num_calls++;"
 				if fd.ret_type != "void"
-					f.puts "	return ret;"
+					f.puts "	return #{local_ret};"
 				end
 				f.puts "}"
 				f.puts
