@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -40,6 +41,7 @@ static void test_assert_operator_OK(void)
 static void test_assert_operator_FAIL1(void)
 {
 	PCU_ASSERT_OPERATOR(-1, <, 1);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_operator_FAIL2(void)

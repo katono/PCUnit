@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -54,8 +55,8 @@ static void test_assert_mem_equal_FAIL(void)
 
 	a[0].x = 1; a[0].y = 2; a[1].x = 3; a[1].y = 4;
 	b[0].x = 1; b[0].y = 2; b[1].x = 3; b[1].y = 5;
-	PCU_ASSERT_MEMORY_EQUAL(&a[0], &b[0], sizeof a[0], 1);
 	PCU_ASSERT_MEMORY_EQUAL(&a[0], &b[0], sizeof a[0], 2);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_mem_equal_MSG(void)
@@ -126,7 +127,7 @@ static void test_assert_mem_not_equal_FAIL(void)
 	a[0].x = 1; a[0].y = 2; a[1].x = 3; a[1].y = 4;
 	b[0].x = 1; b[0].y = 2; b[1].x = 3; b[1].y = 4;
 	PCU_ASSERT_MEMORY_NOT_EQUAL(&a[0], &b[0], sizeof a[0], 2);
-	PCU_ASSERT_MEMORY_NOT_EQUAL(&a[1], &b[1], sizeof a[1], 1);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_mem_not_equal_MSG(void)

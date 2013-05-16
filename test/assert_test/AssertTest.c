@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -29,7 +30,7 @@ static void test_assert_OK(void)
 static void test_assert_FAIL(void)
 {
 	PCU_ASSERT(0);
-	PCU_ASSERT(0);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_MSG(void)
@@ -50,7 +51,7 @@ static void test_assert_true_FAIL(void)
 {
 	int a = 0;
 	PCU_ASSERT_TRUE(a);
-	PCU_ASSERT_TRUE(0);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_true_MSG(void)
@@ -71,7 +72,7 @@ static void test_assert_false_FAIL(void)
 {
 	int a = 1;
 	PCU_ASSERT_FALSE(a);
-	PCU_ASSERT_FALSE(1);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_false_MSG(void)

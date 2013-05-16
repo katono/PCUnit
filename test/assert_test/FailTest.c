@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -24,6 +25,7 @@ static int teardown(void)
 static void test_fail1(void)
 {
 	PCU_FAIL("test_fail");
+	printf("NOT REACHED\n");
 }
 
 static void test_fail2(void)

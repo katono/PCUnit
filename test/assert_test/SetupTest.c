@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 #include <string.h>
 
 static int initialize(void)
@@ -30,6 +31,7 @@ static int teardown(void)
 
 static void test_assert_setup_err(void)
 {
+	printf("NOT REACHED\n");
 	PCU_ASSERT(0);
 }
 
@@ -41,6 +43,7 @@ static void test_assert_teardown_err(void)
 
 static void test_skip(void)
 {
+	printf("NOT REACHED\n");
 	PCU_ASSERT(0);
 }
 

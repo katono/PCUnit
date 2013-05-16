@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -32,7 +33,7 @@ static void test_assert_ptr_equal_FAIL(void)
 {
 	int a, b;
 	PCU_ASSERT_PTR_EQUAL(&a, &b);
-	PCU_ASSERT_PTR_EQUAL(&a, &b);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_ptr_equal_MSG(void)
@@ -55,7 +56,7 @@ static void test_assert_ptr_not_equal_FAIL(void)
 {
 	int a;
 	PCU_ASSERT_PTR_NOT_EQUAL(&a, &a);
-	PCU_ASSERT_PTR_NOT_EQUAL(&a, &a);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_ptr_not_equal_MSG(void)
@@ -80,7 +81,7 @@ static void test_assert_ptr_null_FAIL(void)
 	int *p = NULL;
 	p = &a;
 	PCU_ASSERT_PTR_NULL(p);
-	PCU_ASSERT_PTR_NULL(p);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_ptr_null_MSG(void)
@@ -107,7 +108,7 @@ static void test_assert_ptr_not_null_FAIL(void)
 {
 	int *p = NULL;
 	PCU_ASSERT_PTR_NOT_NULL(p);
-	PCU_ASSERT_PTR_NOT_NULL(p);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_ptr_not_null_MSG(void)

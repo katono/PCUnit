@@ -1,4 +1,5 @@
 #include "../../PCUnit/PCUnit.h"
+#include <stdio.h>
 
 static int initialize(void)
 {
@@ -44,7 +45,7 @@ static void test_assert_dbl_equal_FAIL(void)
 	b = 100.1;
 	delta = 0.0999;
 	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
-	PCU_ASSERT_DOUBLE_EQUAL(a, b, delta);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_dbl_equal_MSG(void)
@@ -82,7 +83,7 @@ static void test_assert_dbl_not_equal_FAIL(void)
 	b = 100.1;
 	delta = 0.1;
 	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
-	PCU_ASSERT_DOUBLE_NOT_EQUAL(a, b, delta);
+	printf("NOT REACHED\n");
 }
 
 static void test_assert_dbl_not_equal_MSG(void)
