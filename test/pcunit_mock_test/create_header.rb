@@ -143,12 +143,12 @@ typedef enum ENUM_t {
 		t2 = t.sub(/const /, '')
 		if !(t =~ /void/)
 			f.puts "#{t2} f_#{name}_arg(#{t} a);"
-			f.puts "void f_#{name}_#{count += 1}(#{t}\na);"
+			f.puts "void f_#{name}_#{count += 1}(#{t}\ne);"
 			f.puts "#{t2} f_#{name}_args(#{t} a, #{t} b, #{t} c, #{t} d);"
 		end
 		f.puts "#{t} *f_#{name}_ptr(#{t} *a);"
 		f.puts "void f_#{name}_#{count += 1}(#{t}* a);"
-		f.puts "#{t}* f_#{name}_#{count += 1}(#{t} * a);"
+		f.puts "#{t}* f_#{name}_#{count += 1}(#{t} * ret);"
 		f.puts "#{t}* f_#{name}_#{count += 1}(#{t} * const a);"
 		f.puts "#{t} *f_#{name}_#{count += 1}(#{t}*a);"
 		f.puts "#{t} *f_#{name}_#{count += 1}(#{t} *a, #{t} *b,\n	#{t} *c);"
