@@ -703,3 +703,10 @@ static void print_params_double(enum PCU_Type type, double expected, double actu
 #endif
 }
 
+#ifndef PCU_NO_CONSOLE_RUN
+int PCU_is_verbose(void)
+{
+	return is_verbose;
+}
+#endif
+

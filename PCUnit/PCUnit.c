@@ -393,11 +393,18 @@ end:
 
 void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 {
+	int PCU_is_verbose(void);
 	reset(suite_methods, num);
 	while (1) {
 		int quit;
 		PCU_puts("************** PCUnit Console **************\n");
 		PCU_puts("(R)un all, (S)elect Suite, (L)ist of Suites, ");
+		if (PCU_is_verbose()) {
+			PCU_puts("(N)ormal");
+		} else {
+			PCU_puts("(V)erbose");
+		}
+		PCU_puts(" mode, ");
 		if (enable_color) {
 			PCU_puts("(D)is");
 		} else {
@@ -421,6 +428,14 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 		case 'l':
 		case 'L':
 			show_list_suites(suite_methods, num);
+			break;
+		case 'n':
+		case 'N':
+			PCU_set_verbose(0);
+			break;
+		case 'v':
+		case 'V':
+			PCU_set_verbose(1);
 			break;
 		case 'e':
 		case 'E':
