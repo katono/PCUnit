@@ -202,24 +202,20 @@ static void print_result_selected(const PCU_Suite *suite, int idx)
 	PCU_puts("\n");
 }
 
-static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
+static void run_selected_suite(PCU_Suite *suite)
 {
-	PCU_Suite *p = (suite_methods[suite_idx])();
-	reset(suite_methods, num);
-	print_before_test(p);
-	PCU_Suite_run(p);
-	add_result(p);
+	PCU_Suite_reset(suite);
+	print_before_test(suite);
+	PCU_Suite_run(suite);
 	PCU_puts("\n");
-	print_after_test(p);
+	print_after_test(suite);
 }
 
-static void run_selected_test(const PCU_SuiteMethod *suite_methods, int num, int suite_idx, int test_idx)
+static void run_selected_test(PCU_Suite *suite, int idx)
 {
-	PCU_Suite *p = (suite_methods[suite_idx])();
-	reset(suite_methods, num);
-	PCU_Suite_run_selected(p, test_idx);
-	add_result(p);
-	print_result_selected(p, test_idx);
+	PCU_Suite_reset(suite);
+	PCU_Suite_run_selected(suite, idx);
+	print_result_selected(suite, idx);
 }
 
 static void show_list_tests(const PCU_Test *tests, int num)
@@ -286,10 +282,9 @@ static void get_line(char *buf, int size)
 	buf[i] = '\0';
 }
 
-static void select_test(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
+static void select_test(PCU_Suite *suite)
 {
 	int idx;
-	PCU_Suite *suite = (suite_methods[suite_idx])();
 	PCU_puts("Enter Number or Name of Test: ");
 	get_line(input_buf, sizeof input_buf);
 
@@ -303,7 +298,7 @@ static void select_test(const PCU_SuiteMethod *suite_methods, int num, int suite
 	}
 	PCU_puts("\n");
 
-	run_selected_test(suite_methods, num, suite_idx, idx);
+	run_selected_test(suite, idx);
 }
 
 static int find_suite_name(const PCU_SuiteMethod *suite_methods, int num, const char *input_str)
@@ -356,12 +351,12 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 		switch (input_buf[0]) {
 		case 'r':
 		case 'R':
-			run_selected_suite(suite_methods, num, idx);
+			run_selected_suite(selected_suite);
 			break;
 		case 's':
 		case 'S':
 			show_list_tests(selected_suite->tests, selected_suite->ntests);
-			select_test(suite_methods, num, idx);
+			select_test(selected_suite);
 			break;
 		case 'l':
 		case 'L':
