@@ -273,9 +273,22 @@ static void get_line(char *buf, int size)
 {
 	int c;
 	int i = 0;
+	static int prev = 0;
 	if (size <= 0) return;
-	while (i < size - 1 && (c = PCU_getchar()) != '\n') {
-		if (c != '\r') {
+	while (i < size - 1) {
+		c = PCU_getchar();
+		if (c == '\r') {
+			prev = c;
+			break;
+		} else if (c == '\n') {
+			if (prev == '\r') {
+				prev = 0;
+			} else {
+				prev = c;
+				break;
+			}
+		} else {
+			prev = c;
 			buf[i++] = (char) c;
 		}
 	}
