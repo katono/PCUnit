@@ -20,22 +20,23 @@ void PCU_Suite_reset(PCU_Suite *self)
 	self->result.num_tests = i;
 }
 
-static int PCU_Suite_initialize(const PCU_Suite *self)
+int PCU_Suite_initialize(PCU_Suite *self)
 {
-	int ret = 0;
+	current_suite = self;
+	self->result.initialize_error = 0;
 	if (self->initialize) {
-		ret = self->initialize();
+		self->result.initialize_error = self->initialize();
 	}
-	return ret;
+	return self->result.initialize_error;
 }
 
-static int PCU_Suite_cleanup(const PCU_Suite *self)
+int PCU_Suite_cleanup(PCU_Suite *self)
 {
-	int ret = 0;
+	self->result.cleanup_error = 0;
 	if (self->cleanup) {
-		ret = self->cleanup();
+		self->result.cleanup_error = self->cleanup();
 	}
-	return ret;
+	return self->result.cleanup_error;
 }
 
 int PCU_Suite_setup(void)
@@ -59,35 +60,14 @@ int PCU_Suite_teardown(void)
 void PCU_Suite_run(PCU_Suite *self)
 {
 	int i;
-	PCU_Test *p;
-	current_suite = self;
-
-	self->result.initialize_error = PCU_Suite_initialize(self);
-	if (self->result.initialize_error) {
-		return;
+	for (i = 0; i < self->ntests; i++) {
+		PCU_Suite_run_selected(self, i);
 	}
-	for (i = 0, p = self->tests; i < self->ntests; i++, p++) {
-		PCU_Test_run(p);
-		if (!PCU_Test_is_skipped(p)) {
-			self->result.num_tests_ran++;
-		}
-		if (PCU_Test_is_failed(p)) {
-			self->result.num_tests_failed++;
-		}
-	}
-	self->result.cleanup_error = PCU_Suite_cleanup(self);
 }
 
-#ifndef PCU_NO_CONSOLE_RUN
 void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 {
 	PCU_Test *p = self->tests + idx;
-	current_suite = self;
-
-	self->result.initialize_error = PCU_Suite_initialize(self);
-	if (self->result.initialize_error) {
-		return;
-	}
 	PCU_Test_run(p);
 	if (!PCU_Test_is_skipped(p)) {
 		self->result.num_tests_ran++;
@@ -95,9 +75,7 @@ void PCU_Suite_run_selected(PCU_Suite *self, int idx)
 	if (PCU_Test_is_failed(p)) {
 		self->result.num_tests_failed++;
 	}
-	self->result.cleanup_error = PCU_Suite_cleanup(self);
 }
-#endif
 
 const char *PCU_suite_name(void)
 {

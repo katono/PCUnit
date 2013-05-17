@@ -162,7 +162,10 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 	for (i = 0; i < num; i++, method++) {
 		PCU_Suite *p = (*method)();
 		print_before_test(p);
-		PCU_Suite_run(p);
+		if (!PCU_Suite_initialize(p)) {
+			PCU_Suite_run(p);
+			PCU_Suite_cleanup(p);
+		}
 		add_result(p);
 		PCU_puts("\n");
 		print_after_test(p);
@@ -181,18 +184,10 @@ static char input_buf[64];
 static void print_result_selected(const PCU_Suite *suite, int idx)
 {
 	PCU_Test *test = &suite->tests[idx];
-	if (suite->result.initialize_error) {
-		print_initialize_error(suite);
-		return;
-	}
 	PCU_puts("\n");
 	if (PCU_Test_is_failed(test)) {
 		set_color(COLOR_RED);
 		PCU_puts("FAILED (");
-		PCU_puts(test->name);
-		PCU_puts(")\n");
-		reset_color();
-		PCU_puts("\n");
 	} else {
 		set_color(COLOR_GREEN);
 		if (PCU_Test_is_skipped(test)) {
@@ -200,14 +195,11 @@ static void print_result_selected(const PCU_Suite *suite, int idx)
 		} else {
 			PCU_puts("OK (");
 		}
-		PCU_puts(test->name);
-		PCU_puts(")\n");
-		reset_color();
-		PCU_puts("\n");
 	}
-	if (suite->result.cleanup_error) {
-		print_cleanup_error(suite);
-	}
+	PCU_puts(test->name);
+	PCU_puts(")\n");
+	reset_color();
+	PCU_puts("\n");
 }
 
 static void run_selected_suite(const PCU_SuiteMethod *suite_methods, int num, int suite_idx)
@@ -329,6 +321,7 @@ static int find_suite_name(const PCU_SuiteMethod *suite_methods, int num, const 
 
 static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 {
+	int ret = 0;
 	int idx;
 	PCU_Suite *selected_suite;
 	PCU_puts("Enter Number or Name of Suite: ");
@@ -344,6 +337,12 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 	}
 
 	selected_suite = (suite_methods[idx])();
+	if (PCU_Suite_initialize(selected_suite)) {
+		print_before_test(selected_suite);
+		PCU_puts("\n");
+		print_initialize_error(selected_suite);
+		return 0;
+	}
 
 	PCU_puts("\n");
 	while (1) {
@@ -370,16 +369,26 @@ static int select_suite(const PCU_SuiteMethod *suite_methods, int num)
 			break;
 		case 'm':
 		case 'M':
-			return 0;
+			ret = 0;
+			goto end;
+			break;
 		case 'q':
 		case 'Q':
-			return 1;
+			ret = 1;
+			goto end;
+			break;
 		default:
 			break;
 		}
 		PCU_puts("\n");
 	}
-	return 0;
+end:
+	if (PCU_Suite_cleanup(selected_suite)) {
+		print_before_test(selected_suite);
+		PCU_puts("\n");
+		print_cleanup_error(selected_suite);
+	}
+	return ret;
 }
 
 void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
