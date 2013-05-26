@@ -148,6 +148,29 @@ static void test_f_int_ptr_return_by_param_ptr(void)
 	PCU_ASSERT_EQUAL(4, f_int_ptr_num_calls());
 }
 
+static void f_int_varg_callback(int *a, va_list ap)
+{
+	PCU_ASSERT_OPERATOR(f_int_varg_num_calls(), <, 2);
+	if (f_int_varg_num_calls() == 0) {
+		PCU_ASSERT_EQUAL(1, va_arg(ap, int));
+		PCU_ASSERT_EQUAL(2, va_arg(ap, int));
+		PCU_ASSERT_EQUAL(3, va_arg(ap, int));
+	} else {
+		PCU_ASSERT_EQUAL(10, va_arg(ap, int));
+		PCU_ASSERT_EQUAL(20, va_arg(ap, int));
+		PCU_ASSERT_EQUAL(30, va_arg(ap, int));
+		PCU_ASSERT_STRING_EQUAL("hoge", va_arg(ap, const char *));
+	}
+}
+
+static void test_f_int_varg_callback(void)
+{
+	f_int_varg_set_callback(f_int_varg_callback);
+	f_int_varg(NULL, 1, 2, 3);
+	f_int_varg(NULL, 10, 20, 30, "hoge");
+	PCU_ASSERT_EQUAL(2, f_int_varg_num_calls());
+}
+
 
 PCU_Suite *MockTest_suite(void)
 {
@@ -161,6 +184,7 @@ PCU_Suite *MockTest_suite(void)
 		PCU_TEST(test_f_STRUCT_t_ptr),
 		PCU_TEST(test_f_int_args_callback),
 		PCU_TEST(test_f_int_ptr_return_by_param_ptr),
+		PCU_TEST(test_f_int_varg_callback),
 	};
 	static PCU_Suite suite = {
 		"MockTest", tests, sizeof tests / sizeof tests[0], setup
