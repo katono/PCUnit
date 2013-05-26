@@ -63,6 +63,9 @@ class FuncDecl
 		@params = get_params(decl_str[(decl_str.index(@name) + @name.length) ... decl_str.length])
 		@callback_type = @name + "_Callback"
 		@callback_typedef = "typedef " + decl_str.strip.sub(@name, "(*#{@callback_type})") + ";"
+		if @callback_typedef.include?('...')
+			@callback_typedef['...'] = 'va_list'
+		end
 		#  puts "decl: " + @decl
 		#  puts "name: " + @name
 		#  puts "ret_type: " + @ret_type
@@ -107,6 +110,8 @@ class FuncDecl
 		if is_omitted_p_name(param)
 			p_type = param
 			if param == 'void'
+				p_name = ""
+			elsif param == '...'
 				p_name = ""
 			else
 				p_name = "mock_param" + @param_count.to_s
@@ -217,6 +222,7 @@ class MockGen
 		@func_decl_list = Array.new
 		@basename = File.basename(@header_file, ".h")
 		@mock_basename = $prefix + @basename
+		@include_stdarg = false
 		File.open(@header_file, "r") { |f|
 			file_str = f.read
 			file_str.gsub!(/\r/, '')
@@ -236,7 +242,10 @@ class MockGen
 			file_str.gsub!(/  +/, ' ')
 
 			file_str.split(/\s*;\s*/).each { |decl_str|
-				if decl_str.include?('(') && !decl_str.include?('...') && !decl_str[/^[^\(]*\(\s*\*/] && !decl_str[/(\{|\||\^|&|<|>|\+|-|\/|%|!|~)/]
+				if !@include_stdarg && decl_str.include?('...')
+					@include_stdarg = true
+				end
+				if decl_str.include?('(') && !decl_str[/^[^\(]*\(\s*\*/] && !decl_str[/(\{|\||\^|&|<|>|\+|-|\/|%|!|~)/]
 					@func_decl_list.push FuncDecl.new(decl_str)
 				end
 			}
@@ -251,6 +260,9 @@ class MockGen
 			f.puts
 			header_path = Pathname.new(@header_file).expand_path
 			f.puts '#include "' + header_path.relative_path_from(Pathname.new($output_dir).expand_path).to_s + '"'
+			if @include_stdarg
+				f.puts "#include <stdarg.h>"
+			end
 			f.puts
 			f.puts "void #{@mock_basename}_#{$function_name[:init]}(void);"
 			f.puts "#define #{@mock_basename}_#{$function_name[:verify]}()	#{@mock_basename}_#{$function_name[:verify]}_aux(__FILE__, __LINE__)"
@@ -272,6 +284,9 @@ class MockGen
 				if fd.params.size > 0 && fd.params[0][0] != "void"
 					f.puts "	struct {"
 					fd.params.each { |param|
+						if param[0] == '...'
+							next
+						end
 						if param.size >= 3 && param[2][/\[\s*\]/]
 							f.puts "		int dummy_#{param[1]};"
 							next
@@ -284,6 +299,9 @@ class MockGen
 					f.puts "	} expected;"
 					f.puts "	struct {"
 					fd.params.each { |param|
+						if param[0] == '...'
+							next
+						end
 						f.puts "		char #{param[1]};"
 					}
 					f.puts "	} ignored;"
@@ -443,10 +461,19 @@ class MockGen
 				f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
 				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_num_expectations, >, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
 				f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_num_calls;"
+				prev_param_name = ''
+				va_list_name = ''
 				if !(fd.params.size == 0 || fd.params[0][0] == "void")
 					fd.params.each { |param|
+						if param[0] == '...'
+							va_list_name = get_local_var_name(fd, "arg_list", 3)
+							next
+						end
 						if param.size >= 3 && param[2][/\[\s*\]/]
 							next
+						end
+						if va_list_name == ''
+							prev_param_name = param[1]
 						end
 						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_num_calls, #{@mock_basename}_ordinal(#{@mock_basename}.#{fd.name}_num_calls))"
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
@@ -476,6 +503,10 @@ class MockGen
 					f.puts "		#{local_ret} = #{local_expectation}->retval;"
 				end
 				f.puts "	} else if (#{@mock_basename}.#{fd.name}_funcptr) {"
+				if va_list_name != ''
+					f.puts "		va_list #{va_list_name};"
+					f.puts "		va_start(#{va_list_name}, #{prev_param_name});"
+				end
 				if fd.ret_type != "void"
 					s = "		#{local_ret} = "
 				else
@@ -488,9 +519,15 @@ class MockGen
 						s += ", "
 					end
 				}
+				if va_list_name != ''
+					s += va_list_name
+				end
 				s.sub!(/, $/, '')
 				s += ");"
 				f.puts s
+				if va_list_name != ''
+					f.puts "		va_end(#{va_list_name});"
+				end
 				f.puts "	} else {"
 				f.puts "		PCU_FAIL(\"Call #{fd.name}_#{$function_name[:expect]}() or #{fd.name}_#{$function_name[:set_callback]}().\");"
 				f.puts "	}"
