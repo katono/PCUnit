@@ -121,6 +121,33 @@ static void test_f_int_args_callback(void)
 	PCU_ASSERT_EQUAL(4, f_int_args_num_calls());
 }
 
+static int *f_int_ptr_callback(int *a)
+{
+	const int ret_a[] = {1, 10, 100, 1000};
+	PCU_ASSERT_OPERATOR(f_int_ptr_num_calls(), <, sizeof ret_a / sizeof ret_a[0]);
+	PCU_ASSERT_PTR_NOT_NULL(a);
+	*a = ret_a[f_int_ptr_num_calls()];
+	return 0;
+}
+
+static void test_f_int_ptr_return_by_param_ptr(void)
+{
+	int a = 0;
+	f_int_ptr_set_callback(f_int_ptr_callback);
+	f_int_ptr(&a);
+	PCU_ASSERT_EQUAL(1, a);
+	a = 0;
+	f_int_ptr(&a);
+	PCU_ASSERT_EQUAL(10, a);
+	a = 0;
+	f_int_ptr(&a);
+	PCU_ASSERT_EQUAL(100, a);
+	a = 0;
+	f_int_ptr(&a);
+	PCU_ASSERT_EQUAL(1000, a);
+	PCU_ASSERT_EQUAL(4, f_int_ptr_num_calls());
+}
+
 
 PCU_Suite *MockTest_suite(void)
 {
@@ -133,6 +160,7 @@ PCU_Suite *MockTest_suite(void)
 		PCU_TEST(test_f_void),
 		PCU_TEST(test_f_STRUCT_t_ptr),
 		PCU_TEST(test_f_int_args_callback),
+		PCU_TEST(test_f_int_ptr_return_by_param_ptr),
 	};
 	static PCU_Suite suite = {
 		"MockTest", tests, sizeof tests / sizeof tests[0], setup
