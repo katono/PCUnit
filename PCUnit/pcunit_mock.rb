@@ -363,34 +363,18 @@ class MockGen
 			f.puts
 			f.puts "void #{@mock_basename}_#{$function_name[:init]}(void)"
 			f.puts "{"
+			f.puts "	char *p = (char *) &#{@mock_basename};"
+			f.puts "	size_t i;"
+			f.puts "	for (i = 0; i < sizeof #{@mock_basename}; i++) {"
+			f.puts "		*(p++) = 0;"
+			f.puts "	}"
 			if $include_original_flag
 				f.puts "#ifdef #{@mock_basename.upcase}_INCLUDE_ORIGINAL"
 				@func_decl_list.each { |fd|
 					f.puts "	#{@mock_basename}.#{fd.name}_funcptr = #{fd.name}_original;"
 				}
-				f.puts "#else"
-			end
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_funcptr = (#{fd.callback_type}) 0;"
-			}
-			if $include_original_flag
 				f.puts "#endif"
 			end
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_num_calls = 0;"
-			}
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_expectations = 0;"
-			}
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_num_expectations = 0;"
-			}
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_file = 0;"
-			}
-			@func_decl_list.each { |fd|
-				f.puts "	#{@mock_basename}.#{fd.name}_line = 0;"
-			}
 			f.puts "}"
 			f.puts
 			f.puts "#ifdef _MSC_VER"
