@@ -392,7 +392,7 @@ class MockGen
 			}
 			f.puts "}"
 			f.puts
-			f.puts 'static const char *ordinal(int num)'
+			f.puts "static const char *#{@mock_basename}_ordinal(int num)"
 			f.puts '{'
 			f.puts '	switch (num) {'
 			f.puts '	case 1:'
@@ -448,7 +448,7 @@ class MockGen
 						if param.size >= 3 && param[2][/\[\s*\]/]
 							next
 						end
-						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_num_calls, ordinal(#{@mock_basename}.#{fd.name}_num_calls))"
+						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_num_calls, #{@mock_basename}_ordinal(#{@mock_basename}.#{fd.name}_num_calls))"
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
 						if param[0] =~ /\b((un)?signed\s+)?\b(u?char|_*u?int(8|16|32|64|128)?(_t)?|u?short|u?long|^size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/
 							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
