@@ -477,26 +477,6 @@ static void print_type_nstr(const char *str, const char *value, size_t len)
 }
 
 #ifdef PCU_USE_WCHAR
-static void print_type_strw(const char *str, const wchar_t *value)
-{
-	if (value) {
-		size_t i;
-		size_t len;
-		PCU_puts("  ");
-		PCU_puts(str);
-		PCU_puts(" : L\"");
-		len = PCU_WCSLEN(value);
-		for (i = 0; i < len; i++) {
-			PCU_PRINTF1("%lc", value[i]);
-		}
-		PCU_puts("\" (");
-		print_p(value);
-		PCU_puts(")\n");
-	} else {
-		print_null(str);
-	}
-}
-
 static void print_type_nstrw(const char *str, const wchar_t *value, size_t len)
 {
 	if (value) {
@@ -640,8 +620,10 @@ static void print_params(enum PCU_Type type, PCU_size_t expected, PCU_size_t act
 		break;
 #ifdef PCU_USE_WCHAR
 	case PCU_TYPE_STRW:
-		print_type_strw(s1, (const wchar_t *)(size_t) expected);
-		print_type_strw(s2  , (const wchar_t *)(size_t) actual);
+		print_type_nstrw(s1, (const wchar_t *)(size_t) expected, 
+				expected ? PCU_WCSLEN((const wchar_t *)(size_t) expected) : 0);
+		print_type_nstrw(s2  , (const wchar_t *)(size_t) actual, 
+				actual ? PCU_WCSLEN((const wchar_t *)(size_t) actual) : 0);
 		break;
 	case PCU_TYPE_NSTRW:
 		print_type_nstrw(s1, (const wchar_t *)(size_t) expected, assert_nstr.n);
