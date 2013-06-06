@@ -310,7 +310,8 @@ class MockGen
 				f.puts fd.callback_typedef
 				f.puts "#define #{fd.name}_#{$function_name[:expect]}(expectations, num)	#{fd.name}_#{$function_name[:expect]}_aux(expectations, num, __FILE__, __LINE__)"
 				f.puts "void #{fd.name}_#{$function_name[:expect]}_aux(const #{fd.name}_Expectation *expectations, int num, const char *file, unsigned int line);"
-				f.puts "void #{fd.name}_#{$function_name[:set_callback]}(#{fd.callback_type} callback);"
+				f.puts "#define #{fd.name}_#{$function_name[:set_callback]}(callback, expected_num_calls)	#{fd.name}_#{$function_name[:set_callback]}_aux(callback, expected_num_calls, __FILE__, __LINE__)"
+				f.puts "void #{fd.name}_#{$function_name[:set_callback]}_aux(#{fd.callback_type} callback, int expected_num_calls, const char *file, unsigned int line);"
 				f.puts "int #{fd.name}_#{$function_name[:num_calls]}(void);"
 				f.puts
 			}
@@ -356,7 +357,7 @@ class MockGen
 				f.puts "	const #{fd.name}_Expectation *#{fd.name}_expectations;"
 			}
 			@func_decl_list.each { |fd|
-				f.puts "	int #{fd.name}_num_expectations;"
+				f.puts "	int #{fd.name}_expected_num_calls;"
 			}
 			@func_decl_list.each { |fd|
 				f.puts "	const char *#{fd.name}_file;"
@@ -404,8 +405,8 @@ class MockGen
 			f.puts "void #{@mock_basename}_#{$function_name[:verify]}_aux(const char *file, unsigned int line)"
 			f.puts "{"
 			@func_decl_list.each { |fd|
-				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_num_expectations > 0) {"
-				f.puts "		PCU_ASSERT_EQUAL_MESSAGE(#{@mock_basename}.#{fd.name}_num_expectations, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", file, line));"
+				f.puts "	if ((#{@mock_basename}.#{fd.name}_expectations || #{@mock_basename}.#{fd.name}_funcptr) && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
+				f.puts "		PCU_ASSERT_EQUAL_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", file, line));"
 				f.puts "	}"
 			}
 			f.puts "}"
@@ -456,10 +457,10 @@ class MockGen
 					local_ret = get_local_var_name(fd, "retval_retval", 3)
 					f.puts "	" + fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + "#{local_ret};"
 				end
-				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_num_expectations > 0) {"
+				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
 				local_expectation = get_local_var_name(fd, "expectation", 1)
 				f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
-				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_num_expectations, >, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
 				f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_num_calls;"
 				prev_param_name = ''
 				va_list_name = ''
@@ -505,6 +506,11 @@ class MockGen
 				f.puts "	} else if (#{@mock_basename}.#{fd.name}_funcptr) {"
 				if va_list_name != ''
 					f.puts "		va_list #{va_list_name};"
+				end
+				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
+				f.puts "			PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "		}"
+				if va_list_name != ''
 					f.puts "		va_start(#{va_list_name}, #{prev_param_name});"
 				end
 				if fd.ret_type != "void"
@@ -540,14 +546,17 @@ class MockGen
 				f.puts "void #{fd.name}_#{$function_name[:expect]}_aux(const #{fd.name}_Expectation *expectations, int num, const char *file, unsigned int line)"
 				f.puts "{"
 				f.puts "	#{@mock_basename}.#{fd.name}_expectations = expectations;"
-				f.puts "	#{@mock_basename}.#{fd.name}_num_expectations = num;"
+				f.puts "	#{@mock_basename}.#{fd.name}_expected_num_calls = num;"
 				f.puts "	#{@mock_basename}.#{fd.name}_file = file;"
 				f.puts "	#{@mock_basename}.#{fd.name}_line = line;"
 				f.puts "}"
 				f.puts
-				f.puts "void #{fd.name}_#{$function_name[:set_callback]}(#{fd.callback_type} callback)"
+				f.puts "void #{fd.name}_#{$function_name[:set_callback]}_aux(#{fd.callback_type} callback, int expected_num_calls, const char *file, unsigned int line)"
 				f.puts "{"
 				f.puts "	#{@mock_basename}.#{fd.name}_funcptr = callback;"
+				f.puts "	#{@mock_basename}.#{fd.name}_expected_num_calls = expected_num_calls;"
+				f.puts "	#{@mock_basename}.#{fd.name}_file = file;"
+				f.puts "	#{@mock_basename}.#{fd.name}_line = line;"
 				f.puts "}"
 				f.puts
 				f.puts "int #{fd.name}_#{$function_name[:num_calls]}(void)"
