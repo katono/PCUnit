@@ -359,10 +359,12 @@ const char *PCU_formatW(const void *format, ...);
 
 #define PCU_LEAVE_TEST_FUNC_IF_FAILED_MSG(msg)	\
 	do {\
-		if (PCU_leave_is_enabled() && !PCU_last_assertion()) {\
+		if (!PCU_last_assertion()) {\
 			PCU_msg_impl(msg, PCU_TYPE_ADDMSG , "", "", 0);\
-			PCU_leave_test_func();\
-			PCU_RETURN_TEST_FUNC;\
+			if (PCU_leave_is_enabled()) {\
+				PCU_leave_test_func();\
+				PCU_RETURN_TEST_FUNC;\
+			}\
 		}\
 	} while (0)
 
