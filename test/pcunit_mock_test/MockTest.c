@@ -103,7 +103,6 @@ static int f_int_args_callback(int a, int b, int c, int d)
 	const int expected_c[] = {3, 30, 300, 3000};
 	const int expected_d[] = {4, 40, 400, 4000};
 	const int retval[]     = {5, 50, 500, 5000};
-	PCU_ASSERT_OPERATOR(f_int_args_num_calls(), <, sizeof retval / sizeof retval[0]);
 	PCU_ASSERT_EQUAL(expected_a[f_int_args_num_calls()], a);
 	PCU_ASSERT_EQUAL(expected_b[f_int_args_num_calls()], b);
 	PCU_ASSERT_EQUAL(expected_c[f_int_args_num_calls()], c);
@@ -113,18 +112,17 @@ static int f_int_args_callback(int a, int b, int c, int d)
 
 static void test_f_int_args_callback(void)
 {
-	f_int_args_set_callback(f_int_args_callback);
+	f_int_args_set_callback(f_int_args_callback, 4);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
 	PCU_ASSERT_EQUAL(50, f_int_args(10, 20, 30, 40));
 	PCU_ASSERT_EQUAL(500, f_int_args(100, 200, 300, 400));
 	PCU_ASSERT_EQUAL(5000, f_int_args(1000, 2000, 3000, 4000));
-	PCU_ASSERT_EQUAL(4, f_int_args_num_calls());
+	mock_target_verify();
 }
 
 static int *f_int_ptr_callback(int *a)
 {
 	const int ret_a[] = {1, 10, 100, 1000};
-	PCU_ASSERT_OPERATOR(f_int_ptr_num_calls(), <, sizeof ret_a / sizeof ret_a[0]);
 	PCU_ASSERT_PTR_NOT_NULL(a);
 	*a = ret_a[f_int_ptr_num_calls()];
 	return 0;
@@ -133,7 +131,7 @@ static int *f_int_ptr_callback(int *a)
 static void test_f_int_ptr_return_by_param_ptr(void)
 {
 	int a = 0;
-	f_int_ptr_set_callback(f_int_ptr_callback);
+	f_int_ptr_set_callback(f_int_ptr_callback, 4);
 	f_int_ptr(&a);
 	PCU_ASSERT_EQUAL(1, a);
 	a = 0;
@@ -145,12 +143,11 @@ static void test_f_int_ptr_return_by_param_ptr(void)
 	a = 0;
 	f_int_ptr(&a);
 	PCU_ASSERT_EQUAL(1000, a);
-	PCU_ASSERT_EQUAL(4, f_int_ptr_num_calls());
+	mock_target_verify();
 }
 
 static void f_int_varg_callback(int *a, va_list ap)
 {
-	PCU_ASSERT_OPERATOR(f_int_varg_num_calls(), <, 2);
 	if (f_int_varg_num_calls() == 0) {
 		PCU_ASSERT_EQUAL(1, va_arg(ap, int));
 		PCU_ASSERT_EQUAL(2, va_arg(ap, int));
@@ -165,10 +162,10 @@ static void f_int_varg_callback(int *a, va_list ap)
 
 static void test_f_int_varg_callback(void)
 {
-	f_int_varg_set_callback(f_int_varg_callback);
+	f_int_varg_set_callback(f_int_varg_callback, 2);
 	f_int_varg(NULL, 1, 2, 3);
 	f_int_varg(NULL, 10, 20, 30, "hoge");
-	PCU_ASSERT_EQUAL(2, f_int_varg_num_calls());
+	mock_target_verify();
 }
 
 
