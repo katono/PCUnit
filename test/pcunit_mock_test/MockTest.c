@@ -168,6 +168,25 @@ static void test_f_int_varg_callback(void)
 	mock_target_verify();
 }
 
+static int f_int_args_callback_many_times(int a, int b, int c, int d)
+{
+	PCU_ASSERT_EQUAL(1, a);
+	PCU_ASSERT_EQUAL(2, b);
+	PCU_ASSERT_EQUAL(3, c);
+	PCU_ASSERT_EQUAL(4, d);
+	return 5;
+}
+
+static void test_f_int_args_callback_many_times(void)
+{
+	int i;
+	f_int_args_set_callback(f_int_args_callback_many_times, -1);
+	for (i = 0; i < 10000; i++) {
+		PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
+	}
+	mock_target_verify();
+}
+
 
 PCU_Suite *MockTest_suite(void)
 {
@@ -182,6 +201,7 @@ PCU_Suite *MockTest_suite(void)
 		PCU_TEST(test_f_int_args_callback),
 		PCU_TEST(test_f_int_ptr_return_by_param_ptr),
 		PCU_TEST(test_f_int_varg_callback),
+		PCU_TEST(test_f_int_args_callback_many_times),
 	};
 	static PCU_Suite suite = {
 		"MockTest", tests, sizeof tests / sizeof tests[0], setup
