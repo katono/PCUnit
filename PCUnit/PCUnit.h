@@ -65,6 +65,7 @@ void PCU_msg_impl(const char *msg,
 void PCU_leave_test_func(void);
 int PCU_last_assertion(void);
 int PCU_leave_is_enabled(void);
+int PCU_test_has_failed(void);
 
 
 typedef struct {

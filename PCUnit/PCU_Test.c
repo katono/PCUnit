@@ -94,6 +94,11 @@ int PCU_Test_is_failed(const PCU_Test *self)
 	return (self->result.num_asserts_failed > 0 || self->result.num_errors > 0);
 }
 
+int PCU_test_has_failed(void)
+{
+	return PCU_Test_is_failed(current_test);
+}
+
 void PCU_leave_test_func(void)
 {
 	PCU_LONGJMP(fatal_jmp, 1);
