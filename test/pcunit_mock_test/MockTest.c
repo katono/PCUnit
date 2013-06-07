@@ -8,6 +8,12 @@ static int setup(void)
 	return 0;
 }
 
+static int teardown(void)
+{
+	mock_target_verify();
+	return 0;
+}
+
 
 static void test_f_int_args(void)
 {
@@ -19,7 +25,6 @@ static void test_f_int_args(void)
 	e[0].retval = 5;
 	f_int_args_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
-	mock_target_verify();
 }
 
 static void test_f_int_args_all_params_ignored(void)
@@ -29,7 +34,6 @@ static void test_f_int_args_all_params_ignored(void)
 	e[0].retval = 5;
 	f_int_args_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
-	mock_target_verify();
 }
 
 static void test_f_int_args_param_ignored(void)
@@ -42,7 +46,6 @@ static void test_f_int_args_param_ignored(void)
 	e[0].retval = 5;
 	f_int_args_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 1000, 3, 1000));
-	mock_target_verify();
 }
 
 static void test_f_int_args_2times(void)
@@ -61,7 +64,6 @@ static void test_f_int_args_2times(void)
 	f_int_args_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
 	PCU_ASSERT_EQUAL(50, f_int_args(10, 20, 30, 40));
-	mock_target_verify();
 }
 
 static void test_f_const_char_ptr(void)
@@ -71,7 +73,6 @@ static void test_f_const_char_ptr(void)
 	e[0].retval = "foo";
 	f_const_char_ptr_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_STRING_EQUAL("foo", f_const_char_ptr("hoge"));
-	mock_target_verify();
 }
 
 static void test_f_void(void)
@@ -79,7 +80,6 @@ static void test_f_void(void)
 	f_void_omitted_Expectation e[1] = {{0}};
 	f_void_omitted_expect(e, sizeof e / sizeof e[0]);
 	f_void_omitted();
-	mock_target_verify();
 }
 
 static void test_f_STRUCT_t_ptr(void)
@@ -92,7 +92,6 @@ static void test_f_STRUCT_t_ptr(void)
 	e[0].retval = &st2;
 	f_STRUCT_t_ptr_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_MEMORY_EQUAL(&st3, f_STRUCT_t_ptr(&st1), sizeof(STRUCT_t), 1);
-	mock_target_verify();
 }
 
 
@@ -117,7 +116,6 @@ static void test_f_int_args_callback(void)
 	PCU_ASSERT_EQUAL(50, f_int_args(10, 20, 30, 40));
 	PCU_ASSERT_EQUAL(500, f_int_args(100, 200, 300, 400));
 	PCU_ASSERT_EQUAL(5000, f_int_args(1000, 2000, 3000, 4000));
-	mock_target_verify();
 }
 
 static int *f_int_ptr_callback(int *a)
@@ -143,7 +141,6 @@ static void test_f_int_ptr_return_by_param_ptr(void)
 	a = 0;
 	f_int_ptr(&a);
 	PCU_ASSERT_EQUAL(1000, a);
-	mock_target_verify();
 }
 
 static void f_int_varg_callback(int *a, va_list ap)
@@ -165,7 +162,6 @@ static void test_f_int_varg_callback(void)
 	f_int_varg_set_callback(f_int_varg_callback, 2);
 	f_int_varg(NULL, 1, 2, 3);
 	f_int_varg(NULL, 10, 20, 30, "hoge");
-	mock_target_verify();
 }
 
 static int f_int_args_callback_many_times(int a, int b, int c, int d)
@@ -184,7 +180,6 @@ static void test_f_int_args_callback_many_times(void)
 	for (i = 0; i < 10000; i++) {
 		PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
 	}
-	mock_target_verify();
 }
 
 
@@ -204,7 +199,7 @@ PCU_Suite *MockTest_suite(void)
 		PCU_TEST(test_f_int_args_callback_many_times),
 	};
 	static PCU_Suite suite = {
-		"MockTest", tests, sizeof tests / sizeof tests[0], setup
+		"MockTest", tests, sizeof tests / sizeof tests[0], setup, teardown
 	};
 	return &suite;
 }
