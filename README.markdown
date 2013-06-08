@@ -20,6 +20,7 @@ PCUnitは以下のような特長があります。
     * ターミナルが対応していればテスト結果のカラー表示ができます。
     * テスト関数の雛形生成や自動登録ができます。
     * テスト結果をXMLファイルで出力することができます。
+    * モックオブジェクトを使用することができます。
 
 * 移植性
 
@@ -480,6 +481,18 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     そうでない場合は`PCU_ASSERT_NSTRING_NOT_EQUAL`に展開されます。
 
 
+* **`PCU_ASSERT_MEMORY_EQUAL(expected, actual, size, n)`**
+
+    expectedとactualがsizeバイトの型のポインタである前提で、expectedとactualの先頭からn個が等しいかどうかチェックします。
+    等しくないならば失敗を出力し、テスト関数から抜けます。
+
+
+* **`PCU_ASSERT_MEMORY_NOT_EQUAL(value1, value2, size, n)`**
+
+    value1とvalue2がsizeバイトの型のポインタである前提で、value1とvalue2の先頭からn個が等しくないかどうかチェックします。
+    等しいならば失敗を出力し、テスト関数から抜けます。
+
+
 * **`PCU_ASSERT_DOUBLE_EQUAL(value1, value2, delta)`**
 
     value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| <= |delta|が真かどうかチェックします。
@@ -796,6 +809,174 @@ setup関数・テスト関数等の雛形が定義されています。
 * `-n`
 
     テスト結果を標準出力に出力しなくなります。
+
+
+### `pcunit_mock.rb`
+
+`pcunit_mock.rb`はモックのソースファイルを生成するRubyスクリプトです。
+書式は次の通りです。
+
+    pcunit_mock.rb header_file ... [-d DIR] [-e PATTERN] [-s [SRC_DIR]] [-p PREFIX]
+
+`header_file`に指定したヘッダファイルでプロトタイプ宣言されているグローバル関数のモックのソースファイルを生成します。
+`header_file`は複数指定またはワイルドカードが使用できます。
+
+#### オプション
+
+* `-d DIR`
+
+    `DIR`にファイルを生成するディレクトリを指定してください。
+    このオプションを省略した場合、カレントディレクトリを指定したと見なします。
+
+* `-e PATTERN`
+
+    `header_file`にワイルドカードで指定した場合、`PATTERN`に除外するディレクトリ名/ファイル名の正規表現パターンを指定してください。
+    このオプションは複数指定できます。
+
+* `-s [SRC_DIR]`
+
+    `header_file`で宣言されているオリジナルの関数をテストで使用したい場合、関数の定義のあるソースファイルのディレクトリを`SRC_DIR`に指定してください。
+    `SRC_DIR`を省略した場合、`header_file`と同じディレクトリを指定したと見なします。
+
+* `-p PREFIX`
+
+    `PREFIX`にファイルを生成するモックのソースファイルのプレフィックスを指定してください。
+    このオプションを省略した場合、`mock_`を指定したと見なします。
+
+#### モックのAPI
+
+例として、**`Foo.h`** というヘッダファイルに
+
+**`int func(int a, const char *str);`**
+
+というプロトタイプ宣言があるとします。
+このヘッダファイルに対して`pcunit_mock.rb`を実行すると、`mock_Foo.h` と `mock_Foo.c` が生成されます。
+`mock_Foo.c` にはテストダブル関数`func()`が定義されます。
+生成されたモックのAPIを以下に示します。
+
+注:
+適宜、**`Foo`** と **`func`** を実際に使用するヘッダファイル名と関数名に読み替えてください。
+プロトタイプ宣言が複数ある場合は、その数だけ`*_expect()`, `*_set_callback()`, `*_num_calls()`が生成されます。
+
+* **`void mock_Foo_init(void)`**
+
+    モックを初期化します。
+    モックを使用するテストコードのsetup()で呼んでください。
+
+
+* **`void mock_Foo_verify(void)`**
+
+    `*_expect()` または `*_set_callback()` を使って設定された全てのエクスペクテーションを満たしたかどうかチェックします。
+    1つでも満たさないエクスペクテーションがあった場合はテスト失敗を出力します。
+    モックを使用するテストコードのteardown()で呼んでください。
+
+
+* **`void func_expect(const func_Expectation *expectations, int num)`**
+
+    テストダブル関数`func()`のエクスペクテーション(期待される引数の値、戻り値、呼び出し回数)を設定します。
+    `expectations`に`func_Expectation`型の配列を指定し、`num`には`expectations`の要素数を指定します。
+    `num`は期待される`func()`の呼び出し回数になります。
+
+    `func_Expectation`型は次のようにtypedefされています。
+
+        typedef struct {
+            int retval; /* テストダブル関数の戻り値を設定 */
+            struct {
+                int a;           /* 期待される引数aの値を設定 */
+                const char *str; /* 期待される引数strの値を設定 */
+            } expected;
+            struct {
+                char a;   /* 引数aの値を無視したい場合に非0の値を設定 */
+                char str; /* 引数strの値を無視したい場合に非0の値を設定 */
+            } ignored;
+        } func_Expectation;
+
+    例:
+
+        以下のエクスペクテーションを設定します。
+        - func()が2回呼び出されること
+        - 1回目のfunc()の引数aは100であること
+        - 1回目のfunc()の引数strは"foo"であること
+        - 1回目のfunc()は200を返す
+        - 2回目のfunc()の引数aは200であること
+        - 2回目のfunc()の引数strは何でもよい
+        - 2回目のfunc()は300を返す
+
+        /* テスト関数 */
+        static void test_func_expect(void)
+        {
+            /* func_Expectationの配列をローカル変数またはstatic変数で確保。
+             * 配列の要素数が、期待されるfunc()の呼び出し回数となる。
+             * 配列は0クリアしておく。 */
+            func_Expectation e[2] = {{0}};
+            e[0].expected.a = 100;     /* 1回目の呼び出し時に期待される引数aの値 */
+            e[0].expected.str = "foo"; /* 1回目の呼び出し時に期待される引数strの値 */
+            e[0].retval = 200;         /* 1回目の呼び出し時の戻り値 */
+            e[1].expected.a = 200;     /* 2回目の呼び出し時に期待される引数aの値 */
+            e[1].ignored.str = 1;      /* 2回目の呼び出し時の引数strは無視 */
+            e[1].retval = 300;         /* 2回目の呼び出し時の戻り値 */
+            /* エクスペクテーションの設定 */
+            func_expect(e, sizeof e / sizeof e[0]);
+            /* 1回目の呼び出し。引数aが100かつ引数strが"foo" でない場合はテスト失敗を出力する */
+            PCU_ASSERT_EQUAL(200, func(100, "foo"));
+            /* 2回目の呼び出し。引数aは200でなければならないが、引数strはどんな値でもよい */
+            PCU_ASSERT_EQUAL(300, func(200, "bar"));
+        }
+
+
+* **`void func_set_callback(func_Callback callback, int expected_num_calls)`**
+
+    テストダブル関数にユーザー定義のコールバック関数を設定します。
+    テストダブル関数`func()`が呼ばれると、設定した`callback()`が呼ばれるようになります。
+    `func_Callback`型は`func()`と同じ型のtypedefです。
+    `expected_num_calls`に期待される`func()`の呼び出し回数を指定します。
+    呼び出し回数を無制限にしたい場合は、`expected_num_calls`に負の数を指定します。
+
+    コールバック関数を使えば、`*_expect()`より複雑なエクスペクテーションを設定することができます。
+    例えば、期待される引数を範囲で指定したい場合や、ポインタ引数が指す値を変更する関数を使いたい場合など、
+    `*_expect()`では期待する設定ができない時に使用してください。
+
+    例:
+
+        以下のエクスペクテーションを設定します。
+        - func()が2回呼び出されること
+        - 1回目のfunc()の引数aの範囲は100 <= a < 200であること
+        - 1回目のfunc()の引数strは"foo"であること
+        - 1回目のfunc()は200を返す
+        - 2回目のfunc()の引数aは何でもよい
+        - 2回目のfunc()の引数strは何でもよい
+        - 2回目のfunc()は300を返す
+
+        /* func()と同じ型のコールバック関数 */
+        static int func_callback(int a, const char *str)
+        {
+            /* func_num_calls()は既に呼び出された回数を返す。これを使って分岐できる */
+            if (func_num_calls() == 0) {
+                /* 1回目の呼び出し時の引数をチェック */
+                PCU_ASSERT_OPERATOR(100 <= a, &&, a < 200);
+                PCU_ASSERT_STRING_EQUAL("foo", str);
+                return 200;
+            } else {
+                /* 2回目の呼び出しは引数をチェックしない */
+                return 300;
+            }
+        }
+        /* テスト関数 */
+        static void test_func_set_callback(void)
+        {
+            /* コールバック関数と期待される呼び出し回数の設定 */
+            func_set_callback(func_callback, 2);
+            /* 1回目の呼び出し。引数aが100 <= a < 200かつ引数strが"foo" でない場合はテスト失敗を出力する */
+            PCU_ASSERT_EQUAL(200, func(150, "foo"));
+            /* 2回目の呼び出し。2つの引数はどんな値でもよい */
+            PCU_ASSERT_EQUAL(300, func(200, "bar"));
+        }
+
+
+* **`int func_num_calls(void)`**
+
+    テストダブル関数`func()`が既に呼び出された回数を返します。
+    `func_set_callback`を使用する場合、コールバック関数内で呼び出された回数によって処理を変える時などに使用できます。
 
 
 ## ライセンス

@@ -22,6 +22,7 @@
 <li>ターミナルが対応していればテスト結果のカラー表示ができます。</li>
 <li>テスト関数の雛形生成や自動登録ができます。</li>
 <li>テスト結果をXMLファイルで出力することができます。</li>
+<li>モックオブジェクトを使用することができます。</li>
 </ul></li>
 <li><p>移植性</p>
 
@@ -465,6 +466,14 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 
 <p><code>_UNICODE</code>マクロまたは<code>UNICODE</code>マクロが定義されている場合は<code>PCU_ASSERT_NSTRINGW_NOT_EQUAL</code>に展開され、
 そうでない場合は<code>PCU_ASSERT_NSTRING_NOT_EQUAL</code>に展開されます。</p></li>
+<li><p><strong><code>PCU_ASSERT_MEMORY_EQUAL(expected, actual, size, n)</code></strong></p>
+
+<p>expectedとactualがsizeバイトの型のポインタである前提で、expectedとactualの先頭からn個が等しいかどうかチェックします。
+等しくないならば失敗を出力し、テスト関数から抜けます。</p></li>
+<li><p><strong><code>PCU_ASSERT_MEMORY_NOT_EQUAL(value1, value2, size, n)</code></strong></p>
+
+<p>value1とvalue2がsizeバイトの型のポインタである前提で、value1とvalue2の先頭からn個が等しくないかどうかチェックします。
+等しいならば失敗を出力し、テスト関数から抜けます。</p></li>
 <li><p><strong><code>PCU_ASSERT_DOUBLE_EQUAL(value1, value2, delta)</code></strong></p>
 
 <p>value1とvalue2とdeltaが浮動小数点数である前提で、|value1 - value2| &lt;= |delta|が真かどうかチェックします。
@@ -770,6 +779,172 @@ setup関数・テスト関数等の雛形が定義されています。
 <li><p><code>-n</code></p>
 
 <p>テスト結果を標準出力に出力しなくなります。</p></li>
+</ul>
+
+<h3><code>pcunit_mock.rb</code></h3>
+
+<p><code>pcunit_mock.rb</code>はモックのソースファイルを生成するRubyスクリプトです。
+書式は次の通りです。</p>
+
+<pre><code>pcunit_mock.rb header_file ... [-d DIR] [-e PATTERN] [-s [SRC_DIR]] [-p PREFIX]
+</code></pre>
+
+<p><code>header_file</code>に指定したヘッダファイルでプロトタイプ宣言されているグローバル関数のモックのソースファイルを生成します。
+<code>header_file</code>は複数指定またはワイルドカードが使用できます。</p>
+
+<h4>オプション</h4>
+
+<ul>
+<li><p><code>-d DIR</code></p>
+
+<p><code>DIR</code>にファイルを生成するディレクトリを指定してください。
+このオプションを省略した場合、カレントディレクトリを指定したと見なします。</p></li>
+<li><p><code>-e PATTERN</code></p>
+
+<p><code>header_file</code>にワイルドカードで指定した場合、<code>PATTERN</code>に除外するディレクトリ名/ファイル名の正規表現パターンを指定してください。
+このオプションは複数指定できます。</p></li>
+<li><p><code>-s [SRC_DIR]</code></p>
+
+<p><code>header_file</code>で宣言されているオリジナルの関数をテストで使用したい場合、関数の定義のあるソースファイルのディレクトリを<code>SRC_DIR</code>に指定してください。
+<code>SRC_DIR</code>を省略した場合、<code>header_file</code>と同じディレクトリを指定したと見なします。</p></li>
+<li><p><code>-p PREFIX</code></p>
+
+<p><code>PREFIX</code>にファイルを生成するモックのソースファイルのプレフィックスを指定してください。
+このオプションを省略した場合、<code>mock_</code>を指定したと見なします。</p></li>
+</ul>
+
+<h4>モックのAPI</h4>
+
+<p>例として、<strong><code>Foo.h</code></strong> というヘッダファイルに</p>
+
+<p><strong><code>int func(int a, const char *str);</code></strong></p>
+
+<p>というプロトタイプ宣言があるとします。
+このヘッダファイルに対して<code>pcunit_mock.rb</code>を実行すると、<code>mock_Foo.h</code> と <code>mock_Foo.c</code> が生成されます。
+<code>mock_Foo.c</code> にはテストダブル関数<code>func()</code>が定義されます。
+生成されたモックのAPIを以下に示します。</p>
+
+<p>注:
+適宜、<strong><code>Foo</code></strong> と <strong><code>func</code></strong> を実際に使用するヘッダファイル名と関数名に読み替えてください。
+プロトタイプ宣言が複数ある場合は、その数だけ<code>*_expect()</code>, <code>*_set_callback()</code>, <code>*_num_calls()</code>が生成されます。</p>
+
+<ul>
+<li><p><strong><code>void mock_Foo_init(void)</code></strong></p>
+
+<p>モックを初期化します。
+モックを使用するテストコードのsetup()で呼んでください。</p></li>
+<li><p><strong><code>void mock_Foo_verify(void)</code></strong></p>
+
+<p><code>*_expect()</code> または <code>*_set_callback()</code> を使って設定された全てのエクスペクテーションを満たしたかどうかチェックします。
+1つでも満たさないエクスペクテーションがあった場合はテスト失敗を出力します。
+モックを使用するテストコードのteardown()で呼んでください。</p></li>
+<li><p><strong><code>void func_expect(const func_Expectation *expectations, int num)</code></strong></p>
+
+<p>テストダブル関数<code>func()</code>のエクスペクテーション(期待される引数の値、戻り値、呼び出し回数)を設定します。
+<code>expectations</code>に<code>func_Expectation</code>型の配列を指定し、<code>num</code>には<code>expectations</code>の要素数を指定します。
+<code>num</code>は期待される<code>func()</code>の呼び出し回数になります。</p>
+
+<p><code>func_Expectation</code>型は次のようにtypedefされています。</p>
+
+<pre><code>typedef struct {
+    int retval; /* テストダブル関数の戻り値を設定 */
+    struct {
+        int a;           /* 期待される引数aの値を設定 */
+        const char *str; /* 期待される引数strの値を設定 */
+    } expected;
+    struct {
+        char a;   /* 引数aの値を無視したい場合に非0の値を設定 */
+        char str; /* 引数strの値を無視したい場合に非0の値を設定 */
+    } ignored;
+} func_Expectation;
+</code></pre>
+
+<p>例:</p>
+
+<pre><code>以下のエクスペクテーションを設定します。
+- func()が2回呼び出されること
+- 1回目のfunc()の引数aは100であること
+- 1回目のfunc()の引数strは"foo"であること
+- 1回目のfunc()は200を返す
+- 2回目のfunc()の引数aは200であること
+- 2回目のfunc()の引数strは何でもよい
+- 2回目のfunc()は300を返す
+
+
+/* テスト関数 */
+static void test_func_expect(void)
+{
+    /* func_Expectationの配列をローカル変数またはstatic変数で確保。
+     * 配列の要素数が、期待されるfunc()の呼び出し回数となる。
+     * 配列は0クリアしておく。 */
+    func_Expectation e[2] = {{0}};
+    e[0].expected.a = 100;     /* 1回目の呼び出し時に期待される引数aの値 */
+    e[0].expected.str = "foo"; /* 1回目の呼び出し時に期待される引数strの値 */
+    e[0].retval = 200;         /* 1回目の呼び出し時の戻り値 */
+    e[1].expected.a = 200;     /* 2回目の呼び出し時に期待される引数aの値 */
+    e[1].ignored.str = 1;      /* 2回目の呼び出し時の引数strは無視 */
+    e[1].retval = 300;         /* 2回目の呼び出し時の戻り値 */
+    /* エクスペクテーションの設定 */
+    func_expect(e, sizeof e / sizeof e[0]);
+    /* 1回目の呼び出し。引数aが100かつ引数strが"foo" でない場合はテスト失敗を出力する */
+    PCU_ASSERT_EQUAL(200, func(100, "foo"));
+    /* 2回目の呼び出し。引数aは200でなければならないが、引数strはどんな値でもよい */
+    PCU_ASSERT_EQUAL(300, func(200, "bar"));
+}
+</code></pre></li>
+<li><p><strong><code>void func_set_callback(func_Callback callback, int expected_num_calls)</code></strong></p>
+
+<p>テストダブル関数にユーザー定義のコールバック関数を設定します。
+テストダブル関数<code>func()</code>が呼ばれると、設定した<code>callback()</code>が呼ばれるようになります。
+<code>func_Callback</code>型は<code>func()</code>と同じ型のtypedefです。
+<code>expected_num_calls</code>に期待される<code>func()</code>の呼び出し回数を指定します。
+呼び出し回数を無制限にしたい場合は、<code>expected_num_calls</code>に負の数を指定します。</p>
+
+<p>コールバック関数を使えば、<code>*_expect()</code>より複雑なエクスペクテーションを設定することができます。
+例えば、期待される引数を範囲で指定したい場合や、ポインタ引数が指す値を変更する関数を使いたい場合など、
+<code>*_expect()</code>では期待する設定ができない時に使用してください。</p>
+
+<p>例:</p>
+
+<pre><code>以下のエクスペクテーションを設定します。
+- func()が2回呼び出されること
+- 1回目のfunc()の引数aの範囲は100 &lt;= a &lt; 200であること
+- 1回目のfunc()の引数strは"foo"であること
+- 1回目のfunc()は200を返す
+- 2回目のfunc()の引数aは何でもよい
+- 2回目のfunc()の引数strは何でもよい
+- 2回目のfunc()は300を返す
+
+
+/* func()と同じ型のコールバック関数 */
+static int func_callback(int a, const char *str)
+{
+    /* func_num_calls()は既に呼び出された回数を返す。これを使って分岐できる */
+    if (func_num_calls() == 0) {
+        /* 1回目の呼び出し時の引数をチェック */
+        PCU_ASSERT_OPERATOR(100 &lt;= a, &amp;&amp;, a &lt; 200);
+        PCU_ASSERT_STRING_EQUAL("foo", str);
+        return 200;
+    } else {
+        /* 2回目の呼び出しは引数をチェックしない */
+        return 300;
+    }
+}
+/* テスト関数 */
+static void test_func_set_callback(void)
+{
+    /* コールバック関数と期待される呼び出し回数の設定 */
+    func_set_callback(func_callback, 2);
+    /* 1回目の呼び出し。引数aが100 &lt;= a &lt; 200かつ引数strが"foo" でない場合はテスト失敗を出力する */
+    PCU_ASSERT_EQUAL(200, func(150, "foo"));
+    /* 2回目の呼び出し。2つの引数はどんな値でもよい */
+    PCU_ASSERT_EQUAL(300, func(200, "bar"));
+}
+</code></pre></li>
+<li><p><strong><code>int func_num_calls(void)</code></strong></p>
+
+<p>テストダブル関数<code>func()</code>が既に呼び出された回数を返します。
+<code>func_set_callback</code>を使用する場合、コールバック関数内で呼び出された回数によって処理を変える時などに使用できます。</p></li>
 </ul>
 
 <h2>ライセンス</h2>
