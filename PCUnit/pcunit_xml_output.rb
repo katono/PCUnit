@@ -63,7 +63,7 @@ def parse_line(line)
 	elsif line =~ /^Test: (.*)/
 		$testcase = REXML::Element.new("testcase") 
 		$testcase.add_attribute("name", $1)
-		$testcase.add_attribute("classname", String($testsuite.attributes["name"]))
+		$testcase.add_attribute("classname", $testsuite.attributes["name"])
 		$testcase.add_attribute("time", "0")
 		$testsuite.add_element($testcase)
 		$exists_testcase = true
@@ -93,7 +93,7 @@ def parse_line(line)
 	elsif line =~ /^(INITIALIZE|CLEANUP) FAILED : (.*)/
 		$testcase = REXML::Element.new("testcase") 
 		$testcase.add_attribute("name", $1 + " FAILED")
-		$testcase.add_attribute("classname", String($testsuite.attributes["name"]))
+		$testcase.add_attribute("classname", $testsuite.attributes["name"])
 		$testcase.add_attribute("time", "0")
 		failure = REXML::Element.new("error") 
 		failure.add_attribute("message", $2)
