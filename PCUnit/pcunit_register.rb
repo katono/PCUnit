@@ -34,26 +34,81 @@ $main_file = nil
 def register_tests(file_name)
 	file = File.open(file_name, "r")
 	lines = []
+	pcu_test_lines = []
 	testfuncs = []
 	registered_testfuncs = []
 	idx = 0
-	mark = false
+	pcu_test_area = false
+	prep_comment_flags = Array.new
+	def is_prep_comment(flags)
+		flags.each {|e|
+			if e
+				return true
+			end
+		}
+		return false
+	end
+	normal_comment_flag = false
 	while line = file.gets
-		lines.push(line)
+		if pcu_test_area && !(line =~ /\};/)
+			pcu_test_lines.push(String.new(line))
+		else
+			lines.push(String.new(line))
+		end
+
+		line.sub!(/\/\/.*$/, "")
+		line.gsub!(/\/\*.*?\*\//, "")
+		if line =~ /#\s*if\b/
+			if line =~ /#\s*if\s+0/
+				prep_comment_flags.push(true)
+			else
+				prep_comment_flags.push(false)
+			end
+		elsif line =~ /#\s*else/
+			if prep_comment_flags.empty?
+			elsif prep_comment_flags.last
+				prep_comment_flags.pop
+				prep_comment_flags.push(false)
+			else
+				prep_comment_flags.pop
+				prep_comment_flags.push(true)
+			end
+		elsif line =~ /#\s*endif/
+			if prep_comment_flags.empty?
+			else
+				prep_comment_flags.pop
+			end
+		end
+		if is_prep_comment(prep_comment_flags)
+			line = ""
+		else
+			if line["/*"]
+				line[/\/\*.*/] = ""
+				normal_comment_flag = true
+			elsif normal_comment_flag
+				if line["*/"]
+					line[/.*\*\//] = ""
+					normal_comment_flag = false
+				else
+					line = ""
+				end
+			end
+		end
+
 		if line =~ /void\s+(test[^\s]*)\s*\(\s*(void|)\s*\)/
 			testfuncs.push($1)
 		end
-		if mark && line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
+		if pcu_test_area && line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
 			registered_testfuncs.push($2)
 		end
 		if line =~ /PCU_Test\s+.*\[\]/
-			mark = true
+			pcu_test_area = true
 			tmp = line.slice(/^\s*/)
 			indent = tmp == "" ? "\t" : tmp * 2
+			pcu_test_area_idx = idx
 		end
-		if mark && line =~ /\};/
-			insert_idx = idx
-			mark = false
+		if pcu_test_area && line =~ /\};/
+			pcu_test_area = false
 		end
 		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\(\s*(void|)\s*\)\s*[^;]*\s*$/
 			$suite_methods.push($1)
@@ -64,8 +119,14 @@ def register_tests(file_name)
 		idx += 1
 	end
 	file.close
-	diff = testfuncs - registered_testfuncs
-	if diff.empty? || !insert_idx
+	undefined_testfuncs = []
+	registered_testfuncs.each {|func|
+		if !testfuncs.include?(func)
+			undefined_testfuncs.push(func)
+		end
+	}
+	added_testfuncs = testfuncs - registered_testfuncs
+	if undefined_testfuncs.empty? && added_testfuncs.empty?
 		return
 	end
 	if lines[0] =~ /\r\n$/
@@ -73,16 +134,30 @@ def register_tests(file_name)
 	else
 		nl = "\n"
 	end
-	diff.each {|func|
-		lines.insert(insert_idx, "#{indent}PCU_TEST(#{func}),#{nl}")
-		insert_idx += 1
-	}
 	if !OPTS[:n]
 		File.rename(file_name, file_name + ".bak")
 	end
 	file = File.open(file_name, "w")
+	idx = 0
+	pcu_test_area_end = false
 	lines.each {|line|
-		file << line
+		if pcu_test_area_idx < idx && !pcu_test_area_end
+			testfuncs.each {|e|
+				pcu_test_lines.each {|v|
+					if v =~ /\b#{e}\b/
+						file << v
+					end
+				}
+				if added_testfuncs.include?(e)
+					file << "#{indent}PCU_TEST(#{added_testfuncs[added_testfuncs.index(e)]}),#{nl}"
+				end
+			}
+			pcu_test_area_end = true
+			file << line
+		else
+			file << line
+		end
+		idx += 1
 	}
 	file.close
 end
