@@ -15,7 +15,7 @@ OBJS += mock_target.o
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	-ruby $(PCUNIT_DIR)/pcunit_register.rb
+	-ruby $(PCUNIT_DIR)/pcunit_register.rb -e mock_target
 
 .SUFFIXES: .c .o
 
