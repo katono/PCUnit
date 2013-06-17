@@ -392,6 +392,9 @@ class MockGen
 				@func_decl_list.each { |fd|
 					f.puts "	#{@mock_basename}.#{fd.name}_funcptr = #{fd.name}_original;"
 				}
+				@func_decl_list.each { |fd|
+					f.puts "	#{@mock_basename}.#{fd.name}_expected_num_calls = -1;"
+				}
 				f.puts "#endif"
 			end
 			f.puts "}"
