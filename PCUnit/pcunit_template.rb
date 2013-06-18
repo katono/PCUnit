@@ -90,7 +90,11 @@ PCU_Suite *#{suite_name}_suite(void)
 	static PCU_Test tests[] = {
 	};
 	static PCU_Suite suite = {
-		"#{suite_name}", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup
+		"#{suite_name}", tests, sizeof tests / sizeof tests[0],
+		setup,
+		teardown,
+		initialize,
+		cleanup,
 	};
 	return &suite;
 }
