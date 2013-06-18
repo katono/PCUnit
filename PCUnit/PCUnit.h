@@ -144,7 +144,7 @@ const char *PCU_suite_name(void);
 void PCU_enable_color(void);
 void PCU_disable_color(void);
 void PCU_set_verbose(int verbose_flag);
-void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
+int PCU_console_run(const PCU_SuiteMethod *suite_methods, int num);
 const char *PCU_format(const char *format, ...);
 const char *PCU_formatW(const void *format, ...);
 #define PCU_format0(f)                                     PCU_format_aux0(&PCU_format_buf, f)

@@ -202,6 +202,7 @@ static void run_selected_suite(PCU_Suite *suite)
 	PCU_Suite_run(suite);
 	PCU_puts("\n");
 	print_after_test(suite);
+	set_result(suite);
 }
 
 static void run_selected_test(PCU_Suite *suite, int idx)
@@ -209,6 +210,7 @@ static void run_selected_test(PCU_Suite *suite, int idx)
 	PCU_Suite_reset(suite);
 	PCU_Suite_run_selected(suite, idx);
 	print_result_selected(suite, idx);
+	set_result(suite);
 }
 
 static void show_list_tests(const PCU_Test *tests, int num)
@@ -392,7 +394,7 @@ end:
 	return ret;
 }
 
-void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
+int PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 {
 	int PCU_is_verbose(void);
 	reset(suite_methods, num);
@@ -424,7 +426,7 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 		case 'S':
 			show_list_suites(suite_methods, num);
 			quit = select_suite(suite_methods, num);
-			if (quit) return;
+			if (quit) goto end;
 			break;
 		case 'l':
 		case 'L':
@@ -448,11 +450,13 @@ void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)
 			break;
 		case 'q':
 		case 'Q':
-			return;
+			goto end;
 		default:
 			break;
 		}
 		PCU_puts("\n");
 	}
+end:
+	return result.failed;
 }
 #endif
