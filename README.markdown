@@ -573,11 +573,12 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
     全テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。
 
 
-* **`void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)`**
+* **`int PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)`**
 
     コンソールモードでテストを実行します。
     実行するテストを対話的に選択したい場合、`PCU_run`の代わりにこちらを使います。
     引数は`PCU_run`と同じです。
+    テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。
     なお、PCUnitが`PCU_NO_CONSOLE_RUN`マクロが定義済みでビルドされている場合は使用できません。
 
 

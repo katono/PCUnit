@@ -551,11 +551,12 @@ msgの型は<code>const char *</code>です。
 <p><code>PCU_SuiteMethod</code>の配列<code>suite_methods</code>から導かれる全テストを実行します。
 <code>num</code>には<code>suite_methods</code>の要素数を指定します。
 全テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。</p></li>
-<li><p><strong><code>void PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)</code></strong></p>
+<li><p><strong><code>int PCU_console_run(const PCU_SuiteMethod *suite_methods, int num)</code></strong></p>
 
 <p>コンソールモードでテストを実行します。
 実行するテストを対話的に選択したい場合、<code>PCU_run</code>の代わりにこちらを使います。
 引数は<code>PCU_run</code>と同じです。
+テストを実行した結果、失敗がなければ0を、1つでも失敗があれば非0を返します。
 なお、PCUnitが<code>PCU_NO_CONSOLE_RUN</code>マクロが定義済みでビルドされている場合は使用できません。</p></li>
 <li><p><strong><code>void PCU_set_putchar(PCU_Putchar func)</code></strong></p>
 
