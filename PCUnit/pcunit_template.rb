@@ -113,11 +113,30 @@ int main(int argc, char *argv[])
 {
 	const PCU_SuiteMethod suites[] = {
 	};
+	int i;
+	int console_mode = 0;
 	PCU_set_putchar(putchar);
 	PCU_set_getchar(getchar);
 	PCU_enable_color();
-	if (argc >= 2) {
-		PCU_set_verbose(1);
+	for (i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			switch (argv[i][1]) {
+			case 'c':
+				console_mode = 1;
+				break;
+			case 'v':
+				PCU_set_verbose(1);
+				break;
+			case 'd':
+				PCU_disable_color();
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if (console_mode) {
+		return PCU_console_run(suites, sizeof suites / sizeof suites[0]);
 	}
 	return PCU_run(suites, sizeof suites / sizeof suites[0]);
 }
@@ -159,7 +178,7 @@ test: all
 	./$(TARGET)
 
 xml: all
-	./$(TARGET) verbose | ruby PCUnit/pcunit_xml_output.rb $(OUTPUT)
+	./$(TARGET) -v | ruby PCUnit/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	cd PCUnit && $(MAKE) clean
@@ -203,7 +222,7 @@ test: all
 	./$(TARGET)
 
 xml: all
-	./$(TARGET) verbose | ruby $(INSTALLDIR)/bin/pcunit_xml_output.rb $(OUTPUT)
+	./$(TARGET) -v | ruby $(INSTALLDIR)/bin/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	rm -f *.o $(TARGET)
