@@ -6,9 +6,7 @@
 static int enable_color;
 
 typedef struct {
-	int num_tests;
-	int num_tests_ran;
-	int num_tests_failed;
+	int failed;
 } PCU_Result;
 static PCU_Result result;
 
@@ -20,7 +18,6 @@ static void reset(const PCU_SuiteMethod *suite_methods, int num)
 	for (i = 0; i < num; i++, method++) {
 		PCU_Suite *p = (*method)();
 		PCU_Suite_reset(p);
-		result.num_tests += p->result.num_tests;
 	}
 }
 
@@ -142,15 +139,11 @@ static void print_after_test(const PCU_Suite *suite)
 	}
 }
 
-static void add_result(const PCU_Suite *suite)
+static void set_result(const PCU_Suite *suite)
 {
-	result.num_tests_ran    += suite->result.num_tests_ran;
-	result.num_tests_failed += suite->result.num_tests_failed;
-	if (suite->result.initialize_error) {
-		result.num_tests_failed++;
-	}
-	if (suite->result.cleanup_error) {
-		result.num_tests_failed++;
+	if (suite->result.num_tests_failed ||
+			suite->result.initialize_error || suite->result.cleanup_error) {
+		result.failed = 1;
 	}
 }
 
@@ -166,7 +159,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 			PCU_Suite_run(p);
 			PCU_Suite_cleanup(p);
 		}
-		add_result(p);
+		set_result(p);
 		PCU_puts("\n");
 		print_after_test(p);
 	}
@@ -175,7 +168,7 @@ static void run_all(const PCU_SuiteMethod *suite_methods, int num)
 int PCU_run(const PCU_SuiteMethod *suite_methods, int num)
 {
 	run_all(suite_methods, num);
-	return result.num_tests_failed > 0;
+	return result.failed;
 }
 
 #ifndef PCU_NO_CONSOLE_RUN
@@ -183,7 +176,7 @@ static char input_buf[64];
 
 static void print_result_selected(const PCU_Suite *suite, int idx)
 {
-	PCU_Test *test = &suite->tests[idx];
+	PCU_Test *test = suite->tests + idx;
 	PCU_puts("\n");
 	if (PCU_Test_is_failed(test)) {
 		set_color(COLOR_RED);
