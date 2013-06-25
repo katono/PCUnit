@@ -108,9 +108,9 @@ static void test_rb_pop(void)
 PCU_Suite *RingBufTest_suite(void)
 {
 	static PCU_Test tests[] = {
-		{ "test_rb_init", test_rb_init },
-		{ "test_rb_push", test_rb_push },
-		{ "test_rb_pop", test_rb_pop },
+		PCU_TEST(test_rb_init),
+		PCU_TEST(test_rb_push),
+		PCU_TEST(test_rb_pop),
 	};
 	static PCU_Suite suite = { "RingBufTest", tests, sizeof tests / sizeof tests[0], setup, teardown, initialize, cleanup };
 	return &suite;

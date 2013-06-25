@@ -33,7 +33,7 @@ test: all
 	./$(TARGET)
 
 xml: all
-	./$(TARGET) | ruby ../PCUnit/pcunit_xml_output.rb $(OUTPUT)
+	./$(TARGET) -v | ruby ../PCUnit/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)

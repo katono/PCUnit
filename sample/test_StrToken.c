@@ -58,7 +58,7 @@ static void test_StrToken(void)
 PCU_Suite *StrTokenTest_suite(void)
 {
 	static PCU_Test tests[] = {
-		{ "test_StrToken", test_StrToken, sizeof test_data / sizeof test_data[0] },
+		PCU_TEST_REPEATED(test_StrToken, sizeof test_data / sizeof test_data[0]),
 	};
 	static PCU_Suite suite = { "StrTokenTest", tests, sizeof tests / sizeof tests[0], setup, teardown };
 	return &suite;
