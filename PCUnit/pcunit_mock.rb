@@ -351,16 +351,16 @@ class MockGen
 				f.puts "	#{fd.callback_type} #{fd.name}_funcptr;"
 			}
 			@func_decl_list.each { |fd|
-				f.puts "	int #{fd.name}_num_calls;"
+				f.puts "	const #{fd.name}_Expectation *#{fd.name}_expectations;"
 			}
 			@func_decl_list.each { |fd|
-				f.puts "	const #{fd.name}_Expectation *#{fd.name}_expectations;"
+				f.puts "	const char *#{fd.name}_file;"
 			}
 			@func_decl_list.each { |fd|
 				f.puts "	int #{fd.name}_expected_num_calls;"
 			}
 			@func_decl_list.each { |fd|
-				f.puts "	const char *#{fd.name}_file;"
+				f.puts "	int #{fd.name}_num_calls;"
 			}
 			@func_decl_list.each { |fd|
 				f.puts "	unsigned int #{fd.name}_line;"
