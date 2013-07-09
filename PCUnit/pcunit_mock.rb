@@ -302,7 +302,7 @@ class MockGen
 						if param[0] == '...'
 							next
 						end
-						f.puts "		char #{param[1]};"
+						f.puts "		unsigned int #{param[1]}:1;"
 					}
 					f.puts "	} ignored;"
 				end
