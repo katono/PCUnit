@@ -188,6 +188,8 @@ typedef enum ENUM_t {
 		f.puts "#{t} *f_#{name}_#{count += 1}(#{t} *[]);"
 		f.puts "#{t} *f_#{name}_#{count += 1}(#{t}* []);"
 		f.puts "#{t} *f_#{name}_#{count += 1}(#{t}*[]);"
+		f.puts "#{t} *f_#{name}_#{count += 1}(void);"
+		f.puts "#{t} *f_#{name}_#{count += 1}();"
 
 		if !(t =~ /void/)
 			f.puts "#{t} *f_#{name}_#{count += 1}(#{t2} (*)(#{t}));"
