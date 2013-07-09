@@ -467,10 +467,16 @@ class MockGen
 					f.puts "	" + fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + "#{local_ret};"
 				end
 				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
-				local_expectation = get_local_var_name(fd, "expectation", 1)
-				f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
+				if fd.ret_type != "void" || !(fd.params.size == 0 || fd.params[0][0] == "void")
+					local_expectation = get_local_var_name(fd, "expectation", 1)
+				end
+				if local_expectation
+					f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
+				end
 				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
-				f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_actual_num_calls;"
+				if local_expectation
+					f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_actual_num_calls;"
+				end
 				prev_param_name = ''
 				va_list_name = ''
 				if !(fd.params.size == 0 || fd.params[0][0] == "void")
