@@ -30,7 +30,7 @@ static void test_f_int_args(void)
 static void test_f_int_args_all_params_ignored(void)
 {
 	f_int_args_Expectation e[1] = {{0}};
-	memset(&e[0].ignored, 1, sizeof e[0].ignored);
+	memset(&e[0].ignored, 0xFF, sizeof e[0].ignored);
 	e[0].retval = 5;
 	f_int_args_expect(e, sizeof e / sizeof e[0]);
 	PCU_ASSERT_EQUAL(5, f_int_args(1, 2, 3, 4));
