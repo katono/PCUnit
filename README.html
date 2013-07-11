@@ -281,7 +281,7 @@ setup, teardown, initialize, cleanupが必要な場合はそれぞれの関数�
 <p>main関数がテストを実装したソースと別ファイルの場合はスイートメソッドのプロトタイプ宣言をしてください。</p>
 
 <p>main関数ではまず、<code>PCU_SuiteMethod</code>型の配列を宣言します。
-<code>PCU_SuiteMethod</code>型はスイートメソッドの関数ポインタのtypedefです。次のように定義されています。</p>
+<code>PCU_SuiteMethod</code>型はスイートメソッドへのポインタ型で、次のように型定義されています。</p>
 
 <pre><code>typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 </code></pre>
@@ -507,7 +507,7 @@ NULLならば失敗を出力し、テスト関数から抜けます。</p></li>
 </ul></li>
 <li><p><strong><code>PCU_ASSERT_OPERATOR_DOUBLE(value1, op, value2)</code></strong></p>
 
-<p>value1とvalue2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
+<p>value1とvalue2が浮動小数点数を返す任意の式でopが比較演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
 偽ならば失敗を出力し、テスト関数から抜けます。
 なお、PCUnitが<code>PCU_NO_FLOATINGPOINT</code>マクロが定義済みでビルドされている場合は使用できません。</p>
 
@@ -561,12 +561,12 @@ msgの型は<code>const char *</code>です。
 <li><p><strong><code>void PCU_set_putchar(PCU_Putchar func)</code></strong></p>
 
 <p>1文字出力する関数を設定します。
-<code>PCU_Putchar</code>型はputcharと同じ<code>int(*)(int)</code>型のtypedefです。
+<code>PCU_Putchar</code>型はputcharと同じ型の関数へのポインタ型で、<code>typedef int (*PCU_Putchar)(int);</code>と型定義されています。
 <code>PCU_run</code>または<code>PCU_console_run</code>の前に必ず設定してください。</p></li>
 <li><p><strong><code>void PCU_set_getchar(PCU_Getchar func)</code></strong></p>
 
 <p>入力した1文字を取得する関数を設定します。
-<code>PCU_Getchar</code>型はgetcharと同じ<code>int(*)(void)</code>型のtypedefです。
+<code>PCU_Getchar</code>型はgetcharと同じ型の関数へのポインタ型で、<code>typedef int (*PCU_Getchar)(void);</code>と型定義されています。
 <code>PCU_console_run</code>の前に必ず設定してください。</p></li>
 <li><p><strong><code>void PCU_set_verbose(int verbose_flag)</code></strong></p>
 
@@ -845,7 +845,7 @@ setup関数・テスト関数等の雛形が定義されています。
 <code>expectations</code>に<code>func_Expectation</code>型の配列を指定し、<code>num</code>には<code>expectations</code>の要素数を指定します。
 <code>num</code>は期待される<code>func()</code>の呼び出し回数になります。</p>
 
-<p><code>func_Expectation</code>型は次のようにtypedefされています。</p>
+<p><code>func_Expectation</code>型は次のように型定義されています。</p>
 
 <pre><code>typedef struct {
     int retval; /* テストダブル関数の戻り値を設定 */
@@ -854,8 +854,8 @@ setup関数・テスト関数等の雛形が定義されています。
         const char *str; /* 期待される引数strの値を設定 */
     } expected;
     struct {
-        char a;   /* 引数aの値を無視したい場合に非0の値を設定 */
-        char str; /* 引数strの値を無視したい場合に非0の値を設定 */
+        unsigned int a:1;   /* 引数aの値を無視したい場合に1を設定 */
+        unsigned int str:1; /* 引数strの値を無視したい場合に1を設定 */
     } ignored;
 } func_Expectation;
 </code></pre>
@@ -897,7 +897,8 @@ static void test_func_expect(void)
 
 <p>テストダブル関数にユーザー定義のコールバック関数を設定します。
 テストダブル関数<code>func()</code>が呼ばれると、設定した<code>callback()</code>が呼ばれるようになります。
-<code>func_Callback</code>型は<code>func()</code>と同じ型のtypedefです。
+<code>func_Callback</code>型は<code>func()</code>と同じ型の関数へのポインタ型で、
+<code>typedef int (*func_Callback)(int a, const char *str);</code>と型定義されています。
 <code>expected_num_calls</code>に期待される<code>func()</code>の呼び出し回数を指定します。
 呼び出し回数を無制限にしたい場合は、<code>expected_num_calls</code>に負の数を指定します。</p>
 

@@ -258,7 +258,7 @@ main関数は次のように定義します。
 main関数がテストを実装したソースと別ファイルの場合はスイートメソッドのプロトタイプ宣言をしてください。
 
 main関数ではまず、`PCU_SuiteMethod`型の配列を宣言します。
-`PCU_SuiteMethod`型はスイートメソッドの関数ポインタのtypedefです。次のように定義されています。
+`PCU_SuiteMethod`型はスイートメソッドへのポインタ型で、次のように型定義されています。
 
     typedef PCU_Suite *(*PCU_SuiteMethod)(void);
 
@@ -528,7 +528,7 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 
 * **`PCU_ASSERT_OPERATOR_DOUBLE(value1, op, value2)`**
 
-    value1とvalue2が浮動小数点数を返す任意の式でopが代入以外の任意の二項演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
+    value1とvalue2が浮動小数点数を返す任意の式でopが比較演算子である前提で、((value1) op (value2)) が真かどうかチェックします。
     偽ならば失敗を出力し、テスト関数から抜けます。
     なお、PCUnitが`PCU_NO_FLOATINGPOINT`マクロが定義済みでビルドされている場合は使用できません。
 
@@ -585,14 +585,14 @@ longjmpの代わりにreturnによってテスト関数から抜けます。
 * **`void PCU_set_putchar(PCU_Putchar func)`**
 
     1文字出力する関数を設定します。
-    `PCU_Putchar`型はputcharと同じ`int(*)(int)`型のtypedefです。
+    `PCU_Putchar`型はputcharと同じ型の関数へのポインタ型で、`typedef int (*PCU_Putchar)(int);`と型定義されています。
     `PCU_run`または`PCU_console_run`の前に必ず設定してください。
 
 
 * **`void PCU_set_getchar(PCU_Getchar func)`**
 
     入力した1文字を取得する関数を設定します。
-    `PCU_Getchar`型はgetcharと同じ`int(*)(void)`型のtypedefです。
+    `PCU_Getchar`型はgetcharと同じ型の関数へのポインタ型で、`typedef int (*PCU_Getchar)(void);`と型定義されています。
     `PCU_console_run`の前に必ず設定してください。
 
 
@@ -878,7 +878,7 @@ setup関数・テスト関数等の雛形が定義されています。
     `expectations`に`func_Expectation`型の配列を指定し、`num`には`expectations`の要素数を指定します。
     `num`は期待される`func()`の呼び出し回数になります。
 
-    `func_Expectation`型は次のようにtypedefされています。
+    `func_Expectation`型は次のように型定義されています。
 
         typedef struct {
             int retval; /* テストダブル関数の戻り値を設定 */
@@ -887,8 +887,8 @@ setup関数・テスト関数等の雛形が定義されています。
                 const char *str; /* 期待される引数strの値を設定 */
             } expected;
             struct {
-                char a;   /* 引数aの値を無視したい場合に非0の値を設定 */
-                char str; /* 引数strの値を無視したい場合に非0の値を設定 */
+                unsigned int a:1;   /* 引数aの値を無視したい場合に1を設定 */
+                unsigned int str:1; /* 引数strの値を無視したい場合に1を設定 */
             } ignored;
         } func_Expectation;
 
@@ -929,7 +929,8 @@ setup関数・テスト関数等の雛形が定義されています。
 
     テストダブル関数にユーザー定義のコールバック関数を設定します。
     テストダブル関数`func()`が呼ばれると、設定した`callback()`が呼ばれるようになります。
-    `func_Callback`型は`func()`と同じ型のtypedefです。
+    `func_Callback`型は`func()`と同じ型の関数へのポインタ型で、
+    `typedef int (*func_Callback)(int a, const char *str);`と型定義されています。
     `expected_num_calls`に期待される`func()`の呼び出し回数を指定します。
     呼び出し回数を無制限にしたい場合は、`expected_num_calls`に負の数を指定します。
 
