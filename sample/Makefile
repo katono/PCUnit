@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -Wall -g
-CFLAGS += -I..
 # CFLAGS += -DPCU_NO_LIBC
 TARGET = sample
 PCUNITDIR = ../PCUnit
+CFLAGS += -I$(PCUNITDIR)/../
 LIBPCUNIT = $(PCUNITDIR)/libpcunit.a
 LFLAGS = -L$(PCUNITDIR) -lpcunit
 OBJS = main.o
@@ -16,7 +16,7 @@ OBJS += $(LIBPCUNIT)
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	-ruby ../PCUnit/pcunit_register.rb
+	-ruby $(PCUNITDIR)/pcunit_register.rb
 
 .SUFFIXES: .c .o
 
@@ -33,7 +33,7 @@ test: all
 	./$(TARGET)
 
 xml: all
-	./$(TARGET) -v | ruby ../PCUnit/pcunit_xml_output.rb $(OUTPUT)
+	./$(TARGET) -v | ruby $(PCUNITDIR)/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
 	rm -f *.o $(TARGET) $(PCUNITDIR)/*.o $(LIBPCUNIT)
