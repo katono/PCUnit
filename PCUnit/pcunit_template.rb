@@ -149,10 +149,12 @@ def create_makefile(objs)
 	ext = OPTS[:p]
 	file = File.open(OPTS[:d] + OPTS[:M], "w")
 	file.print <<-"EOB"
+PCUNITDIR = PCUnit
+
 CC = #{cc}
 CFLAGS = -Wall -g
-CFLAGS += -I.
-LFLAGS = -LPCUnit -lpcunit
+CFLAGS += -I$(PCUNITDIR)/..
+LFLAGS = -L$(PCUNITDIR) -lpcunit
 
 TARGET = alltests
 OBJS = main.o
@@ -163,7 +165,7 @@ OBJS = main.o
 all: pcunit_register $(TARGET)
 
 pcunit_register:
-	-ruby PCUnit/pcunit_register.rb
+	-ruby $(PCUNITDIR)/pcunit_register.rb
 
 .SUFFIXES: #{ext} .o
 
@@ -171,17 +173,17 @@ pcunit_register:
 	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): $(OBJS)
-	cd PCUnit && $(MAKE)
+	cd $(PCUNITDIR) && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
 test: all
 	./$(TARGET)
 
 xml: all
-	./$(TARGET) -v | ruby PCUnit/pcunit_xml_output.rb $(OUTPUT)
+	./$(TARGET) -v | ruby $(PCUNITDIR)/pcunit_xml_output.rb $(OUTPUT)
 
 clean:
-	cd PCUnit && $(MAKE) clean
+	cd $(PCUNITDIR) && $(MAKE) clean
 	rm -f *.o $(TARGET)
 
 	EOB
