@@ -351,16 +351,16 @@ class MockGen
 				f.puts "	#{fd.callback_type} #{fd.name}_funcptr;"
 			}
 			@func_decl_list.each { |fd|
-				f.puts "	const #{fd.name}_Expectation *#{fd.name}_expectations;"
-			}
-			@func_decl_list.each { |fd|
-				f.puts "	const char *#{fd.name}_file;"
-			}
-			@func_decl_list.each { |fd|
 				f.puts "	int #{fd.name}_expected_num_calls;"
 			}
 			@func_decl_list.each { |fd|
 				f.puts "	int #{fd.name}_actual_num_calls;"
+			}
+			@func_decl_list.each { |fd|
+				f.puts "	const #{fd.name}_Expectation *#{fd.name}_expectations;"
+			}
+			@func_decl_list.each { |fd|
+				f.puts "	const char *#{fd.name}_file;"
 			}
 			@func_decl_list.each { |fd|
 				f.puts "	unsigned int #{fd.name}_line;"
@@ -371,6 +371,9 @@ class MockGen
 				f.puts "static struct #{@mock_basename}_t #{@mock_basename} = {"
 				@func_decl_list.each { |fd|
 					f.puts "	#{fd.name}_original,"
+				}
+				@func_decl_list.each { |fd|
+					f.puts "	-1,"
 				}
 				f.puts "};"
 				f.puts "#else"
@@ -408,16 +411,28 @@ class MockGen
 			f.puts "void #{@mock_basename}_#{$function_name[:verify]}_aux(const char *file, unsigned int line)"
 			f.puts "{"
 			f.puts "	if (PCU_test_has_failed()) {"
-			f.puts "		return;"
+			if $include_original_flag
+				f.puts "		goto end;"
+			else
+				f.puts "		return;"
+			end
 			f.puts "	}"
 			@func_decl_list.each { |fd|
 				f.puts "	if ((#{@mock_basename}.#{fd.name}_expectations || #{@mock_basename}.#{fd.name}_funcptr) && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
 				f.puts "		PCU_ASSERT_EQUAL_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", file, line));"
 				f.puts "		if (PCU_test_has_failed()) {"
-				f.puts "			return;"
+				if $include_original_flag
+					f.puts "			goto end;"
+				else
+					f.puts "			return;"
+				end
 				f.puts "		}"
 				f.puts "	}"
 			}
+			if $include_original_flag
+				f.puts "end:"
+				f.puts "	#{@mock_basename}_#{$function_name[:init]}();"
+			end
 			f.puts "}"
 			f.puts
 			f.puts "static const char *#{@mock_basename}_ordinal(int num)"
