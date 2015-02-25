@@ -877,15 +877,15 @@ static void test_func_expect(void)
 {
     /* func_Expectationの配列をローカル変数またはstatic変数で確保。
      * 配列の要素数が、期待されるfunc()の呼び出し回数となる。
-     * 配列は0クリアしておく。 */
+     * 不定値でignoredが有効にならないように、配列は必ず0クリアすること。 */
     func_Expectation e[2] = {{0}};
+    /* エクスペクテーションの設定 */
     e[0].expected.a = 100;     /* 1回目の呼び出し時に期待される引数aの値 */
     e[0].expected.str = "foo"; /* 1回目の呼び出し時に期待される引数strの値 */
     e[0].retval = 200;         /* 1回目の呼び出し時の戻り値 */
     e[1].expected.a = 200;     /* 2回目の呼び出し時に期待される引数aの値 */
     e[1].ignored.str = 1;      /* 2回目の呼び出し時の引数strは無視 */
     e[1].retval = 300;         /* 2回目の呼び出し時の戻り値 */
-    /* エクスペクテーションの設定 */
     func_expect(e, sizeof e / sizeof e[0]);
     /* 1回目の呼び出し。引数aが100かつ引数strが"foo" でない場合はテスト失敗を出力する */
     PCU_ASSERT_EQUAL(200, func(100, "foo"));
