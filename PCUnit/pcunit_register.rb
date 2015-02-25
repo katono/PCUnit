@@ -126,7 +126,7 @@ def register_tests(file_name)
 		end
 	}
 	added_testfuncs = testfuncs - registered_testfuncs
-	if undefined_testfuncs.empty? && added_testfuncs.empty?
+	if (undefined_testfuncs.empty? && added_testfuncs.empty?) || !pcu_test_area_idx
 		return
 	end
 	if lines[0] =~ /\r\n$/
