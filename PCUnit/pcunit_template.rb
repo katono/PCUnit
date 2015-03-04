@@ -155,6 +155,9 @@ CC = #{cc}
 CFLAGS = -Wall -g
 CFLAGS += -I$(PCUNITDIR)/..
 LFLAGS = -L$(PCUNITDIR) -lpcunit
+LIBPCUNIT = $(PCUNITDIR)/libpcunit.a
+
+VPATH = 
 
 TARGET = alltests
 OBJS = main.o
@@ -172,8 +175,10 @@ pcunit_register:
 #{ext}.o:
 	$(CC) $(CFLAGS) -c $<
 
-$(TARGET): $(OBJS)
+$(LIBPCUNIT):
 	cd $(PCUNITDIR) && $(MAKE)
+
+$(TARGET): $(LIBPCUNIT) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
 test: all
@@ -200,6 +205,8 @@ CC = #{cc}
 CFLAGS = -Wall -g
 CFLAGS += -I$(INSTALLDIR)/include
 LFLAGS = -L$(INSTALLDIR)/lib -lpcunit
+
+VPATH = 
 
 TARGET = alltests
 OBJS = main.o
