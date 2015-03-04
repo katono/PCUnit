@@ -9,10 +9,10 @@ require 'optparse'
 opt = OptionParser.new
 OPTS = {}
 
-OPTS[:d] = "."
+src_dirs = Array.new
 excluded = Array.new
 
-opt.on('-d VAL') {|v| OPTS[:d] = v }
+opt.on('-d VAL') {|v| src_dirs.push v }
 opt.on('-e VAL') {|v| excluded.push v }
 opt.on('-n') {|v| OPTS[:n] = v }
 opt.on('-h', '--help') {
@@ -27,6 +27,10 @@ Usage: pcunit_register.rb [-d DIR] [-e PATTERN] [-n]
 }
 
 opt.parse!(ARGV)
+
+if src_dirs.empty?
+	src_dirs.push "."
+end
 
 $suite_methods = []
 $main_file = nil
@@ -114,7 +118,7 @@ def register_tests(file_name)
 			$suite_methods.push($1)
 		end
 		if !$main_file && line =~ /PCU_SuiteMethod\s+.*\[\s*\]/
-			$main_file = file_name
+			$main_file = File.expand_path(file_name)
 		end
 		idx += 1
 	end
@@ -226,18 +230,22 @@ def register_suite_methods(file_name)
 	file.close
 end
 
-Dir.chdir(OPTS[:d])
-Dir.glob("**/*.{c{,pp,c,xx},C{,PP,C,XX}}") {|fname|
-	excluded_flag = false
-	excluded.each {|ex|
-		if fname =~ Regexp.new(ex)
-			excluded_flag = true
-			break
+src_dirs.each {|d|
+	current_dir = Dir.pwd
+	Dir.chdir(d)
+	Dir.glob("**/*.{c{,pp,c,xx},C{,PP,C,XX}}") {|fname|
+		excluded_flag = false
+		excluded.each {|ex|
+			if fname =~ Regexp.new(ex)
+				excluded_flag = true
+				break
+			end
+		}
+		if !excluded_flag
+			register_tests(fname)
 		end
 	}
-	if !excluded_flag
-		register_tests(fname)
-	end
+	Dir.chdir(current_dir)
 }
 if $main_file
 	register_suite_methods($main_file)
