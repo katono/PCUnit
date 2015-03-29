@@ -54,6 +54,7 @@ if OPTS[:m] == "main"
 end
 
 def create_test(suite_name)
+	pcutests_ext = ".pcutests"
 	file = File.open(OPTS[:d] + suite_name + OPTS[:p], "w")
 	file.print <<-"EOB"
 #include "PCUnit/PCUnit.h"
@@ -88,6 +89,7 @@ static void test_TODO(void)
 PCU_Suite *#{suite_name}_suite(void)
 {
 	static PCU_Test tests[] = {
+#include "#{suite_name}#{pcutests_ext}"
 	};
 	static PCU_Suite suite = {
 		"#{suite_name}", tests, sizeof tests / sizeof tests[0],
@@ -100,6 +102,9 @@ PCU_Suite *#{suite_name}_suite(void)
 }
 
 	EOB
+	file.close
+
+	File.open(OPTS[:d] + suite_name + pcutests_ext, "w").close
 end
 
 def create_alltests()
