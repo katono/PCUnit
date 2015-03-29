@@ -77,6 +77,64 @@ def comment_proc(line, normal_comment_flag, prep_comment_flags)
 	return line, normal_comment_flag
 end
 
+def read_pcutests(pcutests_file, registered_testfuncs, pcu_test_lines)
+	if !File.exist?(pcutests_file)
+		return
+	end
+	File.open(pcutests_file, "r") { |f|
+		while line = f.gets
+			if line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
+				registered_testfuncs.push($2)
+				pcu_test_lines.push(String.new(line))
+			end
+		end
+	}
+end
+
+def update_pcutests(pcutests_file, pcu_test_lines, testfuncs, added_testfuncs, nl)
+	File.open(pcutests_file, "w") { |file|
+		testfuncs.each {|e|
+			pcu_test_lines.each {|v|
+				if v =~ /\b#{e}\b/
+					file << v
+				end
+			}
+			if added_testfuncs.include?(e)
+				file << "PCU_TEST(#{added_testfuncs[added_testfuncs.index(e)]}),#{nl}"
+			end
+		}
+	}
+end
+
+def update_test_file(file_name, lines, pcu_test_area_idx, pcu_test_lines, testfuncs, added_testfuncs, indent, nl)
+	if !OPTS[:n]
+		File.rename(file_name, file_name + ".bak")
+	end
+	file = File.open(file_name, "w")
+	idx = 0
+	pcu_test_area_end = false
+	lines.each {|line|
+		if pcu_test_area_idx < idx && !pcu_test_area_end
+			testfuncs.each {|e|
+				pcu_test_lines.each {|v|
+					if v =~ /\b#{e}\b/
+						file << v
+					end
+				}
+				if added_testfuncs.include?(e)
+					file << "#{indent}PCU_TEST(#{added_testfuncs[added_testfuncs.index(e)]}),#{nl}"
+				end
+			}
+			pcu_test_area_end = true
+			file << line
+		else
+			file << line
+		end
+		idx += 1
+	}
+	file.close
+end
+
 def register_tests(file_name)
 	file = File.open(file_name, "r")
 	lines = []
@@ -100,6 +158,9 @@ def register_tests(file_name)
 				registered_testfuncs.push($2)
 				pcu_test_lines.push(String.new(line))
 				lines.pop
+			elsif line =~ /#\s*include\s*"(.*)"/
+				pcutests_file = $1
+				read_pcutests(pcutests_file, registered_testfuncs, pcu_test_lines)
 			elsif line =~ /\};/
 				pcu_test_area = false
 			end
@@ -134,32 +195,11 @@ def register_tests(file_name)
 	else
 		nl = "\n"
 	end
-	if !OPTS[:n]
-		File.rename(file_name, file_name + ".bak")
+	if pcutests_file
+		update_pcutests(pcutests_file, pcu_test_lines, testfuncs, added_testfuncs, nl)
+	else
+		update_test_file(file_name, lines, pcu_test_area_idx, pcu_test_lines, testfuncs, added_testfuncs, indent, nl)
 	end
-	file = File.open(file_name, "w")
-	idx = 0
-	pcu_test_area_end = false
-	lines.each {|line|
-		if pcu_test_area_idx < idx && !pcu_test_area_end
-			testfuncs.each {|e|
-				pcu_test_lines.each {|v|
-					if v =~ /\b#{e}\b/
-						file << v
-					end
-				}
-				if added_testfuncs.include?(e)
-					file << "#{indent}PCU_TEST(#{added_testfuncs[added_testfuncs.index(e)]}),#{nl}"
-				end
-			}
-			pcu_test_area_end = true
-			file << line
-		else
-			file << line
-		end
-		idx += 1
-	}
-	file.close
 end
 
 def register_suite_methods(file_name)
