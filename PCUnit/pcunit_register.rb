@@ -35,6 +35,48 @@ end
 $suite_methods = []
 $main_file = nil
 
+def comment_proc(line, normal_comment_flag, prep_comment_flags)
+	line.sub!(/\/\/.*$/, "")
+	line.gsub!(/\/\*.*?\*\//, "")
+	if line =~ /#\s*if\b/
+		if line =~ /#\s*if\s+0/
+			prep_comment_flags.push(true)
+		else
+			prep_comment_flags.push(false)
+		end
+	elsif line =~ /#\s*else/
+		if prep_comment_flags.empty?
+		elsif prep_comment_flags.last
+			prep_comment_flags.pop
+			prep_comment_flags.push(false)
+		else
+			prep_comment_flags.pop
+			prep_comment_flags.push(true)
+		end
+	elsif line =~ /#\s*endif/
+		if prep_comment_flags.empty?
+		else
+			prep_comment_flags.pop
+		end
+	end
+	if prep_comment_flags.include?(true)
+		line = ""
+	else
+		if line["/*"]
+			line[/\/\*.*/] = ""
+			normal_comment_flag = true
+		elsif normal_comment_flag
+			if line["*/"]
+				line[/.*\*\//] = ""
+				normal_comment_flag = false
+			else
+				line = ""
+			end
+		end
+	end
+	return line, normal_comment_flag
+end
+
 def register_tests(file_name)
 	file = File.open(file_name, "r")
 	lines = []
@@ -44,75 +86,29 @@ def register_tests(file_name)
 	idx = 0
 	pcu_test_area = false
 	prep_comment_flags = Array.new
-	def is_prep_comment(flags)
-		flags.each {|e|
-			if e
-				return true
-			end
-		}
-		return false
-	end
 	normal_comment_flag = false
 	while line = file.gets
-		if pcu_test_area && !(line =~ /\};/)
-			pcu_test_lines.push(String.new(line))
-		else
-			lines.push(String.new(line))
-		end
+		lines.push(String.new(line))
 
-		line.sub!(/\/\/.*$/, "")
-		line.gsub!(/\/\*.*?\*\//, "")
-		if line =~ /#\s*if\b/
-			if line =~ /#\s*if\s+0/
-				prep_comment_flags.push(true)
-			else
-				prep_comment_flags.push(false)
-			end
-		elsif line =~ /#\s*else/
-			if prep_comment_flags.empty?
-			elsif prep_comment_flags.last
-				prep_comment_flags.pop
-				prep_comment_flags.push(false)
-			else
-				prep_comment_flags.pop
-				prep_comment_flags.push(true)
-			end
-		elsif line =~ /#\s*endif/
-			if prep_comment_flags.empty?
-			else
-				prep_comment_flags.pop
-			end
-		end
-		if is_prep_comment(prep_comment_flags)
-			line = ""
-		else
-			if line["/*"]
-				line[/\/\*.*/] = ""
-				normal_comment_flag = true
-			elsif normal_comment_flag
-				if line["*/"]
-					line[/.*\*\//] = ""
-					normal_comment_flag = false
-				else
-					line = ""
-				end
-			end
-		end
+		line, normal_comment_flag = comment_proc(line, normal_comment_flag, prep_comment_flags)
 
 		if line =~ /void\s+(test[^\s]*)\s*\(\s*(void|)\s*\)/
 			testfuncs.push($1)
 		end
-		if pcu_test_area && line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
-			registered_testfuncs.push($2)
+		if pcu_test_area
+			if line =~ /(,|\()\s*(test[^\s"\{\}\(\),]*)/
+				registered_testfuncs.push($2)
+				pcu_test_lines.push(String.new(line))
+				lines.pop
+			elsif line =~ /\};/
+				pcu_test_area = false
+			end
 		end
 		if line =~ /PCU_Test\s+.*\[\]/
 			pcu_test_area = true
 			tmp = line.slice(/^\s*/)
 			indent = tmp == "" ? "\t" : tmp * 2
 			pcu_test_area_idx = idx
-		end
-		if pcu_test_area && line =~ /\};/
-			pcu_test_area = false
 		end
 		if line =~ /PCU_Suite\s*\*\s*([^\s]+)\s*\(\s*(void|)\s*\)\s*[^;]*\s*$/
 			$suite_methods.push($1)
