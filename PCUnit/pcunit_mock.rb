@@ -16,6 +16,12 @@ $include_original_flag = false
 src_dir = ""
 excluded = Array.new
 $function_name = { :init => "init", :verify => "verify", :expect => "expect", :set_callback => "set_callback", :num_calls => "num_calls" }
+$type_int = Array.new
+$type_float = Array.new
+$type_string = Array.new
+$type_wstring = Array.new
+$type_tstring = Array.new
+$type_ptr = Array.new
 
 def usage()
 	print <<-"EOB"
@@ -24,6 +30,12 @@ Usage: pcunit_mock.rb header_file ... [-d DIR] [-e PATTERN] [-s [SRC_DIR]] [-p P
     -e PATTERN     excluded header_file pattern
     -s [SRC_DIR]   you can use functions defined at the original source file in SRC_DIR
     -p PREFIX      prefix of mock file (default: mock_)
+    --type-int TYPE      user-defined integer type
+    --type-float TYPE    user-defined floating point number type
+    --type-string TYPE   user-defined string type
+    --type-wstring TYPE  user-defined wstring type
+    --type-tstring TYPE  user-defined tstring type
+    --type-ptr TYPE      user-defined pointer type
 
 
 	EOB
@@ -38,6 +50,12 @@ opt.on('-s [VAL]') {|v|
 	$include_original_flag = true
 }
 opt.on('-p VAL') {|v| $prefix = v }
+opt.on('--type-int VAL') {|v| $type_int.push v }
+opt.on('--type-float VAL') {|v| $type_float.push v }
+opt.on('--type-string VAL') {|v| $type_string.push v }
+opt.on('--type-wstring VAL') {|v| $type_wstring.push v }
+opt.on('--type-tstring VAL') {|v| $type_tstring.push v }
+opt.on('--type-ptr VAL') {|v| $type_ptr.push v }
 opt.on('-h', '--help') {
 	usage
 	exit
@@ -508,17 +526,17 @@ class MockGen
 						end
 						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls, #{@mock_basename}_ordinal(#{@mock_basename}.#{fd.name}_actual_num_calls))"
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
-						if param[0] =~ /\b((un)?signed\s+)?\b([su]?char|_*[su]?int(8|16|32|64|128)?(_t)?|[su](8|16|32|64|128)|[su]?short|[su]?long|^s?size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/
+						if param[0] =~ /\b((un)?signed\s+)?\b([su]?char|_*[su]?int(8|16|32|64|128)?(_t)?|[su](8|16|32|64|128)|[su]?short|[su]?long|^s?size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/ || $type_int.include?(param[0])
 							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\b(float|double)$/i || param[0] =~ /\bf(32|64)$/i
+						elsif param[0] =~ /\b(float|double)$/i || param[0] =~ /\bf(32|64)$/i || $type_float.include?(param[0])
 							f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
-						elsif param[0] =~ /\bchar\s*\*$/i || param[0] =~ /\bLPC?STR$/
+						elsif param[0] =~ /\bchar\s*\*$/i || param[0] =~ /\bLPC?STR$/ || $type_string.include?(param[0])
 							f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/
+						elsif param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/ || $type_wstring.include?(param[0])
 							f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/
+						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/ || $type_tstring.include?(param[0])
 							f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\*/
+						elsif param[0] =~ /\*/ || $type_ptr.include?(param[0])
 							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /funcptr\d+_t/
 							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
