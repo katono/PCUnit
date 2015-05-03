@@ -508,13 +508,13 @@ class MockGen
 						end
 						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls, #{@mock_basename}_ordinal(#{@mock_basename}.#{fd.name}_actual_num_calls))"
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
-						if param[0] =~ /\b((un)?signed\s+)?\b(u?char|_*u?int(8|16|32|64|128)?(_t)?|u?short|u?long|^size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/
+						if param[0] =~ /\b((un)?signed\s+)?\b([su]?char|_*[su]?int(8|16|32|64|128)?(_t)?|[su](8|16|32|64|128)|[su]?short|[su]?long|^s?size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/
 							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\b(float|double)$/i
+						elsif param[0] =~ /\b(float|double)$/i || param[0] =~ /\bf(32|64)$/i
 							f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
-						elsif param[0] =~ /\bchar\s*\*$/
+						elsif param[0] =~ /\bchar\s*\*$/i || param[0] =~ /\bLPC?STR$/
 							f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
-						elsif param[0] =~ /\bwchar_t\s*\*$/
+						elsif param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/
 							f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/
 							f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
