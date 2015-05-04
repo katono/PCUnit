@@ -499,14 +499,14 @@ class MockGen
 					local_ret = get_local_var_name(fd, "retval_retval", 3)
 					f.puts "	" + fd.ret_type + (fd.ret_type[/ \*+$/] ? "" : " ") + "#{local_ret};"
 				end
-				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
+				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations) {"
 				if fd.ret_type != "void" || !(fd.params.size == 0 || fd.params[0][0] == "void")
 					local_expectation = get_local_var_name(fd, "expectation", 1)
 				end
 				if local_expectation
 					f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
 				end
-				f.puts "		PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "		PCU_ASSERT_OPERATOR_INT_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
 				if local_expectation
 					f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_actual_num_calls;"
 				end
@@ -551,12 +551,13 @@ class MockGen
 				if fd.ret_type != "void"
 					f.puts "		#{local_ret} = #{local_expectation}->retval;"
 				end
-				f.puts "	} else if (#{@mock_basename}.#{fd.name}_funcptr) {"
+				f.puts "	}"
+				f.puts "	if (#{@mock_basename}.#{fd.name}_funcptr) {"
 				if va_list_name != ''
 					f.puts "		va_list #{va_list_name};"
 				end
 				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
-				f.puts "			PCU_ASSERT_OPERATOR_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "			PCU_ASSERT_OPERATOR_INT_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
 				f.puts "		}"
 				if va_list_name != ''
 					f.puts "		va_start(#{va_list_name}, #{prev_param_name});"
@@ -582,7 +583,8 @@ class MockGen
 				if va_list_name != ''
 					f.puts "		va_end(#{va_list_name});"
 				end
-				f.puts "	} else {"
+				f.puts "	}"
+				f.puts "	if (!#{@mock_basename}.#{fd.name}_expectations && !#{@mock_basename}.#{fd.name}_funcptr) {"
 				f.puts "		PCU_FAIL(\"Call #{fd.name}_#{$function_name[:expect]}() or #{fd.name}_#{$function_name[:set_callback]}().\");"
 				f.puts "	}"
 				f.puts "	#{@mock_basename}.#{fd.name}_actual_num_calls++;"
@@ -602,9 +604,11 @@ class MockGen
 				f.puts "void #{fd.name}_#{$function_name[:set_callback]}_aux(#{fd.callback_type} callback, int expected_num_calls, const char *file, unsigned int line)"
 				f.puts "{"
 				f.puts "	#{@mock_basename}.#{fd.name}_funcptr = callback;"
-				f.puts "	#{@mock_basename}.#{fd.name}_expected_num_calls = expected_num_calls;"
-				f.puts "	#{@mock_basename}.#{fd.name}_file = file;"
-				f.puts "	#{@mock_basename}.#{fd.name}_line = line;"
+				f.puts "	if (!#{@mock_basename}.#{fd.name}_expectations) {"
+				f.puts "		#{@mock_basename}.#{fd.name}_expected_num_calls = expected_num_calls;"
+				f.puts "		#{@mock_basename}.#{fd.name}_file = file;"
+				f.puts "		#{@mock_basename}.#{fd.name}_line = line;"
+				f.puts "	}"
 				f.puts "}"
 				f.puts
 				f.puts "int #{fd.name}_#{$function_name[:num_calls]}(void)"
