@@ -436,7 +436,7 @@ class MockGen
 			end
 			f.puts "	}"
 			@func_decl_list.each { |fd|
-				f.puts "	if ((#{@mock_basename}.#{fd.name}_expectations || #{@mock_basename}.#{fd.name}_funcptr) && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
+				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations || (#{@mock_basename}.#{fd.name}_funcptr && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0)) {"
 				f.puts "		PCU_ASSERT_EQUAL_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", file, line));"
 				f.puts "		if (PCU_test_has_failed()) {"
 				if $include_original_flag
