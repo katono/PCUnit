@@ -437,8 +437,8 @@ class MockGen
 			f.puts "	}"
 			@func_decl_list.each { |fd|
 				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations || (#{@mock_basename}.#{fd.name}_funcptr && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0)) {"
-				f.puts "		PCU_ASSERT_EQUAL_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", file, line));"
-				f.puts "		if (PCU_test_has_failed()) {"
+				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls != #{@mock_basename}.#{fd.name}_actual_num_calls) {"
+				f.puts "			PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was %d\", file, line, #{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls));"
 				if $include_original_flag
 					f.puts "			goto end;"
 				else
@@ -452,20 +452,6 @@ class MockGen
 				f.puts "	#{@mock_basename}_#{$function_name[:init]}();"
 			end
 			f.puts "}"
-			f.puts
-			f.puts "static const char *#{@mock_basename}_ordinal(int num)"
-			f.puts '{'
-			f.puts '	switch (num) {'
-			f.puts '	case 1:'
-			f.puts '		return "st";'
-			f.puts '	case 2:'
-			f.puts '		return "nd";'
-			f.puts '	case 3:'
-			f.puts '		return "rd";'
-			f.puts '	default:'
-			f.puts '		return "th";'
-			f.puts '	}'
-			f.puts '}'
 			f.puts
 			f.puts
 			def get_local_var_name(fd, base, idx)
@@ -506,7 +492,9 @@ class MockGen
 				if local_expectation
 					f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
 				end
-				f.puts "		PCU_ASSERT_OPERATOR_INT_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls <= #{@mock_basename}.#{fd.name}_actual_num_calls) {"
+				f.puts "			PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls));"
+				f.puts "		}"
 				if local_expectation
 					f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_actual_num_calls;"
 				end
@@ -524,7 +512,7 @@ class MockGen
 						if va_list_name == ''
 							prev_param_name = param[1]
 						end
-						msg = "PCU_format(\"%s\" LINE_FORMAT \": Check the parameter '#{param[1]}' of #{fd.name}() called for the %d%s time.\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls, #{@mock_basename}_ordinal(#{@mock_basename}.#{fd.name}_actual_num_calls))"
+						msg = "PCU_format(\"%s\" LINE_FORMAT \": call #%d: Parameter '#{param[1]}' of #{fd.name}() is unexpected value\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls + 1)"
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
 						if param[0] =~ /\b((un)?signed\s+)?\b([su]?char|_*[su]?int(8|16|32|64|128)?(_t)?|[su](8|16|32|64|128)|[su]?short|[su]?long|^s?size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/ || $type_int.include?(param[0])
 							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
@@ -557,7 +545,9 @@ class MockGen
 					f.puts "		va_list #{va_list_name};"
 				end
 				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
-				f.puts "			PCU_ASSERT_OPERATOR_INT_MESSAGE(#{@mock_basename}.#{fd.name}_expected_num_calls, >, #{@mock_basename}.#{fd.name}_actual_num_calls, PCU_format(\"%s\" LINE_FORMAT \": Check the number of calls of #{fd.name}().\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line));"
+				f.puts "			if (#{@mock_basename}.#{fd.name}_expected_num_calls <= #{@mock_basename}.#{fd.name}_actual_num_calls) {"
+				f.puts "				PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls));"
+				f.puts "			}"
 				f.puts "		}"
 				if va_list_name != ''
 					f.puts "		va_start(#{va_list_name}, #{prev_param_name});"
