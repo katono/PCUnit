@@ -23,6 +23,7 @@ $type_wstring = Array.new
 $type_tstring = Array.new
 $type_ptr = Array.new
 $additional_include_files = Array.new
+$others = false
 
 def usage()
 	print <<-"EOB"
@@ -31,6 +32,7 @@ Usage: pcunit_mock.rb header_file ... [OPTIONS]
     -e PATTERN     excluded header_file pattern
     -s [SRC_DIR]   you can use functions defined at the original source file in SRC_DIR
     -p PREFIX      prefix of mock file (default: mock_)
+    --others       you can use a created mock with other testing frameworks like CppUTest, GoogleTest, Unity, etc
     --include FILE       additional include file
     --type-int TYPE      user-defined integer type
     --type-float TYPE    user-defined floating point number type
@@ -59,6 +61,7 @@ opt.on('--type-wstring VAL') {|v| $type_wstring.push v }
 opt.on('--type-tstring VAL') {|v| $type_tstring.push v }
 opt.on('--type-ptr VAL') {|v| $type_ptr.push v }
 opt.on('--include VAL') {|v| $additional_include_files.push v }
+opt.on('--others') { $others = true }
 opt.on('-h', '--help') {
 	usage
 	exit
@@ -349,7 +352,34 @@ class MockGen
 	def create_src(src_file)
 		File.open($output_dir + @mock_basename + ".c", "w") { |f|
 			f.puts "#include \"#{@mock_basename}.h\""
-			f.puts "#include \"PCUnit/PCUnit.h\""
+			if $others
+				f.puts "#include <stdio.h>"
+				f.puts "#include <string.h>"
+				use_wchar_h = false
+				use_tchar_h = false
+				@func_decl_list.each { |fd|
+					fd.params.each { |param|
+						if param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/ || $type_wstring.include?(param[0])
+							use_wchar_h = true
+						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/ || $type_tstring.include?(param[0])
+							use_tchar_h = true
+						end
+					}
+				}
+				if use_wchar_h
+					f.puts "#include <wchar.h>"
+				end
+				if use_tchar_h
+					f.puts "#include <tchar.h>"
+				end
+				if $include_original_flag
+					f.puts "#include <stddef.h>"
+				end
+				f.puts
+				f.puts "void PCU_mock_fail(const char *msg);"
+			else
+				f.puts "#include \"PCUnit/PCUnit.h\""
+			end
 			f.puts
 			if $include_original_flag
 				f.puts "#if " + ($include_original_flag ? "1" : "0")
@@ -393,6 +423,10 @@ class MockGen
 			@func_decl_list.each { |fd|
 				f.puts "	unsigned int #{fd.name}_line;"
 			}
+			if $others
+				f.puts "	int failed;"
+				f.puts "	char msg[1024];"
+			end
 			f.puts "};"
 			if $include_original_flag
 				f.puts "#ifdef #{@mock_basename.upcase}_INCLUDE_ORIGINAL"
@@ -413,11 +447,20 @@ class MockGen
 			f.puts
 			f.puts "void #{@mock_basename}_#{$function_name[:init]}(void)"
 			f.puts "{"
-			f.puts "	char *p = (char *) &#{@mock_basename};"
-			f.puts "	size_t i;"
-			f.puts "	for (i = 0; i < sizeof #{@mock_basename}; i++) {"
-			f.puts "		*(p++) = 0;"
-			f.puts "	}"
+			if $others
+				if $include_original_flag
+					size = "offsetof(struct #{@mock_basename}_t, msg)"
+				else
+					size = "sizeof #{@mock_basename}"
+				end
+				f.puts "	memset(&#{@mock_basename}, 0, #{size});"
+			else
+				f.puts "	char *p = (char *) &#{@mock_basename};"
+				f.puts "	size_t i;"
+				f.puts "	for (i = 0; i < sizeof #{@mock_basename}; i++) {"
+				f.puts "		*(p++) = 0;"
+				f.puts "	}"
+			end
 			if $include_original_flag
 				f.puts "#ifdef #{@mock_basename.upcase}_INCLUDE_ORIGINAL"
 				@func_decl_list.each { |fd|
@@ -430,6 +473,14 @@ class MockGen
 			end
 			f.puts "}"
 			f.puts
+			if $others
+				f.puts "static void #{@mock_basename}_fail(const char *msg)"
+				f.puts '{'
+				f.puts "	#{@mock_basename}.failed = 1;"
+				f.puts "	PCU_mock_fail(msg);"
+				f.puts '}'
+				f.puts
+			end
 			f.puts "#ifdef _MSC_VER"
 			f.puts '#define LINE_FORMAT	"(%u) "'
 			f.puts "#else"
@@ -438,29 +489,36 @@ class MockGen
 			f.puts
 			f.puts "void #{@mock_basename}_#{$function_name[:verify]}_aux(const char *file, unsigned int line)"
 			f.puts "{"
-			f.puts "	if (PCU_test_has_failed()) {"
-			if $include_original_flag
-				f.puts "		goto end;"
+			if $others
+				f.puts "	if (#{@mock_basename}.failed) {"
 			else
-				f.puts "		return;"
+				f.puts "	if (PCU_test_has_failed()) {"
 			end
+			if $include_original_flag
+				f.puts "		#{@mock_basename}_#{$function_name[:init]}();"
+			end
+			f.puts "		return;"
 			f.puts "	}"
 			@func_decl_list.each { |fd|
 				f.puts "	if (#{@mock_basename}.#{fd.name}_expectations || (#{@mock_basename}.#{fd.name}_funcptr && #{@mock_basename}.#{fd.name}_expected_num_calls >= 0)) {"
 				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls != #{@mock_basename}.#{fd.name}_actual_num_calls) {"
-				f.puts "			PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was %d\", file, line, #{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls));"
-				if $include_original_flag
-					f.puts "			goto end;"
+				printf_args = "\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was %d\", file, line, #{@mock_basename}.#{fd.name}_expected_num_calls, #{@mock_basename}.#{fd.name}_actual_num_calls"
+				if $others
+					f.puts "			sprintf(#{@mock_basename}.msg, #{printf_args});"
+					if $include_original_flag
+						f.puts "			#{@mock_basename}_#{$function_name[:init]}();"
+					end
+					f.puts "			PCU_mock_fail(#{@mock_basename}.msg);"
 				else
-					f.puts "			return;"
+					f.puts "			PCU_FAIL(PCU_format(#{printf_args}));"
+					if $include_original_flag
+						f.puts "			#{@mock_basename}_#{$function_name[:init]}();"
+					end
 				end
+				f.puts "			return;"
 				f.puts "		}"
 				f.puts "	}"
 			}
-			if $include_original_flag
-				f.puts "end:"
-				f.puts "	#{@mock_basename}_#{$function_name[:init]}();"
-			end
 			f.puts "}"
 			f.puts
 			f.puts
@@ -501,9 +559,19 @@ class MockGen
 				end
 				if local_expectation
 					f.puts "		const #{fd.name}_Expectation *#{local_expectation};"
+					if $others
+						local_offset = get_local_var_name(fd, "offset_offset", 6)
+						f.puts "		int #{local_offset} = 0;"
+					end
 				end
 				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls <= #{@mock_basename}.#{fd.name}_actual_num_calls) {"
-				f.puts "			PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls));"
+				printf_args = "\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls"
+				if $others
+					f.puts "			sprintf(#{@mock_basename}.msg, #{printf_args});"
+					f.puts "			#{@mock_basename}_fail(#{@mock_basename}.msg);"
+				else
+					f.puts "			PCU_FAIL(PCU_format(#{printf_args}));"
+				end
 				f.puts "		}"
 				if local_expectation
 					f.puts "		#{local_expectation} = #{@mock_basename}.#{fd.name}_expectations + #{@mock_basename}.#{fd.name}_actual_num_calls;"
@@ -522,26 +590,114 @@ class MockGen
 						if va_list_name == ''
 							prev_param_name = param[1]
 						end
-						msg = "PCU_format(\"%s\" LINE_FORMAT \": call #%d: Parameter '#{param[1]}' of #{fd.name}() is unexpected value\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls + 1)"
+						printf_args = "\"%s\" LINE_FORMAT \": call #%d: Parameter '#{param[1]}' of #{fd.name}() is unexpected value\\n\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_actual_num_calls + 1"
+						if $others
+							puts_param = Proc.new { |format, expected, actual|
+								f.puts "				#{local_offset} = sprintf(#{@mock_basename}.msg, #{printf_args});"
+								f.puts "				#{local_offset} += sprintf(#{@mock_basename}.msg + #{local_offset}, \"  expected : #{format}\\n\", #{expected});"
+								f.puts "				#{local_offset} += sprintf(#{@mock_basename}.msg + #{local_offset}, \"  actual   : #{format}\\n\", #{actual});"
+								f.puts "				#{@mock_basename}_fail(#{@mock_basename}.msg);"
+							}
+						else
+							printf_args.sub!("\\n", "")
+							msg = "PCU_format(#{printf_args})"
+						end
 						f.puts "		if (!#{local_expectation}->ignored.#{param[1]}) {"
 						if param[0] =~ /\b((un)?signed\s+)?\b([su]?char|_*[su]?int(8|16|32|64|128)?(_t)?|[su](8|16|32|64|128)|[su]?short|[su]?long|^s?size_t|^ptrdiff_t|^bool|^byte|^word|^dword)$/i || param[0] =~ /\b(un)?signed$/ || param[0] =~ /enum\s+\w+$/ || $type_int.include?(param[0])
-							f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (#{local_expectation}->expected.#{param[1]} != #{param[1]}) {"
+								puts_param.call("0x%x (%d)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /\b(float|double)$/i || param[0] =~ /\bf(32|64)$/i || $type_float.include?(param[0])
-							f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
+							if $others
+								f.puts "			if (#{local_expectation}->expected.#{param[1]} != #{param[1]}) {"
+								puts_param.call("%g", "#{local_expectation}->expected.#{param[1]}", "#{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_DOUBLE_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, 0, #{msg});"
+							end
 						elsif param[0] =~ /\bchar\s*\*$/i || param[0] =~ /\bLPC?STR$/ || $type_string.include?(param[0])
-							f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (strcmp((const char *) #{local_expectation}->expected.#{param[1]}, (const char *) #{param[1]})) {"
+								puts_param.call("\\\"%s\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/ || $type_wstring.include?(param[0])
-							f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (wcscmp(#{local_expectation}->expected.#{param[1]}, #{param[1]})) {"
+								puts_param.call("\\\"%ls\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/ || $type_tstring.include?(param[0])
-							f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (_tcscmp(#{local_expectation}->expected.#{param[1]}, #{param[1]})) {"
+								puts_param.call("\\\"%s\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /\*/ || $type_ptr.include?(param[0])
-							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (#{local_expectation}->expected.#{param[1]} != #{param[1]}) {"
+								puts_param.call("%p", "#{local_expectation}->expected.#{param[1]}", "#{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /funcptr\d+_t/
-							f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							if $others
+								f.puts "			if (#{local_expectation}->expected.#{param[1]} != #{param[1]}) {"
+								puts_param.call("%p", "#{local_expectation}->expected.#{param[1]}", "#{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_PTR_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
+							end
 						elsif param[0] =~ /array\d+_t/
-							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							if $others
+								f.puts "			if (memcmp(#{local_expectation}->expected.#{param[1]}, #{param[1]}, sizeof(#{local_expectation}->expected.#{param[1]}))) {"
+								puts_param.call("%p", "#{local_expectation}->expected.#{param[1]}", "#{param[1]}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							end
 						else
-							f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(&#{local_expectation}->expected.#{param[1]}, &#{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							if $others
+								f.puts "			if (memcmp(&#{local_expectation}->expected.#{param[1]}, &#{param[1]}, sizeof(#{local_expectation}->expected.#{param[1]}))) {"
+								i = get_local_var_name(fd, "iiiii", 1)
+								exp_p = get_local_var_name(fd, "exp_p_exp_p", 5)
+								act_p = get_local_var_name(fd, "act_p_act_p", 5)
+								exp_offset = get_local_var_name(fd, "exp_offset_exp_offset", 10)
+								act_offset = get_local_var_name(fd, "act_offset_act_offset", 10)
+								exp_buf = get_local_var_name(fd, "exp_buf_exp_buf", 7)
+								act_buf = get_local_var_name(fd, "act_buf_act_buf", 7)
+								max_num = 32
+								f.puts "				const unsigned char *#{exp_p} = (const unsigned char *) &#{local_expectation}->expected.#{param[1]};"
+								f.puts "				const unsigned char *#{act_p} = (const unsigned char *) &#{param[1]};"
+								f.puts "				int #{exp_offset} = 0;"
+								f.puts "				int #{act_offset} = 0;"
+								f.puts "				char #{exp_buf}[3 * #{(max_num+1).to_s} + 1];"
+								f.puts "				char #{act_buf}[3 * #{(max_num+1).to_s} + 1];"
+								f.puts "				int #{i};"
+								f.puts "				for (#{i} = 0; #{i} < sizeof #{local_expectation}->expected.#{param[1]} && #{i} < #{max_num.to_s}; #{i}++) {"
+								f.puts "					#{exp_offset} += sprintf(#{exp_buf} + #{exp_offset}, \"%02x \", #{exp_p}[#{i}]);"
+								f.puts "					#{act_offset} += sprintf(#{act_buf} + #{act_offset}, \"%02x \", #{act_p}[#{i}]);"
+								f.puts "				}"
+								f.puts "				if (sizeof #{local_expectation}->expected.#{param[1]} > #{max_num.to_s}) {"
+								f.puts "					#{exp_offset} += sprintf(#{exp_buf} + #{exp_offset}, \"...\");"
+								f.puts "					#{act_offset} += sprintf(#{act_buf} + #{act_offset}, \"...\");"
+								f.puts "				}"
+								puts_param.call("%s", "#{exp_buf}", "#{act_buf}")
+								f.puts "			}"
+							else
+								f.puts "			PCU_ASSERT_MEMORY_EQUAL_MESSAGE(&#{local_expectation}->expected.#{param[1]}, &#{param[1]}, sizeof(#{param[1]}), 1, #{msg});"
+							end
 						end
 						f.puts "		}"
 					}
@@ -556,7 +712,13 @@ class MockGen
 				end
 				f.puts "		if (#{@mock_basename}.#{fd.name}_expected_num_calls >= 0) {"
 				f.puts "			if (#{@mock_basename}.#{fd.name}_expected_num_calls <= #{@mock_basename}.#{fd.name}_actual_num_calls) {"
-				f.puts "				PCU_FAIL(PCU_format(\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls));"
+				printf_args = "\"%s\" LINE_FORMAT \": Expected %d calls of #{fd.name}(), but was more\", #{@mock_basename}.#{fd.name}_file, #{@mock_basename}.#{fd.name}_line, #{@mock_basename}.#{fd.name}_expected_num_calls"
+				if $others
+					f.puts "				sprintf(#{@mock_basename}.msg, #{printf_args});"
+					f.puts "				#{@mock_basename}_fail(#{@mock_basename}.msg);"
+				else
+					f.puts "				PCU_FAIL(PCU_format(#{printf_args}));"
+				end
 				f.puts "			}"
 				f.puts "		}"
 				if va_list_name != ''
@@ -585,7 +747,12 @@ class MockGen
 				end
 				f.puts "	}"
 				f.puts "	if (!#{@mock_basename}.#{fd.name}_expectations && !#{@mock_basename}.#{fd.name}_funcptr) {"
-				f.puts "		PCU_FAIL(\"Call #{fd.name}_#{$function_name[:expect]}() or #{fd.name}_#{$function_name[:set_callback]}().\");"
+				printf_args = "\"Call #{fd.name}_#{$function_name[:expect]}() or #{fd.name}_#{$function_name[:set_callback]}()\""
+				if $others
+					f.puts "		#{@mock_basename}_fail(#{printf_args});"
+				else
+					f.puts "		PCU_FAIL(#{printf_args});"
+				end
 				f.puts "	}"
 				f.puts "	#{@mock_basename}.#{fd.name}_actual_num_calls++;"
 				if fd.ret_type != "void"
