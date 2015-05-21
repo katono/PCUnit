@@ -22,14 +22,16 @@ $type_string = Array.new
 $type_wstring = Array.new
 $type_tstring = Array.new
 $type_ptr = Array.new
+$additional_include_files = Array.new
 
 def usage()
 	print <<-"EOB"
-Usage: pcunit_mock.rb header_file ... [-d DIR] [-e PATTERN] [-s [SRC_DIR]] [-p PREFIX]
+Usage: pcunit_mock.rb header_file ... [OPTIONS]
     -d DIR         output directory
     -e PATTERN     excluded header_file pattern
     -s [SRC_DIR]   you can use functions defined at the original source file in SRC_DIR
     -p PREFIX      prefix of mock file (default: mock_)
+    --include FILE       additional include file
     --type-int TYPE      user-defined integer type
     --type-float TYPE    user-defined floating point number type
     --type-string TYPE   user-defined string type
@@ -56,6 +58,7 @@ opt.on('--type-string VAL') {|v| $type_string.push v }
 opt.on('--type-wstring VAL') {|v| $type_wstring.push v }
 opt.on('--type-tstring VAL') {|v| $type_tstring.push v }
 opt.on('--type-ptr VAL') {|v| $type_ptr.push v }
+opt.on('--include VAL') {|v| $additional_include_files.push v }
 opt.on('-h', '--help') {
 	usage
 	exit
@@ -276,6 +279,13 @@ class MockGen
 			f.puts "#ifndef #{included}"
 			f.puts "#define #{included}"
 			f.puts
+			$additional_include_files.each { |v|
+				if v =~ /<.*>/
+					f.puts '#include ' + v
+				else
+					f.puts '#include "' + v + '"'
+				end
+			}
 			header_path = Pathname.new(@header_file).expand_path
 			f.puts '#include "' + header_path.relative_path_from(Pathname.new($output_dir).expand_path).to_s + '"'
 			if @include_stdarg
