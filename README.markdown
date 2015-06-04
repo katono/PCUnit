@@ -824,7 +824,7 @@ setup関数・テスト関数等の雛形が定義されています。
 `pcunit_mock.rb`はモックのソースファイルを生成するRubyスクリプトです。
 書式は次の通りです。
 
-    pcunit_mock.rb header_file ... [-d DIR] [-e PATTERN] [-s [SRC_DIR]] [-p PREFIX]
+    pcunit_mock.rb header_file ... [OPTIONS]
 
 `header_file`に指定したヘッダファイルでプロトタイプ宣言されているグローバル関数のモックのソースファイルを生成します。
 `header_file`は複数指定またはワイルドカードが使用できます。
@@ -850,6 +850,52 @@ setup関数・テスト関数等の雛形が定義されています。
 
     `PREFIX`にファイルを生成するモックのソースファイルのプレフィックスを指定してください。
     このオプションを省略した場合、`mock_`を指定したと見なします。
+
+* `--include FILE`
+
+    生成するモックに、`FILE`で指定したファイルのインクルードを追加します。
+    このオプションは複数指定できます。
+
+* `--type-int TYPE` / `--type-float TYPE` / `--type-string TYPE` / `--type-wstring TYPE` / `--type-tstring TYPE` / `--type-ptr TYPE`
+
+    これらのオプションは、それぞれ`TYPE`にユーザー定義の整数型、浮動小数点数型、文字列型、ワイド文字列型、TCHARの文字列型、ポインタ型を指定します。
+    プロトタイプ宣言の引数の型が、整数型等のtypedefの場合に使用してください。
+    これらのオプションは複数指定できます。
+
+* `--others`
+
+    生成するモックのソースファイルを、PCUnit以外のユニットテストフレームワークで使用できるようになります。
+    このオプションを使う場合は、テストコードのどこか1箇所で`void PCU_mock_fail(const char *msg)`関数を定義する必要があります。
+    `PCU_mock_fail()`関数では、メッセージを表示してテストを失敗するマクロ(`PCU_FAIL`に相当)を呼んでください。
+    また、C++のテストコードでモックを使う場合は、モックのヘッダファイルのインクルードと`PCU_mock_fail()`の定義を`extern "C" {}`で囲んでください。
+
+    例: CppUTestの場合
+
+        extern "C" {
+            #include "mock_Foo.h"
+            void PCU_mock_fail(const char *msg)
+            {
+                FAIL(msg);
+            }
+        }
+
+    例: GoogleTestの場合
+
+        extern "C" {
+            #include "mock_Foo.h"
+            void PCU_mock_fail(const char *msg)
+            {
+                FAIL() << msg;
+            }
+        }
+
+    例: Unityの場合
+
+        void PCU_mock_fail(const char *msg)
+        {
+            TEST_FAIL_MESSAGE(msg);
+        }
+
 
 #### モックのAPI
 
