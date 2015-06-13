@@ -351,6 +351,11 @@ class MockGen
 	end
 	def create_src(src_file)
 		File.open($output_dir + @mock_basename + ".c", "w") { |f|
+			if $others
+				f.puts "#ifdef _WIN32"
+				f.puts "#define _CRT_SECURE_NO_WARNINGS"
+				f.puts "#endif"
+			end
 			f.puts "#include \"#{@mock_basename}.h\""
 			if $others
 				f.puts "#include <stdio.h>"
