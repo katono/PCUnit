@@ -621,24 +621,64 @@ class MockGen
 							end
 						elsif param[0] =~ /\bchar\s*\*$/i || param[0] =~ /\bLPC?STR$/ || $type_string.include?(param[0])
 							if $others
-								f.puts "			if (strcmp((const char *) #{local_expectation}->expected.#{param[1]}, (const char *) #{param[1]})) {"
-								puts_param.call("\\\"%s\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			if ((#{local_expectation}->expected.#{param[1]} != #{param[1]}) && (!#{local_expectation}->expected.#{param[1]} || !#{param[1]} || strcmp((const char *) #{local_expectation}->expected.#{param[1]}, (const char *) #{param[1]}))) {"
+								exp_p = get_local_var_name(fd, "exp_p_exp_p", 5)
+								act_p = get_local_var_name(fd, "act_p_act_p", 5)
+								exp_q = get_local_var_name(fd, "exp_q_exp_q", 5)
+								act_q = get_local_var_name(fd, "act_q_act_q", 5)
+								f.puts "				const char *#{exp_p} = #{local_expectation}->expected.#{param[1]} ? #{local_expectation}->expected.#{param[1]} : \"NULL\";"
+								f.puts "				const char *#{act_p} = #{param[1]} ? #{param[1]} : \"NULL\";"
+								f.puts "				const char *#{exp_q} = #{local_expectation}->expected.#{param[1]} ? \"\\\"\" : \"\";"
+								f.puts "				const char *#{act_q} = #{param[1]} ? \"\\\"\" : \"\";"
+								puts_param.call("%s%s%s (%p)", "#{exp_q}, #{exp_p}, #{exp_q}, #{local_expectation}->expected.#{param[1]}", "#{act_q}, #{act_p}, #{act_q}, #{param[1]}")
 								f.puts "			}"
 							else
 								f.puts "			PCU_ASSERT_STRING_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 							end
 						elsif param[0] =~ /\bwchar(_t)?\s*\*$/i || param[0] =~ /\bLPC?WSTR$/ || $type_wstring.include?(param[0])
 							if $others
-								f.puts "			if (wcscmp(#{local_expectation}->expected.#{param[1]}, #{param[1]})) {"
-								puts_param.call("\\\"%ls\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			if ((#{local_expectation}->expected.#{param[1]} != #{param[1]}) && (!#{local_expectation}->expected.#{param[1]} || !#{param[1]} || wcscmp((const wchar_t *) #{local_expectation}->expected.#{param[1]}, (const wchar_t *) #{param[1]}))) {"
+								exp_p = get_local_var_name(fd, "exp_p_exp_p", 5)
+								act_p = get_local_var_name(fd, "act_p_act_p", 5)
+								exp_q1 = get_local_var_name(fd, "exp_q1_exp_q1", 6)
+								act_q1 = get_local_var_name(fd, "act_q1_act_q1", 6)
+								exp_q2 = get_local_var_name(fd, "exp_q2_exp_q2", 6)
+								act_q2 = get_local_var_name(fd, "act_q2_act_q2", 6)
+								f.puts "				const wchar_t *#{exp_p} = #{local_expectation}->expected.#{param[1]} ? #{local_expectation}->expected.#{param[1]} : L\"NULL\";"
+								f.puts "				const wchar_t *#{act_p} = #{param[1]} ? #{param[1]} : L\"NULL\";"
+								f.puts "				const char *#{exp_q1} = #{local_expectation}->expected.#{param[1]} ? \"L\\\"\" : \"\";"
+								f.puts "				const char *#{act_q1} = #{param[1]} ? \"L\\\"\" : \"\";"
+								f.puts "				const char *#{exp_q2} = #{local_expectation}->expected.#{param[1]} ? \"\\\"\" : \"\";"
+								f.puts "				const char *#{act_q2} = #{param[1]} ? \"\\\"\" : \"\";"
+								puts_param.call("%s%ls%s (%p)", "#{exp_q1}, #{exp_p}, #{exp_q2}, #{local_expectation}->expected.#{param[1]}", "#{act_q1}, #{act_p}, #{act_q2}, #{param[1]}")
 								f.puts "			}"
 							else
 								f.puts "			PCU_ASSERT_STRINGW_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
 							end
 						elsif param[0] =~ /\b(TCHAR\s*\*|LPC?TSTR)$/ || $type_tstring.include?(param[0])
 							if $others
-								f.puts "			if (_tcscmp(#{local_expectation}->expected.#{param[1]}, #{param[1]})) {"
-								puts_param.call("\\\"%s\\\" (%p)", "#{local_expectation}->expected.#{param[1]}, #{local_expectation}->expected.#{param[1]}", "#{param[1]}, #{param[1]}")
+								f.puts "			if ((#{local_expectation}->expected.#{param[1]} != #{param[1]}) && (!#{local_expectation}->expected.#{param[1]} || !#{param[1]} || _tcscmp((const TCHAR *) #{local_expectation}->expected.#{param[1]}, (const TCHAR *) #{param[1]}))) {"
+								exp_p = get_local_var_name(fd, "exp_p_exp_p", 5)
+								act_p = get_local_var_name(fd, "act_p_act_p", 5)
+								exp_q1 = get_local_var_name(fd, "exp_q1_exp_q1", 6)
+								act_q1 = get_local_var_name(fd, "act_q1_act_q1", 6)
+								exp_q2 = get_local_var_name(fd, "exp_q2_exp_q2", 6)
+								act_q2 = get_local_var_name(fd, "act_q2_act_q2", 6)
+								f.puts "				const TCHAR *#{exp_p} = #{local_expectation}->expected.#{param[1]} ? #{local_expectation}->expected.#{param[1]} : _T(\"NULL\");"
+								f.puts "				const TCHAR *#{act_p} = #{param[1]} ? #{param[1]} : _T(\"NULL\");"
+								f.puts "#if defined(_UNICODE) || defined(UNICODE)"
+								f.puts "				const char *#{exp_q1} = #{local_expectation}->expected.#{param[1]} ? \"L\\\"\" : \"\";"
+								f.puts "				const char *#{act_q1} = #{param[1]} ? \"L\\\"\" : \"\";"
+								f.puts "#define TSTRING_FORMAT	\"%ls\""
+								f.puts "#else"
+								f.puts "				const char *#{exp_q1} = #{local_expectation}->expected.#{param[1]} ? \"\\\"\" : \"\";"
+								f.puts "				const char *#{act_q1} = #{param[1]} ? \"\\\"\" : \"\";"
+								f.puts "#define TSTRING_FORMAT	\"%s\""
+								f.puts "#endif"
+								f.puts "				const char *#{exp_q2} = #{local_expectation}->expected.#{param[1]} ? \"\\\"\" : \"\";"
+								f.puts "				const char *#{act_q2} = #{param[1]} ? \"\\\"\" : \"\";"
+								puts_param.call("%s\" TSTRING_FORMAT \"%s (%p)", "#{exp_q1}, #{exp_p}, #{exp_q2}, #{local_expectation}->expected.#{param[1]}", "#{act_q1}, #{act_p}, #{act_q2}, #{param[1]}")
+								f.puts "#undef TSTRING_FORMAT"
 								f.puts "			}"
 							else
 								f.puts "			PCU_ASSERT_STRINGT_EQUAL_MESSAGE(#{local_expectation}->expected.#{param[1]}, #{param[1]}, #{msg});"
