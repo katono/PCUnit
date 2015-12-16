@@ -750,8 +750,32 @@ class MockGen
 				if fd.ret_type != "void"
 					f.puts "		#{local_ret} = #{local_expectation}->retval;"
 				end
+				f.puts "		if (#{@mock_basename}.#{fd.name}_funcptr) {"
+				if va_list_name != ''
+					f.puts "			va_list #{va_list_name};"
+				end
+				if va_list_name != ''
+					f.puts "			va_start(#{va_list_name}, #{prev_param_name});"
+				end
+				s = "			#{@mock_basename}.#{fd.name}_funcptr("
+				fd.params.each { |param|
+					if !param[1].empty?
+						s += param[1]
+						s += ", "
+					end
+				}
+				if va_list_name != ''
+					s += va_list_name
+				end
+				s.sub!(/, $/, '')
+				s += ");"
+				f.puts s
+				if va_list_name != ''
+					f.puts "			va_end(#{va_list_name});"
+				end
+				f.puts "		}"
 				f.puts "	}"
-				f.puts "	if (#{@mock_basename}.#{fd.name}_funcptr) {"
+				f.puts "	else if (#{@mock_basename}.#{fd.name}_funcptr) {"
 				if va_list_name != ''
 					f.puts "		va_list #{va_list_name};"
 				end
